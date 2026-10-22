@@ -1,0 +1,21 @@
+{
+  "config": {
+    "block_M": 128,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128,
+    "swizzle": 16
+  },
+  "development_only": true,
+  "numeric": {
+    "status": "error",
+    "passed": false,
+    "error_type": "InternalError",
+    "reason": "Check failed: (dtype == DataType::Float(16) || dtype == DataType::Float(32) || dtype == DataType::BFloat(16)) is false: Only float16, float32, and bfloat16 are supported, but got float32x4",
+    "checked_target": "metal",
+    "cuda_binary_executed": false,
+    "config_sha256": "9811cd3eb25a6a0bf6b1095057f5c984aadfa34a1fdda8bedd983ac30a70f6cb",
+    "elapsed_ms": 3579
+  }
+}

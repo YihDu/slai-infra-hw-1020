@@ -1,0 +1,42 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 1.0,
+    "pipeline": 1.5,
+    "footprint": 0.5
+  },
+  "rationale": "Third-round plan for M=32,N=4096,K=4096. Both prior attempts passed numerics/compile; attempt-01 (16x64x64,2 stages,256 threads,swizzle 4) improved simulated latency to 176.4 us vs 195.8 us, but simulated DRAM stayed ~33.8 MB, so the panel-reuse hypothesis produced no measured locality gain and swizzles remain largely launch-equivalent with only 1-2 tile rows (ceil(32/16)=2, ceil(32/32)=1). block_M stays [16,32] since larger tiles waste M rows; block_N spans 64..256; block_K [32,64,128]. Threads narrowed to [128] to isolate the thread-count hypothesis the proxy ties: attempt-00 and attempt-01 both used 256, so 128 is an untested branch per the guidance to change thread or block_K domain early. Stages restricted to [2,3,4] as stage 1 rarely helps a K=4096 pipeline. Weights adjusted from equal to emphasize pipeline (1.5) since accumulated DRAM was flat and latency is likely pipeline/occupancy-bound, and de-emphasize footprint (0.5) since smem usage is well under cap; traffic/launches kept at 1.0. Shared estimate max(2*block_K*(block_M+block_N)*stages, 4*block_M*block_N) under the 32768 cap and portability limit. Next hypothesis: with 128 threads, deeper stages and possibly block_N=128/256 may lower simulated latency; if 128 threads regresses, revert to 256. GB10 values are simulator estimates, not hardware measurements; Metal checks validate exact source/TIR but do not execute the CUDA binary."
+}

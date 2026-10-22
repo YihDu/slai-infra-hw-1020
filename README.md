@@ -1,5 +1,12 @@
 # Agent + HiGHS + TileLang optimizer for GB10
 
+Development continues after the frozen v2 submission candidate. The existing ZIP,
+`report.md`, and `setup/acceptance.json` describe v2; no course upload has been made.
+The expanded 12-round exploration is saved separately in `results/exploration-v3/`.
+Its `comparison.json` compares against the **previous best**, not just a new initial
+candidate. `best-known.json` indexes the retained best complete runs and final acceptance.
+Per-run source snapshots preserve the version actually evaluated.
+
 This workspace runs a real DeepSeek/API formulation agent, HiGHS MIP selection,
 TileLang numerical checks, GB10 cross-compilation and the supplied timing simulator.
 The supported development environment is **Apple Silicon macOS with Metal**, plus
@@ -65,7 +72,7 @@ All three adapters have fixture tests; real public-case runs use DeepSeek.
 Optional `max_tokens_field`, `trust_env` and `thinking` extensions are documented by
 `configs/deepseek.json`. Model responses and provider usage are saved without headers.
 
-Output must be new or empty. Eight rounds are attempted by default, bounded by 1200
+Output must be new or empty. Twelve rounds are attempted by default, bounded by 1200
 seconds. `--rounds N` and `--budget-seconds S` are available for experiments.
 Disk TileLang/autotuning caches are explicitly disabled, and cleanup time is reserved
 within the workload deadline. The timed entry point never installs dependencies or retrieves external knowledge;
@@ -76,9 +83,11 @@ or `no_valid_result`, and nonzero for an execution error without a retained resu
 
 The current family implements `C = A @ B`: rank-2 FP16 inputs/output, FP32 accumulation.
 It reads tensor sizes and tolerance from the workload, not the case ID. Tile domains
-are M={32,64,128}, N={64,128}, K={32,64}, stages={1,2,3}, threads={128}, serpentine row-panel swizzle={0,4,8,16}.
+are M={16,32,64,128}, N={32,64,128,256}, K={32,64,128}, stages={1,2,3,4}, threads={64,128,256}, serpentine row-panel swizzle={0,4,8,16,32,64}.
 The first Agent plan uses conventional row-major swizzle=0 as the comparison baseline.
-Subsequent plans search tile/stage/swizzle choices. Only divisible tuples are searched; workloads with no supported tuple are recorded
+The prompt establishes a core-domain row-major baseline, then explores core-domain
+locality before opening the expanded tile/stage/thread/swizzle choices. Launch-equivalent swizzles
+are deduplicated, and the bounds proof uses constant-divisor complete/tail panels. Only divisible tuples are searched; workloads with no supported tuple are recorded
 as no valid result, without pretending to support arbitrary operators.
 Case-side reference/baseline/README files are resolved relative to workload.json and
 retained; this family replaces any supplied starting implementation and uses its

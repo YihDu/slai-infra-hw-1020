@@ -1,0 +1,37 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      256
+    ],
+    "swizzle": [
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 0.5,
+    "pipeline": 1.25,
+    "footprint": 1.5
+  },
+  "rationale": "Best observed remains attempt-01 (232.89us): block_M=64, block_N=128, block_K=32, stage=2, threads=256, swizzle=8. Attempt-03 (block_M=32, block_N=256, stage=1, swizzle=64) regressed to 440.81us; attempt-04 (same good region but swizzle=16) regressed slightly to 244.33us. Lesson: narrow-M/wide-N with stage=1 and very large panels hurt, and swizzle=16 did not beat swizzle=8. Revision: drop block_M=32 and block_N=256 (both implicated in the attempt-03 regression and narrow-M high-launch regime); keep block_M {64,128} and block_N {64,128} around the known-good region. Require stage>=2 to avoid the stage=1 under-pipelining seen in attempts 00/03; retain stage 4 for exploration. Keep block_K {32,64} where 32 is the proven winner; 128 was never usefully exercised and would inflate footprint. Threads fixed to {256} since 128/64 never produced a win and 256 is confirmed with the best config. Swizzle narrowed to {4,8,16} to keep testing panel locality near swizzle=8 without the cache-exceeding 32/64. Weights unchanged from attempt-04 (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at the 32KB cap and deeper K-pipelining has helped, launches are already sufficient at 2048 square. Validation scope: Metal executes exact source/TIR numerically; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and the proxy cost is only a dimensionless ranking. Next hypothesis: block_M in {64,128} with block_N in {64,128}, block_K=32, stage=2, threads=256, and swizzle in {4,8} should reconfirm near 232.89us; if a 128x128 or 128x64 tile with stage 2-3 and swizzle 4/8 beats it, wider-M tiling helps occupancy; otherwise retain the attempt-01 configuration as the working optimum. No claim of global optimality."
+}

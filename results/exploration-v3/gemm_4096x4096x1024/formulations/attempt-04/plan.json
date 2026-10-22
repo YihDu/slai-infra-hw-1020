@@ -1,0 +1,42 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Attempt-03 (64x128x64,s1,t128,sw64) edged baseline at 470.76us vs 470.78us; attempts 01-02 with block_M=32 and block_N=256 plus swizzle=64 regressed (863.78us, 679.45us). Simulated DRAM is invariant at 16.78MB across all attempts, so the analytic panel-reuse/swizzle hypothesis is unsupported by simulator traffic; we retain the full swizzle domain but expect it to be roughly neutral and rely on tile/stage effects. Drop block_M=32 (consistently slow corner) and keep threads=[128] (256 correlated with the worst run). Keep block_N=256 and num_stages=4 to probe wider-N and deeper pipelines before excluding them. Uniform weights retained since traffic proxy has not tracked latency; footprint influences feasibility only via the 32768-byte cap. Next hypothesis: block_M=128 with block_N=128, stages=2-3, threads=128, swizzle in 0-16 reduces simulated latency below 470.76us by raising blocks/SM and pipelining K. Scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed."
+}

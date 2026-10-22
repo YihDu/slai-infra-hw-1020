@@ -1,0 +1,194 @@
+{
+  "history": [
+    {
+      "attempt": "attempt-00",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ],
+          "swizzle": [
+            0
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 1,
+          "pipeline": 1,
+          "footprint": 1
+        },
+        "rationale": "Initial baseline plan per staged policy. Core portable domains only: block_M [32,64,128], block_N [64,128], block_K [32,64], num_stages [1,2,3], threads [128], swizzle [0]. All tiles divide M=N=K=4096. Shared-memory cap 32768 bytes (within allowed [8192,49152], also satisfying the hard portability cap) gates the largest tiles: e.g. 2*block_K*(block_M+block_N)*num_stages and 4*block_M*block_N must fit; largest candidates like 128x128x64x3 exceed the cap and will be excluded by HiGHS. Weights are equal (1 each) to avoid workload-specific bias before any measurements; traffic, launches, pipeline, and footprint contribute symmetrically so the first solve reveals structural tradeoffs rather than encoding a guess. Swizzle is restricted to 0 (row-major) to establish the conventional baseline; locality via serpentine panels will be explored in the next plan with swizzle [4,8,16]. No observations yet: this is the first plan with empty history, so no exclusions are applied and no numerical, simulator, or compile claims are made. Next hypothesis: after this baseline, retain core tile/stage/thread domains and introduce swizzle [4,8,16] to test whether panel locality improves the traffic proxy without exceeding the 32 KB shared-memory estimate."
+      },
+      "selection": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "proxy_cost": 35.566921386666664,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 122,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 2558.094079725122,
+      "simulated_dram_mb": 531.628032,
+      "simulated_blocks_per_sm": 3,
+      "best_simulated_us": 2558.094079725122
+    },
+    {
+      "attempt": "attempt-01",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ],
+          "swizzle": [
+            4,
+            8,
+            16
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 1,
+          "pipeline": 1,
+          "footprint": 1
+        },
+        "rationale": "Second plan per staged policy: baseline attempt-00 passed numerically, compiled with 32768 smem/122 regs, simulated 2558.09 us at 128x64x64, stages=1, swizzle=0 (3 blocks/SM). Retain core tile/stage/thread domains and hold equal weights (no measurements yet justify reweighting). Only change: introduce swizzle [4,8,16] to test whether serpentine panel locality improves the analytic reuse and reduces simulated DRAM traffic on this 4096^3 workload. Tiles still divide M=N=K=4096; shared-memory estimate gates oversized combos via HiGHS under the 32768 cap (also within the 32768 hard portability cap). Deduplication note: M/block_M ranges 32-128 tile rows, so swizzle 4/8/16 are distinct panels here, not launch-equivalent. Hypothesis: nonzero panel reuse should lower traffic cost and simulated dram_mb; if simulator traffic/latency does not improve, the locality proxy is misleading and I will change the thread or block_K domain next rather than sweeping more swizzles. Simulation values are GB10 estimates, not hardware measurements; Metal checks validate source but do not execute CUDA binaries."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "proxy_cost": 15.434262186666666,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 134,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 1616.2401305170706,
+      "simulated_dram_mb": 269.746176,
+      "simulated_blocks_per_sm": 3,
+      "best_simulated_us": 1616.2401305170706
+    }
+  ],
+  "excluded": [
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128,
+      "swizzle": 0
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128,
+      "swizzle": 16
+    }
+  ],
+  "best": {
+    "attempt": "attempt-01",
+    "eligible": true,
+    "implementation": "implementation/attempt-01/kernel.py",
+    "configuration": {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128,
+      "swizzle": 16
+    },
+    "identity": {
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config_sha256": "e70d9056e92f2d05fafcd0185d290af6966165d8906cd2ae53ed512b9aa07664",
+      "tir_sha256": "2d08ec516e994c04a42b88beb901be9d35d3dfa979ae35396c9312d859eeebe2",
+      "sass_sha256": "7b86e8c6fbc95226e9bf4e836d1388198ddede7ab706857c9a9e0805b13258c5",
+      "cubin_sha256": "afc4e947f4c58a4f20ad68021e47c29b813ff7cb8ba9d14ab72f19960a921e42"
+    },
+    "simulated_us": 1616.2401305170706
+  },
+  "initial": {
+    "attempt": "attempt-00",
+    "eligible": true,
+    "implementation": "implementation/attempt-00/kernel.py",
+    "configuration": {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128,
+      "swizzle": 0
+    },
+    "identity": {
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config_sha256": "a2f4d13ddcabafbba063a13ce79635ad80c6b505a28ca32ab9eac8020d04979d",
+      "tir_sha256": "34e9262831146ec30d07c493b3d05062ae89e9004e00db2183c28b747667d323",
+      "sass_sha256": "30ab5930954108e368c5065696677eebaf163399fcacdcc5cf3db40472e1cfef",
+      "cubin_sha256": "c30447e8f987d65c0ddc070e8a70e82968005e41293b549a8ef13e23bc1591eb"
+    },
+    "simulated_us": 2558.094079725122
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[128],\"block_K\":[32,64],\"num_stages\":[2,3],\"threads\":[128],\"swizzle\":[8,16,32]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1.5,\"footprint\":0.5},\"rationale\":\"Best is attempt-09 (64x128x32,s2,t128,sw16) at 399.54us, a real improvement over the prior 462.42us sweet spot; it shares tile/stage/thread with attempt-04/06 (sw64/sw32 at 462.4-462.5us) so swizzle=16 is the differentiator despite invariant 16.78MB simulated DRAM — the analytic traffic feature does not capture it, so keep traffic=1, pipeline=1.5, footprint=0.5. Threads=64 (654.98us) and 256 (474.98us) regressed, so fix threads=[128]. stages=3 regressed at 64x64 (524.35us); keep num_stages=[2,3] but bias toward s2. Narrow block_N to [128] and swizzle to mid-range [8,16,32] around the winner to isolate whether sw16 or larger block_M is the driver; keep block_M=[64,128] and block_K=[32,64] to test the still-unmeasured block_M=128 / block_K=64 hypotheses. Next hypothesis: 128x128x32 or block_K=64 at stages=2 with swizzle 8-32 lowers latency below 399.54us. Scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 7409,
+    "completion_tokens": 394,
+    "total_tokens": 7803,
+    "prompt_tokens_details": {
+      "cached_tokens": 6656
+    },
+    "prompt_cache_hit_tokens": 6656,
+    "prompt_cache_miss_tokens": 753
+  },
+  "response_id": "f726fe1e-6a5a-47b0-9608-598d94b83710"
+}

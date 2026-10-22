@@ -1,0 +1,43 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Attempt-01 (32x256x32,s1,t256,sw64) passed checks but regressed badly to 863.78us vs baseline 470.78us: the small block_M cut tile-row count and wide block_N plus swizzle=64 did not reduce simulated DRAM (both report 16.78MB), so the analytic panel-reuse hypothesis is unsupported so far. Revert to threads=[128], which matched the fast baseline, to isolate tile/stage/swizzle effects before re-testing warp layouts; keep the expanded swizzle and stage=4 domains to probe structural alternatives toward larger block_M/latency. block_B tiles remain under the 32768 smem cap; HiGHS excludes infeasible smem combos. Next hypothesis: larger block_M (64/128) with moderate block_N and stages=2-3 outperforms the 32-wide-M, large-N direction, since wide-M raises blocks/SM and trims redundant A traffic. Scope note: Metal executes exact source/config/TIR, GB10 numbers are simulator estimates, not hardware measurements; no global optimality claimed."
+}

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128,256],\"block_N\":[64,128,256],\"block_K\":[32,64,128],\"num_stages\":[2,3,4],\"threads\":[128,256],\"swizzle\":[0,4,8,16,32,64]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":0.5,\"pipeline\":1.2,\"footprint\":1.2},\"rationale\":\"Attempt-01 improved 316.97us -> 232.89us with block_M=64, block_N=128, block_K=32, stage=2, threads=256, swizzle=8, still capped at 32768B smem and 2 blocks/SM. The pipeline+swizzle hypothesis paid off, so I keep stage {2,3,4} and block_K up to 128 to probe deeper pipelining and wider K tiles. Added block_M=256 to test larger M tiles with more reuse (reuse=min(swizzle,M/block_M)) since M=2048 is divisible and prior block_M choices were small. Block_N retained {64,128,256}. Swizzle expanded fully to {0,4,8,16,32,64}; with block_M>=64 there are >=8 tile rows, so large panels are now meaningful, though the proxy may misrank oversized panels vs cache. Threads kept {128,256}; 64 still excluded as undersubscribed. Weight shifts: launches 0.5 (square problem, enough blocks), pipeline up to 1.2 (stage depth helped), footprint 1.2 (baseline repeatedly sat at cap; must trade stage/K against 32KB). Traffic remains 1 since panel-reuse gains are still an unverified analytical hypothesis and simulator DRAM was flat at 16.78MB; if larger swizzle does not lower simulated latency I will downweight the reuse feature. Next hypothesis: block_K=64/128 with stage=3/4 and larger swizzle panels, or block_M=256 with moderate blocks, may further reduce simulated latency while respecting the portability cap. Validation scope: Metal numerical checks run exact source/TIR; CUDA binaries are not executed; GB10 values are simulator estimates, never hardware measurements.\"}",
+  "usage": {
+    "prompt_tokens": 2353,
+    "completion_tokens": 495,
+    "total_tokens": 2848,
+    "prompt_tokens_details": {
+      "cached_tokens": 1536
+    },
+    "prompt_cache_hit_tokens": 1536,
+    "prompt_cache_miss_tokens": 817
+  },
+  "response_id": "324a6684-6851-4c3c-8a08-8ae422440726"
+}

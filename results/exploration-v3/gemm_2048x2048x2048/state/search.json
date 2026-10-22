@@ -1,0 +1,849 @@
+{
+  "history": [
+    {
+      "attempt": "attempt-00",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128,
+            256
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128,
+            256
+          ],
+          "swizzle": [
+            0
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 1,
+          "pipeline": 1,
+          "footprint": 1
+        },
+        "rationale": "Initial plan. M=N=K=2048 is divisible by all chosen tiles. block_M in {32,64,128}, block_N in {64,128,256}, block_K in {32,64}, stages 1-3, threads 128/256 give a compact but non-trivial search under the 32KB portability cap. Shared estimate max(2*block_K*(block_M+block_N)*stages, 4*block_M*block_N) is checked by HiGHS against the limit. Swizzle fixed to [0] for a row-major baseline per instructions; serpentine panels deferred until feedback. Threads 128 and 256 included as a cheap early hypothesis on warp layout; block_N=256 probes wider-N alternatives and stage=3 approaches stage=4 without inflating footprint beyond cap for small tiles. Objective is equal weighting of traffic, launches, pipeline, footprint; will revise after simulator feedback on whether panel reuse or thread changes affect latency. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements."
+      },
+      "selection": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 256,
+        "swizzle": 0
+      },
+      "proxy_cost": 5.5251985066666665,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 98,
+        "smem_bytes": 32768,
+        "threads": 256
+      },
+      "simulation_status": "completed",
+      "simulated_us": 316.972596203,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 2,
+      "best_simulated_us": 316.972596203
+    },
+    {
+      "attempt": "attempt-01",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128,
+            256
+          ],
+          "block_K": [
+            32,
+            64,
+            128
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            128,
+            256
+          ],
+          "swizzle": [
+            0,
+            4,
+            8
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1,
+          "footprint": 1.5
+        },
+        "rationale": "Initial baseline selected block_M=128, block_N=64, block_K=64, stage=1, threads=256, swizzle=0 at 316.97us with 2 blocks/SM and full 32768B smem. Stage=1 likely under-pipelines K=2048, so this revision tests num_stages {2,3,4} (including stage=4, previously unexplored) to hide DRAM latency, and expands block_K to 128 as an early structural hypothesis. Since M=N=K=2048 is square and divisible by all tiles, wider block_N=256 and smaller block_M=32/64 are retained so launches can grow when block_M=128 yields only 16 tiles per dimension. Swizzle is now expanded beyond [0] to {0,4,8} to probe serpentine panel reuse; larger panels (16+) deferred because 2048/128=16 rows may make wide panels exceed cache, and swizzle benefit is a hypothesis not measured truth. Threads kept {128,256} since prior 256 worked; 64 excluded to avoid undersubscribed warps on 128x64 tiles. Launches weight lowered to 0.5 because 2048x2048 already has sufficient blocks at modest tiles, while footprint weight raised to 1.5 since baseline sat exactly at the 32KB cap and stage>=2 with larger block_K can breach it; HiGHS must trade stage depth against footprint. Traffic/pipeline remain 1. Validation scope unchanged: Metal numerical checks run exact source/TIR; CUDA binaries are not executed; GB10 numbers are simulator estimates, not hardware. Next hypothesis: stage>=2 plus swizzle>0 should reduce simulated latency via better K-pipelining and panel locality; if footprint dominates or swizzle=0/4/8 tie, shift budget toward block_K and stage before widening swizzle panels."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 8
+      },
+      "proxy_cost": 3.2537216,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 82,
+        "smem_bytes": 32768,
+        "threads": 256
+      },
+      "simulation_status": "completed",
+      "simulated_us": 232.88711697108477,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 2,
+      "best_simulated_us": 232.88711697108477
+    },
+    {
+      "attempt": "attempt-02",
+      "stage": "model_or_schema",
+      "error_type": "ValueError"
+    },
+    {
+      "attempt": "attempt-03",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128,
+            256
+          ],
+          "block_K": [
+            32,
+            64,
+            128
+          ],
+          "num_stages": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            128,
+            256
+          ],
+          "swizzle": [
+            0,
+            4,
+            8,
+            16,
+            32,
+            64
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1,
+          "footprint": 1.5
+        },
+        "rationale": "Attempt-01 improved simulated latency from 316.97us to 232.89us using block_M=64, block_N=128, block_K=32, stage=2, threads=256, swizzle=8, confirming stage>=2 pipelining helped. Attempt-02 failed with a schema/model ValueError before evaluation; this revision restores a fully valid schema and keeps the confirmed-good structural region. Retaining block_M {32,64,128}, block_N {64,128,256}, block_K expanded to {32,64,128} to keep testing the block_K=128 hypothesis from attempt-01 that did not get exercised. Stages {1,2,3,4} retained so HiGHS can trade depth vs footprint under the 32KB cap (stage>=3 with block_K>=64 and block_M+block_N large will be footprint-limited). Threads still {128,256}; 64 remains excluded pending evidence that warp layout is underutilized. Swizzle expanded to the full {0,4,8,16,32,64}: attempt-01's swizzle=8 selection coincided with the gain, but reuse is an analytic hypothesis, so larger panels must be tested to see whether locality gains materialize or whether panels exceeding cache reduce benefit. Weights: traffic=1, pipeline=1, launches lowered to 0.5 (2048^3 already saturates the machine at modest tiles), footprint raised to 1.5 because baseline sat at the 32KB cap and deeper pipelines with wider block_K will hit the limit. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and the proxy cost is a dimensionless ranking only. Next hypothesis: swizzle panels >8 and/or block_K=128 with stage 3-4 may further reduce simulated latency if locality and K-pipelining outweigh footprint; if larger swizzle values tie or underperform, revert to narrower panels and spend domain width on block_M/block_N/threads. No claim of global optimality is made."
+      },
+      "selection": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 256,
+        "swizzle": 64
+      },
+      "proxy_cost": 2.65097472,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 86,
+        "smem_bytes": 32768,
+        "threads": 256
+      },
+      "simulation_status": "completed",
+      "simulated_us": 440.80765160610184,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 2,
+      "best_simulated_us": 232.88711697108477
+    },
+    {
+      "attempt": "attempt-04",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128,
+            256
+          ],
+          "block_K": [
+            32,
+            64,
+            128
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            64,
+            128,
+            256
+          ],
+          "swizzle": [
+            0,
+            4,
+            8,
+            16
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Best observed is attempt-01 (232.89us): block_M=64, block_N=128, block_K=32, stage=2, threads=256, swizzle=8. Attempt-03 selected small block_M=32 with wide block_N=256, stage=1, swizzle=64 and regressed to 440.81us despite lower proxy cost, showing the monotone reuse proxy misranks large panels and narrow-M/wide-N choices, and that stage=1 under-pipelines. Revision: narrow swizzle to {0,4,8,16} to avoid cache-exceeding panels (32,64 dropped); require num_stages>=2 to keep K-pipelining since stage=1 hurt; add threads=64 as the early changed-thread-domain hypothesis per guidance while keeping 128/256; keep block_K up to 128 to test the untested wider-K option but retain 32 which worked. Weights: pipeline raised to 1.25 to favor deeper stages, footprint 1.5 kept since 32KB cap binds, launches 0.5 kept. block_M=32 and block_N=256 remain allowed so HiGHS can still probe them but the proxy now penalizes their narrow-M/high-launch combos. Validation scope: Metal runs exact source/TIR numerically; CUDA binaries are not executed; GB10 figures are simulator estimates, not hardware. Next hypothesis: stage in {2,3} with block_K in {32,64} and swizzle in {4,8,16} near the attempt-01 region should beat 232.89us; observe whether threads=64 helps or hurts and whether swizzle>8 materializes locality gains."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 16
+      },
+      "proxy_cost": 3.16594944,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 86,
+        "smem_bytes": 32768,
+        "threads": 256
+      },
+      "simulation_status": "completed",
+      "simulated_us": 244.33342737532496,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 2,
+      "best_simulated_us": 232.88711697108477
+    },
+    {
+      "attempt": "attempt-05",
+      "plan": {
+        "domains": {
+          "block_M": [
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            256
+          ],
+          "swizzle": [
+            4,
+            8,
+            16
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Best observed remains attempt-01 (232.89us): block_M=64, block_N=128, block_K=32, stage=2, threads=256, swizzle=8. Attempt-03 (block_M=32, block_N=256, stage=1, swizzle=64) regressed to 440.81us; attempt-04 (same good region but swizzle=16) regressed slightly to 244.33us. Lesson: narrow-M/wide-N with stage=1 and very large panels hurt, and swizzle=16 did not beat swizzle=8. Revision: drop block_M=32 and block_N=256 (both implicated in the attempt-03 regression and narrow-M high-launch regime); keep block_M {64,128} and block_N {64,128} around the known-good region. Require stage>=2 to avoid the stage=1 under-pipelining seen in attempts 00/03; retain stage 4 for exploration. Keep block_K {32,64} where 32 is the proven winner; 128 was never usefully exercised and would inflate footprint. Threads fixed to {256} since 128/64 never produced a win and 256 is confirmed with the best config. Swizzle narrowed to {4,8,16} to keep testing panel locality near swizzle=8 without the cache-exceeding 32/64. Weights unchanged from attempt-04 (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at the 32KB cap and deeper K-pipelining has helped, launches are already sufficient at 2048 square. Validation scope: Metal executes exact source/TIR numerically; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and the proxy cost is only a dimensionless ranking. Next hypothesis: block_M in {64,128} with block_N in {64,128}, block_K=32, stage=2, threads=256, and swizzle in {4,8} should reconfirm near 232.89us; if a 128x128 or 128x64 tile with stage 2-3 and swizzle 4/8 beats it, wider-M tiling helps occupancy; otherwise retain the attempt-01 configuration as the working optimum. No claim of global optimality."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 4
+      },
+      "proxy_cost": 3.66926592,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 82,
+        "smem_bytes": 32768,
+        "threads": 256
+      },
+      "simulation_status": "completed",
+      "simulated_us": 232.88711697108477,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 2,
+      "best_simulated_us": 232.88711697108477
+    },
+    {
+      "attempt": "attempt-06",
+      "plan": {
+        "domains": {
+          "block_M": [
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            64,
+            128,
+            256
+          ],
+          "swizzle": [
+            0,
+            4,
+            8
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Best observed remains attempt-01 at 232.89us (block_M=64, block_N=128, block_K=32, stage=2, threads=256, swizzle=8); attempt-05 reproduced the exact same latency with swizzle=4, suggesting swizzle 4 vs 8 is tied in this region and panel locality beyond that does not materialize as a win. Attempt-03 (block_M=32, block_N=256, stage=1, swizzle=64) regressed to 440.81us; attempt-04 (swizzle=16) regressed to 244.33us. Revision: keep block_M {64,128} and block_N {64,128} around the confirmed-good region, retaining block_M=128 so the 128x128 / 128x64 tiles with stages 2-4 can be exercised as the untested wider-M hypothesis. block_K stays {32,64}; 32 is the proven winner, 64 allowed but rarely favored. Stages {2,3,4} retained to keep depth exploration and satisfy the stage=4 consideration; stage=1 excluded because it under-pipelined in attempts 00/03. Threads expanded to {64,128,256} to finally exercise the changed-thread-domain hypothesis that attempt-04 added but HiGHS never selected (it favored 256), while 256 remains the confirmed incumbent. Swizzle narrowed to {0,4,8}: include swizzle=0 to re-establish the row-major reference in the improved pipeline region and to test whether locality actually helps versus the monotone proxy, while 4 and 8 cover the confirmed-good narrow panel range; 16/32/64 dropped since 16 regressed and wide panels exceed cache. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5) since footprint binds at the 32KB cap and deeper K-pipelining has helped. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 figures are simulator estimates, not hardware measurements, and proxy cost is a dimensionless ranking only. Next hypothesis: with threads {64,128,256} finally in play and block_M=128 tiles plus stage 3-4 now selectable, a different warp layout or wider-M tile may beat 232.89us; if swizzle=0 ties swizzle=4/8 at the improved config, the panel-reuse proxy is not materializing and swizzle can be retired to free domain width for tile/thread/stage exploration."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "proxy_cost": 3.3337216,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 134,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 203.6936494479265,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 3,
+      "best_simulated_us": 203.6936494479265
+    },
+    {
+      "attempt": "attempt-07",
+      "plan": {
+        "domains": {
+          "block_M": [
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            2,
+            3
+          ],
+          "threads": [
+            64,
+            128
+          ],
+          "swizzle": [
+            0,
+            4,
+            8
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Best observed is attempt-06 at 203.69us (block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle=8), improving on the 232.89us incumbent when the changed thread domain was finally exercised (128 threads gave 3 blocks/SM instead of 2). History shows: stage=1 under-pipelines (attempts 00/03); block_M=32/block_N=256 with swizzle=64 regressed to 440.81us; swizzle=4 and swizzle=8 tie at 232.89us in the 256-thread region and swizzle=16 regressed, so panel locality is largely a proxy artifact, not a measured win. Revision: keep block_M {64,128}, block_N {64,128} near the confirmed region; block_K {32,64} with 32 the proven winner; stages {2,3} to retain depth near the working point without overspending footprint at the 32KB cap; threads narrowed to {64,128} to consolidate the win at 128 while still testing 64 against the confirmed 128 (256 dropped since it consistently gave 2 blocks/SM and never won). Swizzle kept {0,4,8}: swizzle=0 to re-verify whether serpentine panels help at the new 128-thread config, 4/8 retained as near-tied options, wider panels (16/32/64) dropped as cache-exceeding regressions. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at the cap and pipelining helped, block counts already ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements, and proxy cost is only a dimensionless ranking. Next hypothesis: threads=128 with block_M=128 or block_K=64 and stage 2-3 near the attempt-06 tile may further lower latency; if swizzle=0 ties swizzle=4/8 the panel-reuse feature is confirmed non-materializing and can be retired. No claim of global optimality."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 64,
+        "swizzle": 8
+      },
+      "proxy_cost": 3.3337216,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 200,
+        "smem_bytes": 32768,
+        "threads": 64
+      },
+      "simulation_status": "completed",
+      "simulated_us": 295.7771175183446,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 3,
+      "best_simulated_us": 203.6936494479265
+    },
+    {
+      "attempt": "attempt-08",
+      "plan": {
+        "domains": {
+          "block_M": [
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            128,
+            256
+          ],
+          "swizzle": [
+            0,
+            4,
+            8
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Best observed is attempt-06 at 203.69us: block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle=8, achieving 3 blocks/SM. Attempt-07 with threads=64 regressed to 295.78us (registers 200, same blocks/SM), so 64 threads oversubscribes registers and is dropped; threads=128 is confirmed and 256 retained to recheck whether wider warp counts help with block_M=128 tiles at higher register pressure. History shows stage=1 under-pipelines (316.97us, 440.81us), swizzle=4 tied swizzle=8, swizzle=16 regressed, and swizzle=32/64 with narrow-M/wide-N regressed badly - panel reuse is largely a proxy artifact, so swizzle is narrowed to {0,4,8} to re-establish the row-major reference at the new 128-thread config and test whether locality materializes there. block_M=32 and block_N=256 are dropped (attempt-03 regression, narrow-M high-launch regime); block_M/block_N kept to {64,128} around the confirmed region so the untested 128x128 and 128x64 tiles with threads=128 and stages 2-4 can be exercised. block_K {32,64} retained with 32 the proven winner; 64 allowed but rarely favored given footprint. Stages {2,3,4} keep depth exploration and satisfy the stage=4 consideration. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at the 32KB cap, deeper K-pipelining has helped, block counts are ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements, and proxy cost is only a dimensionless ranking. Next hypothesis: block_M=128 with threads=128 and stage 2-3 may beat 203.69us if wider-M tiling raises arithmetic intensity without exceeding footprint; if swizzle=0 ties 4/8 at 128 threads, panel locality is confirmed non-materializing and swizzle can be retired to free domain width for tile/stage/thread exploration. No claim of global optimality."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "proxy_cost": 3.66926592,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 134,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 203.6936494479265,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 3,
+      "best_simulated_us": 203.6936494479265
+    },
+    {
+      "attempt": "attempt-09",
+      "plan": {
+        "domains": {
+          "block_M": [
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            128,
+            256
+          ],
+          "swizzle": [
+            0,
+            4,
+            8
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Best observed remains attempt-06/08 at 203.69us: block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle 8 or 4 (tied). Threads=128 confirmed as the win versus 256 (232.89us, 2 blocks/SM); threads=64 regressed to 295.78us with 200 registers, so 64 is dropped. Swizzle 4 and 8 tie and 16/32/64 regressed, so panel reuse is largely a proxy artifact; swizzle narrowed to {0,4,8} to keep a row-major reference and the tied values. block_M=32/block_N=256 dropped (attempt-03 440.81us regression); block_M/block_N kept {64,128} so 128x128/128x64 tiles with threads in {128,256} and stages 2-4 can finally be exercised alongside the confirmed 64x128 region. block_K {32,64} retained with 32 proven; 64 allowed to recheck wider-K footprint trade. Stages {2,3,4} keep depth exploration and satisfy stage=4 consideration; stage=1 excluded (under-pipelined 316.97us/440.81us). Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at 32768B cap, deeper K-pipelining helped, block counts ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and proxy cost is a dimensionless ranking only. Next hypothesis: block_M=128 with threads=128 or 256 and stage 2-3, or block_K=64 with stage>=3, may beat 203.69us if wider-M arithmetic intensity outweighs footprint; if swizzle=0 ties 4/8 at threads=128 the panel-reuse feature is confirmed non-materializing and can be retired. No claim of global optimality."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 8
+      },
+      "proxy_cost": 4.43189888,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 64,
+        "smem_bytes": 16384,
+        "threads": 256
+      },
+      "simulation_status": "completed",
+      "simulated_us": 269.7636026487255,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 4,
+      "best_simulated_us": 203.6936494479265
+    },
+    {
+      "attempt": "attempt-10",
+      "plan": {
+        "domains": {
+          "block_M": [
+            64,
+            128
+          ],
+          "block_N": [
+            128,
+            256
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            128,
+            256
+          ],
+          "swizzle": [
+            0,
+            4,
+            8
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Best observed is 203.69us at block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle 4 or 8 (attempts 06/08 tied). Block_N=64 with threads=256 regressed to 269.76us (attempt-09), so narrow-N is dropped and block_N raised to {128,256} to probe wider-N arithmetic intensity with the confirmed 128-thread layout, which so far has only been tested at block_N=128. block_M kept {64,128} so 128x128 and 128x256 tiles with 128 threads can finally be exercised; block_M=32 stays excluded (narrow-M regression in attempt-03). block_K {32,64} with 32 proven; 64 retained to recheck wider-K under the 32KB footprint cap. Stages {2,3,4} to keep depth exploration including stage=4; stage=1 excluded as under-pipelined. Threads {128,256} since 128 won and 256 gives a cheap wider-warp check at block_N=256; 64 dropped (200 registers, 295.78us). Swizzle {0,4,8}: 4/8 tied and swizzle=0 re-establishes the row-major reference at the new tile region to verify whether panel reuse is a proxy artifact; 16/32/64 dropped as cache-exceeding regressions. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): smem binds at the 32768B cap across winning configs, launches remain ample at 2048 square, and deeper pipelining has consistently helped. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and proxy cost is a dimensionless ranking only. Next hypothesis: block_N=256 (or block_M=128) with threads=128, stage 2-3, swizzle 4/8 may beat 203.69us if wider tiles raise arithmetic intensity without breaking the footprint cap; if swizzle=0 ties 4/8, panel reuse is confirmed non-materializing and can be retired. No claim of global optimality."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "proxy_cost": 5.682531839999999,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 130,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 222.1818392034746,
+      "simulated_dram_mb": 16.777216,
+      "simulated_blocks_per_sm": 3,
+      "best_simulated_us": 203.6936494479265
+    },
+    {
+      "attempt": "attempt-11",
+      "stage": "MIP",
+      "status": "Infeasible",
+      "plan": {
+        "domains": {
+          "block_M": [
+            64,
+            128
+          ],
+          "block_N": [
+            128,
+            256
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            2,
+            3,
+            4
+          ],
+          "threads": [
+            128,
+            256
+          ],
+          "swizzle": [
+            4,
+            8
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 1.25,
+          "footprint": 1.5
+        },
+        "rationale": "Incumbent is 203.69us at block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle 4 or 8 (attempts 06/08 tied). Attempt-10 tested swizzle=0 at the same config and regressed to 222.18us, so a nonzero panel does help slightly and the tied swizzle=8 row is retained as the reference; swizzle=0 is dropped since it is dominated here. Attempt-09 (block_N=64, threads=256) regressed to 269.76us, so block_N=64 is dropped and block_N raised to {128,256} to probe wider-N arithmetic intensity with the confirmed 128-thread layout. block_M kept {64,128} so 128x128 and 128x256 tiles with threads=128 can finally be exercised; block_M=32 stays excluded (attempt-03 regression). block_K {32,64} with 32 proven; 64 retained for a wider-K footprint trade. Stages {2,3,4} keep depth exploration including stage=4; stage=1 excluded (under-pipelined 316.97us/440.81us). Threads {128,256} since 128 won and 256 is a cheap wider-warp check at wider block_N; 64 dropped (200 registers, 295.78us). Weights unchanged: footprint binds at the 32768B cap, deeper K-pipelining has helped, block counts are ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and proxy cost is only a dimensionless ranking. Next hypothesis: block_M=128 or block_N=256 with threads=128 and stage 2-3 may beat 203.69us if wider tiles raise arithmetic intensity without breaching the footprint cap; otherwise retain the 64x128x32/stage2/threads128/swizzle8 incumbent. No claim of global optimality."
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 256,
+      "swizzle": 0
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 8
+    },
+    {
+      "block_M": 32,
+      "block_N": 256,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 256,
+      "swizzle": 64
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 16
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 4
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 8
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 64,
+      "swizzle": 8
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 4
+    },
+    {
+      "block_M": 64,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 8
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 0
+    }
+  ],
+  "best": {
+    "attempt": "attempt-06",
+    "eligible": true,
+    "implementation": "implementation/attempt-06/kernel.py",
+    "configuration": {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 8
+    },
+    "identity": {
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config_sha256": "cb7952b8da15d610651736d8d03f64d96f11837d05c6924d30086531514e7507",
+      "tir_sha256": "75445cd516570662692ae32a0c7c0ed6b99ea56ac42bc96d4f7dc5f98e2dd462",
+      "sass_sha256": "be6e29daaeb568e1e1656d59fca2e60634673ada09fc75e79e2352664ee2677e",
+      "cubin_sha256": "ac36d80b5b7f3a4d696cd8027d8b85fff3f287be1fd3e4b470ff21ca3f157d08"
+    },
+    "simulated_us": 203.6936494479265
+  },
+  "initial": {
+    "attempt": "attempt-00",
+    "eligible": true,
+    "implementation": "implementation/attempt-00/kernel.py",
+    "configuration": {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 256,
+      "swizzle": 0
+    },
+    "identity": {
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config_sha256": "da520ab0daa2992126d992f1ff6ab3238cfc6e643082c34b66da49a7570ae59d",
+      "tir_sha256": "b9f0ef5fa808a81cf46080136e16883f141ecbffba12da33dd3aef9a692fa7cd",
+      "sass_sha256": "26bca811461bb41c6da8deed28f3febb6b0d14a0e6bc59a800cd8fad625da1b4",
+      "cubin_sha256": "66a07b8e37b922b40fd76b8d1680ac27a7e6b34b51259787c289a88b01858a10"
+    },
+    "simulated_us": 316.972596203
+  }
+}

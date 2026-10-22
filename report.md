@@ -1,5 +1,9 @@
 # Agentic GB10 optimizer — submission report
 
+This is the frozen v2 report accompanying the existing ZIP. Subsequent development
+exploration is recorded separately in `results/exploration-v3/comparison.json` and
+`docs/iteration-log.md`; those experiments have not replaced this submission candidate.
+
 ## Result and validation boundary
 
 The five published GEMM workloads completed through real DeepSeek formulation,

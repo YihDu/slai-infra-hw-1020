@@ -1,0 +1,6 @@
+{
+  "status": "timeout",
+  "reason": "Simulator wall-clock limit",
+  "value": null,
+  "unit": "us"
+}

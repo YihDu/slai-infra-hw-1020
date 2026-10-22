@@ -1,0 +1,66 @@
+{
+  "attempt": "attempt-01",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32,
+        64,
+        128
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        1,
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ],
+      "swizzle": [
+        4,
+        8,
+        16
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1,
+      "launches": 1,
+      "pipeline": 1,
+      "footprint": 1
+    },
+    "rationale": "Second plan per staged policy: baseline attempt-00 passed numerically, compiled with 32768 smem/122 regs, simulated 2558.09 us at 128x64x64, stages=1, swizzle=0 (3 blocks/SM). Retain core tile/stage/thread domains and hold equal weights (no measurements yet justify reweighting). Only change: introduce swizzle [4,8,16] to test whether serpentine panel locality improves the analytic reuse and reduces simulated DRAM traffic on this 4096^3 workload. Tiles still divide M=N=K=4096; shared-memory estimate gates oversized combos via HiGHS under the 32768 cap (also within the 32768 hard portability cap). Deduplication note: M/block_M ranges 32-128 tile rows, so swizzle 4/8/16 are distinct panels here, not launch-equivalent. Hypothesis: nonzero panel reuse should lower traffic cost and simulated dram_mb; if simulator traffic/latency does not improve, the locality proxy is misleading and I will change the thread or block_K domain next rather than sweeping more swizzles. Simulation values are GB10 estimates, not hardware measurements; Metal checks validate source but do not execute CUDA binaries."
+  },
+  "selection": {
+    "block_M": 64,
+    "block_N": 128,
+    "block_K": 64,
+    "num_stages": 1,
+    "threads": 128,
+    "swizzle": 16
+  },
+  "proxy_cost": 15.434262186666666,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 134,
+    "smem_bytes": 32768,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 1616.2401305170706,
+  "simulated_dram_mb": 269.746176,
+  "simulated_blocks_per_sm": 3,
+  "best_simulated_us": 1616.2401305170706
+}

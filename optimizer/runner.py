@@ -41,7 +41,7 @@ def main():
     parser.add_argument('--workload',type=Path,required=True)
     parser.add_argument('--model-config',type=Path,default=ROOT/'configs/deepseek.json')
     parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--rounds',type=int,default=8)
+    parser.add_argument('--rounds',type=int,default=12)
     parser.add_argument('--budget-seconds',type=int,default=1200)
     args=parser.parse_args()
     if not 1<=args.rounds<=20 or not 1<=args.budget_seconds<=1200:parser.error('rounds 1..20, budget 1..1200')
@@ -127,7 +127,8 @@ def main():
                 raise
             except Exception as exc:
                 if not response_path.exists():add_usage(usage,{})
-                observation=dict(attempt=tag,stage='model_or_schema',error_type=type(exc).__name__)
+                observation=dict(attempt=tag,stage='model_or_schema',error_type=type(exc).__name__,
+                                 reason=str(exc)[:300] if response_path.exists() else 'Model request failed before a response was saved')
                 history.append(observation);attempts.append(observation)
                 trace.record('model_failed',**observation,artifacts=[str(request_path.relative_to(out))]+([str(response_path.relative_to(out))] if response_path.exists() else []))
                 checkpoint();continue

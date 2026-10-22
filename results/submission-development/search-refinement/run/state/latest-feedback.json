@@ -1,0 +1,71 @@
+{
+  "attempt": "attempt-03",
+  "plan": {
+    "domains": {
+      "block_M": [
+        16,
+        32
+      ],
+      "block_N": [
+        64,
+        128,
+        256
+      ],
+      "block_K": [
+        32,
+        64,
+        128
+      ],
+      "num_stages": [
+        2,
+        3,
+        4
+      ],
+      "threads": [
+        64,
+        128
+      ],
+      "swizzle": [
+        0,
+        4,
+        8,
+        16,
+        32,
+        64
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1.0,
+      "launches": 1.0,
+      "pipeline": 1.5,
+      "footprint": 0.5
+    },
+    "rationale": "Fourth-round plan for M=32,N=4096,K=4096. History: attempt-00 195.8us (256thr,3st), attempt-01 176.4us (256thr,2st), attempt-02 147.6us (128thr,3st) — all passed numerics/compile, DRAM flat ~33.8MB so panel locality never materialized; swizzles remain launch-equivalent with ceil(M/block_M) in {1,2}. Threads reduced to 128 improved latency, so we probe 64 threads (untested branch) while keeping 128 as the incumbent; block_M stays [16,32] since larger tiles waste M rows and small M needs blocks for occupancy; block_N spans 64..256 (attempt-02 used 64; worth testing wider N with fewer launches); block_K [32,64,128] kept broad since only 64 has been measured; stages [2,3,4] as stage 1 rarely helps K=4096; swizzle expanded again but expected launch-equivalent. Weights kept from attempt-02 (pipeline 1.5, footprint 0.5) since flat DRAM confirms latency is pipeline/occupancy-bound rather than traffic-bound. Shared estimate max(2*block_K*(block_M+block_N)*stages, 4*block_M*block_N) under 32768 cap and portability limit. Next hypothesis: 64 threads and/or larger block_N with 3-4 stages may reduce simulated latency; if 64-thread regresses revert to 128. GB10 values are simulator-only estimates; Metal checks validate exact source/TIR but do not execute the CUDA binary. No global optimality claimed."
+  },
+  "selection": {
+    "block_M": 16,
+    "block_N": 64,
+    "block_K": 64,
+    "num_stages": 3,
+    "threads": 64,
+    "swizzle": 4
+  },
+  "proxy_cost": 1.26381648,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 68,
+    "smem_bytes": 30720,
+    "threads": 64
+  },
+  "simulation_status": "completed",
+  "simulated_us": 147.61459665339947,
+  "simulated_dram_mb": 33.816576,
+  "simulated_blocks_per_sm": 3,
+  "best_simulated_us": 147.55014783450181
+}

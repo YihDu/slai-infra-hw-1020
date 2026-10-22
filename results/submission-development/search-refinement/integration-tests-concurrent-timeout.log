@@ -1,0 +1,31 @@
+E...................
+======================================================================
+ERROR: test_generated_program_and_corrupted_program_are_distinguished (test_actual_numeric.ActualNumericTests.test_generated_program_and_corrupted_program_are_distinguished)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/tests/test_actual_numeric.py", line 23, in test_generated_program_and_corrupted_program_are_distinguished
+    process=subprocess.run([str(ROOT/'.venv-metal/bin/python'),'-m','optimizer.tilelang_numeric','--workload',str(d/'workload.json'),
+        '--config',str(d/'config.json'),'--source',str(path),'--output',str(out)],cwd=ROOT,capture_output=True,text=True,timeout=45)
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.13/subprocess.py", line 556, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.13/subprocess.py", line 1222, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.13/subprocess.py", line 2155, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.13/subprocess.py", line 1269, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.venv-metal/bin/python', '-m', 'optimizer.tilelang_numeric', '--workload', '/var/folders/gl/973_xp352hg0qvrrwqrnbsp00000gn/T/tmp6u1lgzby/workload.json', '--config', '/var/folders/gl/973_xp352hg0qvrrwqrnbsp00000gn/T/tmp6u1lgzby/config.json', '--source', '/var/folders/gl/973_xp352hg0qvrrwqrnbsp00000gn/T/tmp6u1lgzby/corrupted.py', '--output', '/var/folders/gl/973_xp352hg0qvrrwqrnbsp00000gn/T/tmp6u1lgzby/corrupted/numeric.json']' timed out after 45 seconds
+
+----------------------------------------------------------------------
+Ran 20 tests in 56.921s
+
+FAILED (errors=1)
+{"status": "no_valid_result", "workload_id": "small", "elapsed_ms": 1759, "usage": {"model_calls": 1, "input_tokens": 1, "output_tokens": 1, "cached_tokens": null, "reasoning_tokens": null, "evaluations": 0, "cpu_diagnostics": 1, "compilations": 0, "simulations": 0}}
+{"status": "no_valid_result", "workload_id": "small", "elapsed_ms": 35, "usage": {"model_calls": 1, "input_tokens": null, "output_tokens": null, "cached_tokens": null, "reasoning_tokens": null, "evaluations": 0, "cpu_diagnostics": 0, "compilations": 0, "simulations": 0}}
+{"status": "checked", "workload_id": "small", "elapsed_ms": 147, "usage": {"model_calls": 2, "input_tokens": 2, "output_tokens": 4, "cached_tokens": null, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 2, "compilations": 2, "simulations": 2, "numerical_checks": 2, "solver_calls": 2}}
+{"status": "no_valid_result", "workload_id": "gemm_32x4096x4096", "elapsed_ms": 906, "usage": {"model_calls": 1, "input_tokens": null, "output_tokens": null, "cached_tokens": null, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 0, "compilations": 0, "simulations": 0, "numerical_checks": 0, "solver_calls": 0}}

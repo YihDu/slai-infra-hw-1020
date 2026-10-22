@@ -1,0 +1,35 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      128,
+      256
+    ],
+    "block_K": [
+      64,
+      128
+    ],
+    "num_stages": [
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.3,
+    "launches": 1.5,
+    "pipeline": 1.2,
+    "footprint": 1
+  },
+  "rationale": "Best observed is 147.67us from attempts 03/04/06/07 (M=32,N=64,K=64,st=2,thr 128/256); attempt-06/07 reproductions with sw=16/0 stayed at 147.68us and DRAM flat at 33.8 MB, so nonzero swizzle adds nothing at M/block_M<=2 and is collapsed to [0] per instructions once locality is shown absent. block_K=32 lost twice (~195.8us) and is dropped. block_M stays {16,32} since M=32 and 64/128 overshoot. Key structural change this round: drop block_N=64 (the incumbent already used it and swizzle variants were the only repeats) and force block_N into {128,256} so the solver must test whether a wider N tile beats the incumbent; similarly require stages {3,4} to finally exercise deeper pipelining, while keeping block_K {64,128} to probe deeper K (K=64 already beat K=32; K=128 untested with stage>=3). Threads {128,256} both tied at the winner, so retain both. traffic weight 0.3 retained because DRAM is invariant; launches 1.5 because N/block_N dominates block count at M=32; pipeline raised to 1.2 to favor deeper stages now that they are forced; footprint 1 penalizes stage=4+K=128+N=256 tuples under the 32768 cap and hard portability cap. Next hypothesis: from the K=64/st=2/N=64 winner family, test whether block_N in {128,256} combined with block_K=128 and stage>=3 or stage=4 reduces GB10 simulated latency below 147.7us; if wider N/deeper stages lose, revert N to 64 in the next round while keeping the changed-thread/K hypothesis. GB10 values are simulator estimates, not hardware measurements; Metal validates exact source/TIR numerically but does not execute the CUDA binary, so compile/memory status is a scoped estimate, not a hardware proof. No global optimality claimed."
+}

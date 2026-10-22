@@ -1,0 +1,66 @@
+{
+  "attempt": "attempt-10",
+  "plan": {
+    "domains": {
+      "block_M": [
+        64,
+        128
+      ],
+      "block_N": [
+        128,
+        256
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        2,
+        3,
+        4
+      ],
+      "threads": [
+        128,
+        256
+      ],
+      "swizzle": [
+        0,
+        4,
+        8
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1,
+      "launches": 0.5,
+      "pipeline": 1.25,
+      "footprint": 1.5
+    },
+    "rationale": "Best observed is 203.69us at block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle 4 or 8 (attempts 06/08 tied). Block_N=64 with threads=256 regressed to 269.76us (attempt-09), so narrow-N is dropped and block_N raised to {128,256} to probe wider-N arithmetic intensity with the confirmed 128-thread layout, which so far has only been tested at block_N=128. block_M kept {64,128} so 128x128 and 128x256 tiles with 128 threads can finally be exercised; block_M=32 stays excluded (narrow-M regression in attempt-03). block_K {32,64} with 32 proven; 64 retained to recheck wider-K under the 32KB footprint cap. Stages {2,3,4} to keep depth exploration including stage=4; stage=1 excluded as under-pipelined. Threads {128,256} since 128 won and 256 gives a cheap wider-warp check at block_N=256; 64 dropped (200 registers, 295.78us). Swizzle {0,4,8}: 4/8 tied and swizzle=0 re-establishes the row-major reference at the new tile region to verify whether panel reuse is a proxy artifact; 16/32/64 dropped as cache-exceeding regressions. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): smem binds at the 32768B cap across winning configs, launches remain ample at 2048 square, and deeper pipelining has consistently helped. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and proxy cost is a dimensionless ranking only. Next hypothesis: block_N=256 (or block_M=128) with threads=128, stage 2-3, swizzle 4/8 may beat 203.69us if wider tiles raise arithmetic intensity without breaking the footprint cap; if swizzle=0 ties 4/8, panel reuse is confirmed non-materializing and can be retired. No claim of global optimality."
+  },
+  "selection": {
+    "block_M": 64,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128,
+    "swizzle": 0
+  },
+  "proxy_cost": 5.682531839999999,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 130,
+    "smem_bytes": 32768,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 222.1818392034746,
+  "simulated_dram_mb": 16.777216,
+  "simulated_blocks_per_sm": 3,
+  "best_simulated_us": 203.6936494479265
+}

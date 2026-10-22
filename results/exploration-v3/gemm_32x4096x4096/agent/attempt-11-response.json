@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[16],\"block_N\":[64],\"block_K\":[64],\"num_stages\":[2],\"threads\":[128,256],\"swizzle\":[0]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":0.3,\"launches\":1.5,\"pipeline\":1,\"footprint\":1},\"rationale\":\"History: attempts 08/09 MIP-infeasible because stage>=3 with block_N>=128 and block_K>=64 exceeds the 32768-byte cap (e.g. N=128,K=64,st=3 estimate 61440B); stage=4 is cap-infeasible for every tuple. The incumbent 147.67us is block_M=32,block_N=64,block_K=64,st=2,thr 128/256 (attempts 03/04); many swizzle and thread reproductions (06/07/10) gave identical 33.8MB DRAM and ~147.68us, so the serpentine panel-reuse proxy shows no measured locality at M/block_M=1 and traffic stays low (0.3). Key structural change: force the one feasible untested point family, block_M=16 with block_N=64, block_K=64, num_stages=2 (estimate max(2*64*80*2=20480, 4*16*64=4096)=20480B, under cap). This tests whether halving block_M changes occupancy/epilogue overhead at M=32 (2 tile rows instead of 1) versus the incumbent single-tile-row shape; swizzle is fixed to [0] because every nonzero swizzle tested (8/16/32/64) reproduced flat DRAM and latency or was SMT-infeasible, and launches weight 1.5/n=64 keeps enough blocks to fill the machine. Threads {128,256} both tied at the winner, retained to resolve the thread domain cheaply. Footprint/pipeline at 1 to stay off the cap edge. Next hypothesis: if block_M=16/st=2 does not beat 147.67us, revert to block_M=32 and test block_K=128 only at block_N=64/st=2 if the estimate fits (2*128*96*2=49152B exceeds cap, so likely infeasible), otherwise accept the incumbent family and stop broadening. GB10 values are simulator estimates, not hardware measurements; Metal validates exact source/TIR numerically but the CUDA binary is not executed, so compile/memory status is a scoped estimate, not a hardware proof. No global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 9292,
+    "completion_tokens": 563,
+    "total_tokens": 9855,
+    "prompt_tokens_details": {
+      "cached_tokens": 8320
+    },
+    "prompt_cache_hit_tokens": 8320,
+    "prompt_cache_miss_tokens": 972
+  },
+  "response_id": "d7144612-89d3-49ac-b478-90fd0324d898"
+}

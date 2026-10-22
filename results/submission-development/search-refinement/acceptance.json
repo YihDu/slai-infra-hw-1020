@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "tested_candidates": 4,
+  "numeric_test_cases": 12,
+  "elapsed_seconds": 87.608,
+  "distinct_launch_configurations": 4,
+  "all_smt_passed": true
+}

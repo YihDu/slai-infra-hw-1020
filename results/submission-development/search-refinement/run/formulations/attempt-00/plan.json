@@ -1,0 +1,40 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      64,
+      128,
+      256
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial plan for M=32,N=4096,K=4096. block_M restricted to [16,32] since M=32 must be divisible and larger tiles would waste rows; block_N spans 64..256 to control launch count over the wide N; block_K and stages explore pipeline depth; threads [64,128,256] to probe warp layout given the proxy ties them. swizzle=[0] establishes the required row-major baseline (one tile row makes swizzle launch-equivalent anyway). Shared estimate max(2*block_K*(block_M+block_N)*stages, 4*block_M*block_N) with a 32768-byte cap, well under the portability limit for these small M tiles. Equal weights initially; next hypothesis: after baseline, expand swizzle and test a changed block_K/thread domain to see whether pipeline depth or thread count drives simulated latency, acknowledging this proxy is dimensionless and GB10 estimates are simulator-only."
+}

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128,256],\"block_K\":[64,128],\"num_stages\":[1,2,3,4],\"threads\":[128,256],\"swizzle\":[0,4,8]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1.2,\"launches\":1.2,\"pipeline\":1.2,\"footprint\":0.5},\"rationale\":\"Attempt-04 was infeasible because the narrow domains combined with the 32768-byte cap left no allowed tuples once excluded configs were removed (block_N=[128,256] with block_M=[64,128], block_K=[64,128], stages 2-4 overshoot the estimate). Broaden to restore feasibility: add block_N=64 back (attempt-03 winner used block_N=64), widen block_K to include 64 only (128 kept for deeper-work test), and keep stages 1-4 (attempt-00 won at stage=1 with threads=256, attempt-03 won at stage=2 with threads=128; stage=1 should stay eligible). Best observed is attempt-03 at 156.26us (block_M=64,block_N=64,block_K=64,stages=2,threads=128,swizzle=4, 3 blocks/SM); attempt-00 close at 157.29us (block_M=128,block_N=64,block_K=64,stages=1,threads=256,swizzle=0). attempts-01/02 (block_M=32,block_N=128,block_K=32,stages=3,threads=256) both 186.64us identical across swizzle 16 vs 64, confirming small-tile/short-block_K regime is worse and panel swizzle gave no measurable gain there; drop block_M=16/32 and block_K=32. Swizzle trimmed to [0,4,8] since 16/64 were equivalent and M=128 gives at most 2 tile rows. Weights: pipeline raised to equal traffic/launches at 1.2 to keep stage choices competitive without over-bias; footprint dropped to 0.5 (smem pinned at cap and not the binding limiter in either winner). Next hypothesis: test block_M=64/128 with block_N=128/256 (wider N, fewer launches, still feasible via block_N=64 fallback) at block_K=64/128 to see if launch reduction beats 156.26us, and probe threads=128 vs 256 at deeper stages. Validation scope: Metal executed exact source/config/TIR numerics; CUDA binary not executed; GB10 latencies are simulator estimates, not hardware measurements; no global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 4788,
+    "completion_tokens": 601,
+    "total_tokens": 5389,
+    "prompt_tokens_details": {
+      "cached_tokens": 4096
+    },
+    "prompt_cache_hit_tokens": 4096,
+    "prompt_cache_miss_tokens": 692
+  },
+  "response_id": "9f21be1f-3350-4573-8056-45bc5044dd5a"
+}

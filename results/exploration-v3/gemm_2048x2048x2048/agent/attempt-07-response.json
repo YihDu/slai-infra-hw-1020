@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[2,3],\"threads\":[64,128],\"swizzle\":[0,4,8]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":0.5,\"pipeline\":1.25,\"footprint\":1.5},\"rationale\":\"Best observed is attempt-06 at 203.69us (block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle=8), improving on the 232.89us incumbent when the changed thread domain was finally exercised (128 threads gave 3 blocks/SM instead of 2). History shows: stage=1 under-pipelines (attempts 00/03); block_M=32/block_N=256 with swizzle=64 regressed to 440.81us; swizzle=4 and swizzle=8 tie at 232.89us in the 256-thread region and swizzle=16 regressed, so panel locality is largely a proxy artifact, not a measured win. Revision: keep block_M {64,128}, block_N {64,128} near the confirmed region; block_K {32,64} with 32 the proven winner; stages {2,3} to retain depth near the working point without overspending footprint at the 32KB cap; threads narrowed to {64,128} to consolidate the win at 128 while still testing 64 against the confirmed 128 (256 dropped since it consistently gave 2 blocks/SM and never won). Swizzle kept {0,4,8}: swizzle=0 to re-verify whether serpentine panels help at the new 128-thread config, 4/8 retained as near-tied options, wider panels (16/32/64) dropped as cache-exceeding regressions. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at the cap and pipelining helped, block counts already ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements, and proxy cost is only a dimensionless ranking. Next hypothesis: threads=128 with block_M=128 or block_K=64 and stage 2-3 near the attempt-06 tile may further lower latency; if swizzle=0 ties swizzle=4/8 the panel-reuse feature is confirmed non-materializing and can be retired. No claim of global optimality.\"}",
+  "usage": {
+    "prompt_tokens": 5629,
+    "completion_tokens": 574,
+    "total_tokens": 6203,
+    "prompt_tokens_details": {
+      "cached_tokens": 4608
+    },
+    "prompt_cache_hit_tokens": 4608,
+    "prompt_cache_miss_tokens": 1021
+  },
+  "response_id": "8354d379-541b-4dd0-b862-40d443b3e204"
+}

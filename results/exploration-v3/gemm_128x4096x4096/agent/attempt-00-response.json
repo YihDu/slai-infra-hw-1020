@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[16,32,64,128],\"block_N\":[32,64,128,256],\"block_K\":[32,64,128],\"num_stages\":[1,2,3,4],\"threads\":[64,128,256],\"swizzle\":[0]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1,\"footprint\":1},\"rationale\":\"Initial baseline plan for gemm_128x4096x4096 (M=128,N=4096,K=4096). Domains chosen so tiles divide M/N/K: block_M in {16,32,64,128} divides 128; block_N in {32,64,128,256} divides 4096; block_K in {32,64,128} divides 4096. num_stages 1-4 and threads 64/128/256 included for exploration, but swizzle restricted to [0] to establish a conventional row-major baseline as instructed. Shared limit 32768 (also within the hard portability cap) to keep register/shared pressure conservative for Metal/GB10 portability; estimate = max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) will bind for large tiles at high stages. Equal weights 1 for traffic, launches, pipeline, footprint to get an unbiased first ranking. Note M has a single tile row for block_M=128, so swizzle reuse gains are moot there; larger N tiles reduce launches but increase footprint, and smaller block_M may add parallelism. Next hypothesis after baseline: perturb thread domain (e.g., 256) and block_K (e.g., 128) to test register/pipeline trade-offs, then expand swizzle to [0,4,8,16,32,64] once row-major baseline is measured.\"}",
+  "usage": {
+    "prompt_tokens": 1034,
+    "completion_tokens": 407,
+    "total_tokens": 1441,
+    "prompt_tokens_details": {
+      "cached_tokens": 640
+    },
+    "prompt_cache_hit_tokens": 640,
+    "prompt_cache_miss_tokens": 394
+  },
+  "response_id": "601845d9-01d1-4f24-8491-21088a326424"
+}

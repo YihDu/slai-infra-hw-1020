@@ -1,0 +1,79 @@
+# from tvm.script import ir as I
+# from tvm.script import tirx as T
+
+@I.ir_module
+class Module:
+    @T.prim_func
+    def matmul_kernel(A: T.handle("float16", "global"), B: T.handle("float16", "global"), C: T.handle("float16", "global")):
+        T.func_attr({"calling_conv": 2, "dyn_shared_memory_buf": 30720, "target": T.target({"arch": "sm_121a", "keys": ["cuda", "gpu"], "kind": "cuda", "max_num_threads": 1024, "tag": "", "thread_warp_size": 32}), "thread_extent": {"blockIdx.x": 64, "blockIdx.y": 2, "threadIdx.x": 128, "threadIdx.y": 1, "threadIdx.z": 1}, "tirx.is_global_func": T.bool(True), "tirx.kernel_launch_params": ["blockIdx.x", "blockIdx.y", "threadIdx.x", "threadIdx.y", "threadIdx.z", "tirx.use_dyn_shared_memory"], "tirx.noalias": True, "tl.non_restrict_params": [], "tl.readonly_param_indices": [0, 1]})
+        C_1 = T.decl_buffer((131072,), "float16", data=C)
+        bx = T.launch_thread("blockIdx.x", 64)
+        buf_dyn_shmem = T.alloc_buffer((30720,), "uint8", scope="shared.dyn")
+        a_s: T.handle("float16", "shared.dyn") = T.handle_add_byte_offset(buf_dyn_shmem.data, 0)
+        c_s: T.handle("float32", "shared.dyn") = T.handle_add_byte_offset(buf_dyn_shmem.data, 0)
+        b_s: T.handle("float16", "shared.dyn") = T.handle_add_byte_offset(buf_dyn_shmem.data, 6144)
+        acc = T.alloc_buffer((8,), scope="local")
+        by = T.launch_thread("blockIdx.y", 2)
+        thread_binding = T.launch_thread("threadIdx.x", 128)
+        ty = T.launch_thread("threadIdx.y", 1)
+        tz = T.launch_thread("threadIdx.z", 1)
+        acc_1 = T.decl_buffer((8,), data=acc.data, scope="local")
+        c_s_1 = T.decl_buffer((1024,), data=c_s, scope="shared.dyn")
+        acc_2 = T.decl_buffer((8,), data=acc.data, scope="local")
+        for i in T.unroll(2):
+            acc_2[i * 4:i * 4 + 4] = T.Broadcast(T.float32(0.0), 4)
+        T.ptx_cp_async(T.tvm_access_ptr(T.type_annotation("float16"), a_s, thread_binding // 8 * 64 + (thread_binding % 64 // 32 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 32 // 16 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 16 // 8 + thread_binding % 2) % 2 * 8, 1, 2), T.tvm_access_ptr(T.type_annotation("float16"), A, bx % 2 * 65536 + thread_binding // 8 * 4096 + thread_binding % 8 * 8, 1, 1), 8)
+        for i in T.unroll(4):
+            T.ptx_cp_async(T.tvm_access_ptr(T.type_annotation("float16"), b_s, i * 1024 + thread_binding // 8 * 64 + (thread_binding % 64 // 32 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 32 // 16 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 16 // 8 + thread_binding % 2) % 2 * 8, 1, 2), T.tvm_access_ptr(T.type_annotation("float16"), B, i * 65536 + thread_binding // 8 * 4096 + by * 2048 + bx // 2 * 64 + thread_binding % 8 * 8, 1, 1), 8)
+        T.ptx_commit_group()
+        T.ptx_cp_async(T.tvm_access_ptr(T.type_annotation("float16"), a_s, thread_binding // 8 * 64 + (thread_binding % 64 // 32 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 32 // 16 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 16 // 8 + thread_binding % 2) % 2 * 8 + 1024, 1, 2), T.tvm_access_ptr(T.type_annotation("float16"), A, bx % 2 * 65536 + thread_binding // 8 * 4096 + thread_binding % 8 * 8 + 64, 1, 1), 8)
+        for i in T.unroll(4):
+            T.ptx_cp_async(T.tvm_access_ptr(T.type_annotation("float16"), b_s, i * 1024 + thread_binding // 8 * 64 + (thread_binding % 64 // 32 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 32 // 16 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 16 // 8 + thread_binding % 2) % 2 * 8 + 4096, 1, 2), T.tvm_access_ptr(T.type_annotation("float16"), B, i * 65536 + thread_binding // 8 * 4096 + by * 2048 + bx // 2 * 64 + thread_binding % 8 * 8 + 262144, 1, 1), 8)
+        T.ptx_commit_group()
+        for p in T.serial(62, annotations={"tl_pipelined_num_stages": 3}):
+            T.tvm_storage_sync("shared.dyn")
+            T.ptx_cp_async(T.tvm_access_ptr(T.type_annotation("float16"), a_s, (p + 2) % 3 * 1024 + thread_binding // 8 * 64 + (thread_binding % 64 // 32 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 32 // 16 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 16 // 8 + thread_binding % 2) % 2 * 8, 1, 2), T.tvm_access_ptr(T.type_annotation("float16"), A, bx % 2 * 65536 + thread_binding // 8 * 4096 + p * 64 + thread_binding % 8 * 8 + 128, 1, 1), 8)
+            for i in T.unroll(4):
+                T.ptx_cp_async(T.tvm_access_ptr(T.type_annotation("float16"), b_s, (p + 2) % 3 * 4096 + i * 1024 + thread_binding // 8 * 64 + (thread_binding % 64 // 32 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 32 // 16 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 16 // 8 + thread_binding % 2) % 2 * 8, 1, 2), T.tvm_access_ptr(T.type_annotation("float16"), B, p * 262144 + i * 65536 + thread_binding // 8 * 4096 + by * 2048 + bx // 2 * 64 + thread_binding % 8 * 8 + 524288, 1, 1), 8)
+            T.ptx_commit_group()
+            T.ptx_wait_group(2)
+            T.tvm_storage_sync("shared")
+            T.attr(0, "lexical_alloc_scope", 1)
+            A_local = T.alloc_buffer((8,), "float16", scope="local")
+            B_local = T.alloc_buffer((8,), "float16", scope="local")
+            for ki in range(4):
+                T.ptx_ldmatrix(T.bool(False), 4, T.tvm_access_ptr(T.type_annotation("float16"), a_s, p % 3 * 1024 + thread_binding % 16 * 64 + (thread_binding % 8 // 4 + ki // 2) % 2 * 32 + (thread_binding % 4 // 2 + ki % 2) % 2 * 16 + (thread_binding % 32 // 16 + thread_binding % 2) % 2 * 8, 8, 1), T.tvm_access_ptr(T.type_annotation("float16"), A_local.data, 0, 8, 2))
+                T.ptx_ldmatrix(T.bool(True), 4, T.tvm_access_ptr(T.type_annotation("float16"), b_s, p % 3 * 4096 + ki * 1024 + thread_binding % 16 * 64 + (thread_binding // 64 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 64 // 32 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 32 // 16 + thread_binding % 2) % 2 * 8, 8, 1), T.tvm_access_ptr(T.type_annotation("float16"), B_local.data, 0, 8, 2))
+                T.ptx_mma("float32", "m16n8k16", "row", "col", "fp16", "fp16", "fp32", A_local.data, 0, B_local.data, 0, acc.data, 0, T.bool(False))
+                T.ptx_mma("float32", "m16n8k16", "row", "col", "fp16", "fp16", "fp32", A_local.data, 0, B_local.data, 4, acc.data, 4, T.bool(False))
+        T.ptx_wait_group(1)
+        T.tvm_storage_sync("shared")
+        with T.attr(0, "lexical_alloc_scope", 1):
+            A_local = T.alloc_buffer((8,), "float16", scope="local")
+            B_local = T.alloc_buffer((8,), "float16", scope="local")
+            for ki in range(4):
+                T.ptx_ldmatrix(T.bool(False), 4, T.tvm_access_ptr(T.type_annotation("float16"), a_s, thread_binding % 16 * 64 + (thread_binding % 8 // 4 + ki // 2) % 2 * 32 + (thread_binding % 4 // 2 + ki % 2) % 2 * 16 + (thread_binding % 32 // 16 + thread_binding % 2) % 2 * 8 + 2048, 8, 1), T.tvm_access_ptr(T.type_annotation("float16"), A_local.data, 0, 8, 2))
+                T.ptx_ldmatrix(T.bool(True), 4, T.tvm_access_ptr(T.type_annotation("float16"), b_s, ki * 1024 + thread_binding % 16 * 64 + (thread_binding // 64 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 64 // 32 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 32 // 16 + thread_binding % 2) % 2 * 8 + 8192, 8, 1), T.tvm_access_ptr(T.type_annotation("float16"), B_local.data, 0, 8, 2))
+                T.ptx_mma("float32", "m16n8k16", "row", "col", "fp16", "fp16", "fp32", A_local.data, 0, B_local.data, 0, acc.data, 0, T.bool(False))
+                T.ptx_mma("float32", "m16n8k16", "row", "col", "fp16", "fp16", "fp32", A_local.data, 0, B_local.data, 4, acc.data, 4, T.bool(False))
+        T.ptx_wait_group(0)
+        T.tvm_storage_sync("shared")
+        with T.attr(0, "lexical_alloc_scope", 1):
+            A_local = T.alloc_buffer((8,), "float16", scope="local")
+            B_local = T.alloc_buffer((8,), "float16", scope="local")
+            for ki in range(4):
+                T.ptx_ldmatrix(T.bool(False), 4, T.tvm_access_ptr(T.type_annotation("float16"), a_s, thread_binding % 16 * 64 + (thread_binding % 8 // 4 + ki // 2) % 2 * 32 + (thread_binding % 4 // 2 + ki % 2) % 2 * 16 + (thread_binding % 32 // 16 + thread_binding % 2) % 2 * 8, 8, 1), T.tvm_access_ptr(T.type_annotation("float16"), A_local.data, 0, 8, 2))
+                T.ptx_ldmatrix(T.bool(True), 4, T.tvm_access_ptr(T.type_annotation("float16"), b_s, ki * 1024 + thread_binding % 16 * 64 + (thread_binding // 64 + thread_binding % 8 // 4) % 2 * 32 + (thread_binding % 64 // 32 + thread_binding % 4 // 2) % 2 * 16 + (thread_binding % 32 // 16 + thread_binding % 2) % 2 * 8, 8, 1), T.tvm_access_ptr(T.type_annotation("float16"), B_local.data, 0, 8, 2))
+                T.ptx_mma("float32", "m16n8k16", "row", "col", "fp16", "fp16", "fp32", A_local.data, 0, B_local.data, 0, acc.data, 0, T.bool(False))
+                T.ptx_mma("float32", "m16n8k16", "row", "col", "fp16", "fp16", "fp32", A_local.data, 0, B_local.data, 4, acc.data, 4, T.bool(False))
+        T.tvm_storage_sync("shared")
+        for i in T.unroll(4):
+            c_s_1[i % 2 * 512 + thread_binding % 32 // 4 * 64 + thread_binding // 32 * 16 + i // 2 * 8 + thread_binding % 4 * 2:i % 2 * 512 + thread_binding % 32 // 4 * 64 + thread_binding // 32 * 16 + i // 2 * 8 + thread_binding % 4 * 2 + 2] = acc_1[i * 2:i * 2 + 2]
+        T.tvm_storage_sync("shared")
+        for i in T.unroll(2):
+            T.attr(0, "lexical_alloc_scope", 1)
+            c_s_local_cast_1 = T.alloc_buffer((4,), scope="local")
+            C_local_cast = T.alloc_buffer((4,), "float16", scope="local")
+            c_s_local_cast_1[0:4] = c_s_1[i * 512 + thread_binding * 4:i * 512 + thread_binding * 4 + 4]
+            C_local_cast[0:4] = T.Cast("float16x4", c_s_local_cast_1[0:4])
+            C_1[bx % 2 * 65536 + i * 32768 + thread_binding // 16 * 4096 + by * 2048 + bx // 2 * 64 + thread_binding % 16 * 4:bx % 2 * 65536 + i * 32768 + thread_binding // 16 * 4096 + by * 2048 + bx // 2 * 64 + thread_binding % 16 * 4 + 4] = C_local_cast[0:4]

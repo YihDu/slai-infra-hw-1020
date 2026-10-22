@@ -1,0 +1,43 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 2,
+    "launches": 0.5,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "History: baseline 128x64x64 s1 t256 sw0=3560.55us; 32x256x32 s1 t256 sw64=3518.99us; 32x256x32 s1 t128 sw64=2504.88us (best prior); 64x128x32 s2 t256 sw64=3989.52us; 32x256x32 s1 t64 sw64=2891.16us; 32x256x32 s1 t128 sw32=2503.47us (new best, 278.9MB DRAM, 3 blocks/SM). Lessons: threads=128 clearly beats 256 and 64 at the winning wide-N tile; wide-N (256) with narrow block_M reduces DRAM and latency; swizzle>=32 helps but 32 vs 64 barely differs here, so I keep a spread of panels [0,8,16,32,64] to test smaller panels and re-confirm row-major. Excluding the exact evaluated tuples, I re-admit block_K=128 and num_stages=3-4 combined with wider block_M=64/128 and threads=128/256 to probe untested structural points (deeper pipeline with larger K-chunks) rather than re-spending rounds on equivalent swizzles at fixed 32x256x32. block_K=32 retained since the best configs use it; block_N>=128 retained (32 dropped as low-N), block_M>=32 (16 dropped as low-reuse). Weights: traffic 2 because DRAM reductions tracked latency gains, launches 0.5 since 4096^2 grid already saturates, pipeline 1 (deeper stages untested benefit), footprint 1. Estimate max(2*block_K*(block_M+block_N)*num_stages,4*block_M*block_N) plus hard 32768 cap prunes oversized combos (e.g. 128x256 with high K/stages). Scope: Metal checks execute exact source/config/TIR but do NOT execute the CUDA binary; GB10 values are simulator estimates, not hardware. Next hypothesis: test whether threads=128 with block_M=64/128, block_K=64/128 and num_stages=2-4 can beat 2503us, and whether swizzle=8/16 with narrow-M wide-N differentiates from 32/64; if larger block_M or deeper stages lose, drop them and try t=128 with smaller block_N next."
+}

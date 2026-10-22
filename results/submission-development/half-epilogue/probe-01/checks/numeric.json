@@ -1,0 +1,10 @@
+{
+  "status": "error",
+  "passed": false,
+  "error_type": "InternalError",
+  "reason": "Check failed: (dtype == DataType::Float(16) || dtype == DataType::Float(32) || dtype == DataType::BFloat(16)) is false: Only float16, float32, and bfloat16 are supported, but got float32x4",
+  "checked_target": "metal",
+  "cuda_binary_executed": false,
+  "config_sha256": "f11c266fd1878fa9b05a922a140c93601a9eeed611dfbf567d80b97370d9ac4d",
+  "elapsed_ms": 2465
+}

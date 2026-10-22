@@ -1,0 +1,41 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      64,
+      128,
+      256
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial plan for 4096^3 GEMM. All tiles divide M=N=K=4096. Domains span block_M 32-128, block_N 32-256, block_K 32-64, stages 1-4, and threads 64-256, with swizzle fixed to 0 for a conventional row-major baseline as instructed. The analytic shared-memory estimate 2*block_K*(block_M+block_N)*num_stages stays under the 32768 cap for these choices (e.g. 64x128x64x3 = 73728 would exceed it, so HiGHS selection plus the cap prunes large-tile/high-stage combos); footprint and traffic terms are weighted equally. No prior observations exist, so weights are uniform. This is a scoped analytic estimate, not a compiled-memory proof. Next hypothesis: after baseline feedback, vary the thread domain (or block_K) first, then expand swizzle to [0,4,8,16,32,64] and consider block_M=128/block_N=256 and num_stages=4, revising weights/domains if simulator traffic/latency or memory checks contradict the reuse proxy."
+}

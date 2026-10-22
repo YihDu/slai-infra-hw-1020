@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[128,256],\"block_K\":[32,64],\"num_stages\":[2,3,4],\"threads\":[128],\"swizzle\":[0,4,8,16,32,64]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1.5,\"footprint\":0.5},\"rationale\":\"Best remains attempt-04 (64x128x32,s2,t128,sw64) at 462.42us; attempt-06 tied at 462.54us with sw32. Deeper stages hurt: attempt-08 (64x64x32,s3) regressed to 524.35us despite 4 blocks/SM and lower smem, so restrict num_stages to [2,3,4] but drop the block_N=64 corner that drove that pick. Threads: 64 (654.98us) and 256 (474.98us) both regressed vs 128, so fix threads=[128]; single-value domain is justified by measured feedback. Simulated DRAM invariant at 16.78MB across every run, so panel-reuse/swizzle hypothesis stays unsupported; keep traffic=1, pipeline=1.5, footprint=0.5. Narrow block_N to [128,256] to avoid slow 64-wide N, keep block_M=[64,128], block_K=[32,64], full swizzle. Next hypothesis: block_M=128 with block_N=128/256 at stages=2-3, threads=128 beats 462.42us by raising tile-row count and pipelining K; if 128-wide M regresses, the 64x128x32,s2 sweet spot is confirmed locally. Scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 6748,
+    "completion_tokens": 412,
+    "total_tokens": 7160,
+    "prompt_tokens_details": {
+      "cached_tokens": 6016
+    },
+    "prompt_cache_hit_tokens": 6016,
+    "prompt_cache_miss_tokens": 732
+  },
+  "response_id": "ee4e12d5-b027-4e68-929c-43591b454c1c"
+}

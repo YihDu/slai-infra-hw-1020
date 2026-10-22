@@ -1,0 +1,21 @@
+{
+  "config": {
+    "block_M": 64,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128,
+    "swizzle": 16
+  },
+  "development_only": true,
+  "numeric": {
+    "status": "error",
+    "passed": false,
+    "error_type": "InternalError",
+    "reason": "coalesced_width should be an IntImmNode.",
+    "checked_target": "metal",
+    "cuda_binary_executed": false,
+    "config_sha256": "f11c266fd1878fa9b05a922a140c93601a9eeed611dfbf567d80b97370d9ac4d",
+    "elapsed_ms": 2484
+  }
+}

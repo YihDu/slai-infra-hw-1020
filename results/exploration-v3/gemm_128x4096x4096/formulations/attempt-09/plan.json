@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      64
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.2,
+    "launches": 1.2,
+    "pipeline": 1.3,
+    "footprint": 0.5
+  },
+  "rationale": "Nine attempts observed. Best remains attempt-03 (block_M=64,block_N=64,block_K=64,stages=2,threads=128,swizzle=4, smem=32768, 3 blocks/SM) at 156.26us. attempts-05/06/07 all tie at 156.49us for block_M=64,block_N=128,block_K=64,stages=1,threads=256 across swizzle 4/8/64, so large panels give no measurable gain when M=128 limits reuse to <=2 tile rows. attempt-08 (block_M=64,block_N=128,block_K=64,stages=1,threads=128,swizzle=4) was slower at 157.64us with 132 registers, showing too few threads at stage=1 hurts. attempts-01/02 rejected the small-tile/short-K regime (186.64us). All attempts compiled, passed SMT and numerics. Revision: keep block_K=64 (the competitive regime; block_K=128 repeatedly drove MIP infeasibility at the 32768 cap and has never won), retain block_M 64/128 and block_N 64/128/256 for launch-vs-footprint trade-offs, and restrict threads to [128] since 256 tied but never beat 128 and 64 is unmeasured. Raise num_stages to [2,3,4] to test whether deeper K-pipelining at block_K=64 can break the 156.26us plateau (stage=1 with threads=128 lost in attempt-08), keeping the winning stage=2 tuple eligible. Swizzle trimmed to [0,4] since 8/16/32/64 were equivalent. Weights: pipeline raised to 1.3 to favor stage exploration, traffic/launches 1.2, footprint 0.5 since smem is pinned at the portability cap and not the binding limiter. Shared limit stays 32768 (hard portability cap binds). Next hypothesis: stages=3-4 with threads=128 at the winning block_M=64,block_N=64 tiles may beat 156.26us; block_M=128/block_N=64 alternate may tie. Validation scope: Metal executed exact source/config/TIR numerics; CUDA binary not executed; GB10 latencies are simulator estimates, not hardware measurements; no global optimality claimed."
+}

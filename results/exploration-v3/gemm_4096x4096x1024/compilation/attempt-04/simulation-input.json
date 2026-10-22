@@ -1,0 +1,22 @@
+{
+  "path": "cpasync",
+  "sass": "kernel.sass",
+  "kernel": "matmul_kernel",
+  "shape": {
+    "M": 4096,
+    "N": 4096,
+    "K": 1024
+  },
+  "holes": {
+    "block_M": 64,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128,
+    "swizzle": 64
+  },
+  "regs": 130,
+  "smem_bytes": 32768,
+  "warm": true,
+  "split": 1
+}

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128,256],\"block_N\":[128,256],\"block_K\":[32,64],\"num_stages\":[2,3],\"threads\":[128],\"swizzle\":[8,16,32]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1.5,\"footprint\":0.5},\"rationale\":\"Best is attempt-09 (64x128x32,s2,t128,sw16) at 399.54us; attempt-10 with identical tile/stage/thread but sw8 tied exactly at 399.54us, so mid-range swizzle 8-16 is the active ingredient versus sw32/64 (462us) even though simulated DRAM stays invariant at 16.78MB — analytic traffic does not capture this, so keep traffic=1, pipeline=1.5, footprint=0.5 and rely on measured feedback. Threads: 64 (654.98us) and 256 (474.98us) both regressed, so fix threads=[128]. stages=3 regressed at 64x64 (524.35us), so keep num_stages=[2,3] biased to s2. block_N=64 drove the slow attempt-08, so restrict to [128,256]. To test the still-unexplored large-M hypothesis, expand block_M to [64,128,256] (256 divides M=4096 and may raise per-SM work while keeping swizzle panel reuse meaningful); keep block_K=[32,64] to test deeper-K at the winning tile, and swizzle [8,16,32] to bracket the winner. Note smem estimate 4*block_M*block_N=4*256*256=262144 > cap so 256x256 is pruned by HiGHS; 128x256 footprint 131072 also infeasible, steering toward feasible large-M/moderate-N combos. Next hypothesis: block_M=128 (or 256) with block_N=128/256, block_K=32/64, stages=2, threads=128, swizzle 8-32 lowers latency below 399.54us. Validation scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 8050,
+    "completion_tokens": 503,
+    "total_tokens": 8553,
+    "prompt_tokens_details": {
+      "cached_tokens": 7296
+    },
+    "prompt_cache_hit_tokens": 7296,
+    "prompt_cache_miss_tokens": 754
+  },
+  "response_id": "17af5303-ade8-4efd-89a9-65fc9fe8f983"
+}

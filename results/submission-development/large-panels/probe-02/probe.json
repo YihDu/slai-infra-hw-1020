@@ -1,0 +1,203 @@
+{
+  "config": {
+    "block_M": 128,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128,
+    "swizzle": 32
+  },
+  "development_only": true,
+  "numeric": {
+    "status": "passed",
+    "passed": true,
+    "checked_target": "metal",
+    "cuda_binary_executed": false,
+    "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+    "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "config": {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 32
+    },
+    "tir_sha256": "a7e058ac4f7f083f0e40a144f6e8376235b2951d35e699b200913471c91577e4",
+    "metal_sha256": "004b23b553f0352526ec703ae8cc9140e281ca3dfd346db14078acc82d14493b",
+    "reference": "CPU PyTorch float64 full matmul rounded to float16",
+    "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "torch_version": "2.11.0",
+    "tilelang_version": "0.1.15",
+    "disk_kernel_cache_disabled": true,
+    "tolerance": {
+      "rtol": 0.02,
+      "atol": 0.002
+    },
+    "cases": [
+      {
+        "pattern": "normal",
+        "seed": 42,
+        "passed": true,
+        "max_abs_error": 0.001953125,
+        "mismatches": 0,
+        "elapsed_ms": 1763,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      },
+      {
+        "pattern": "normal",
+        "seed": 7,
+        "passed": true,
+        "max_abs_error": 0.001953125,
+        "mismatches": 0,
+        "elapsed_ms": 572,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      },
+      {
+        "pattern": "zero_rows_signed_columns",
+        "seed": 42,
+        "passed": true,
+        "max_abs_error": 0.001953125,
+        "mismatches": 0,
+        "elapsed_ms": 592,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      }
+    ],
+    "config_sha256": "54956f0a62dfc1f996c39c606f37c65046b92068c0ffdb5c9e9f58dd884374c1",
+    "elapsed_ms": 9953
+  },
+  "compile": {
+    "status": "compiled",
+    "target": "sm_121a",
+    "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "config_sha256": "54956f0a62dfc1f996c39c606f37c65046b92068c0ffdb5c9e9f58dd884374c1",
+    "gpu_execution": false,
+    "stage": "complete",
+    "versions": {
+      "tilelang": "0.1.15",
+      "torch": "2.11.0+cpu",
+      "nvidia-cuda-nvcc": "13.0.88",
+      "nvidia-cuda-nvdisasm": "13.4.92"
+    },
+    "device_attributes": [
+      {
+        "target": "{\"kind\":\"cuda\",\"tag\":\"\",\"keys\":[\"cuda\",\"gpu\"],\"max_num_threads\":1024,\"thread_warp_size\":32,\"arch\":\"sm_121a\"}",
+        "tirx.noalias": "True",
+        "tl.non_restrict_params": "()",
+        "tl.readonly_param_indices": "(0, 1)",
+        "tirx.is_global_func": "T.bool(True)",
+        "calling_conv": "2",
+        "tirx.kernel_launch_params": "(\"blockIdx.x\", \"blockIdx.y\", \"threadIdx.x\", \"threadIdx.y\", \"threadIdx.z\", \"tirx.use_dyn_shared_memory\")",
+        "global_symbol": "matmul_kernel",
+        "thread_extent": "{\"blockIdx.x\": 64, \"blockIdx.y\": 32, \"threadIdx.x\": 128, \"threadIdx.y\": 1, \"threadIdx.z\": 1}",
+        "dyn_shared_memory_buf": "32768"
+      }
+    ],
+    "command": [
+      "nvcc",
+      "-std=c++20",
+      "-arch=sm_121a",
+      "-cubin",
+      "/out/kernel.cu",
+      "-o",
+      "/out/kernel.cubin",
+      "-Xptxas",
+      "-v",
+      "-O3",
+      "--expt-relaxed-constexpr",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/../src",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/cutlass/include",
+      "-I/usr/local/lib/python3.12/site-packages/nvidia/cu13/include"
+    ],
+    "kernel": "matmul_kernel",
+    "registers": 123,
+    "threads": 128,
+    "static_smem_bytes": 0,
+    "dynamic_smem_bytes": 32768,
+    "smem_bytes": 32768,
+    "cubin_sha256": "e7555d36463beb609df9dc771ab015eb8676cd5e50e02650aec837354cb3ec64",
+    "sass_sha256": "0551f48cca1b847a9b6a615568d562fb8f3fd0b0a95d98c17f40ce300db83eb4",
+    "elapsed_ms": 3917,
+    "container_image": "slai-gb10-compiler:0.1.15",
+    "container_image_id": "sha256:bf3f7ba6bd1027687bb11c7b3c41231907b96acc08d6140dffe8694c3062f987"
+  },
+  "simulation": {
+    "status": "completed",
+    "source": "gb10_instruction_simulator",
+    "unit": "us",
+    "value": 2889.5914119613744,
+    "source_commit": "a628c9d963cf9c029fa596b872d6e8920ca883e8",
+    "audit": [
+      {
+        "warps": 172,
+        "warps_done": 172,
+        "cycles": 7332958.186381891
+      }
+    ],
+    "scope": "Timing simulation only; not numerical correctness",
+    "opcode_counts": {
+      "LDC": 4,
+      "S2R": 2,
+      "S2UR": 2,
+      "LDCU": 2,
+      "MOV": 3,
+      "CS2R": 32,
+      "USHF": 2,
+      "ULOP3": 2,
+      "IMAD": 27,
+      "SHF": 3,
+      "LOP3": 32,
+      "LEA": 17,
+      "IADD3": 16,
+      "UMOV": 1,
+      "ULEA": 1,
+      "IADD": 10,
+      "LDS": 22,
+      "LDGSTS": 12,
+      "LDGDEPBAR": 3,
+      "BAR": 5,
+      "ISETP": 1,
+      "DEPBAR": 2,
+      "LDSM": 24,
+      "HMMA": 64,
+      "NOP": 52,
+      "BRA": 2,
+      "STS": 32,
+      "F2FP": 32,
+      "STG": 16,
+      "EXIT": 1
+    },
+    "raw": {
+      "source": "gb10_instruction_simulator",
+      "unit": "us",
+      "sass_sha256": "0551f48cca1b847a9b6a615568d562fb8f3fd0b0a95d98c17f40ce300db83eb4",
+      "simulation": {
+        "us": 2889.5914119613744,
+        "tiles": 2048,
+        "blocks_per_sm": 3,
+        "waves": 15,
+        "dram_MB": 540.540928,
+        "parts": [
+          {
+            "counts": {},
+            "blocks": 2048,
+            "per_sm": 3,
+            "miss_frac": 0.168,
+            "dram_GBs": 193.3,
+            "us": 2886.99,
+            "busy": {
+              "tensor": 1.54,
+              "smem": 0.22,
+              "fill": 0.54,
+              "fma": 0.03,
+              "alu": 0.12,
+              "lsu": 0.12,
+              "dram": 0.97,
+              "stg": 0.03
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,654 @@
+{
+  "scope": "Actual TileLang Metal execution; not CUDA binary execution",
+  "attempts": [
+    {
+      "attempt": "attempt-00",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 256,
+        "swizzle": 0
+      },
+      "tir_sha256": "40ce0124d803a576d0c9eb936123c3d24749daac317a518e0c974de7526419a2",
+      "metal_sha256": "b1c15be451ec4d6dcdcdb63be19a8ba8c9994ca4dab4b34ed97ac37019efd909",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 1288,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 12,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 12,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "da520ab0daa2992126d992f1ff6ab3238cfc6e643082c34b66da49a7570ae59d",
+      "elapsed_ms": 8683
+    },
+    {
+      "attempt": "attempt-01",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 3,
+        "threads": 256,
+        "swizzle": 16
+      },
+      "tir_sha256": "f5d1b0de7e6733f6a2142cb6635a130375d356ffc21eb82e7a8026b11dad1e40",
+      "metal_sha256": "1ec81d09aa0b88455a305a6b0c0cc97564c23ea0d65f73ae7277279ff8937cbd",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 2704,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 49,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 44,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "a76298ef87919dad68c4c096fa84b1d58ed59a08276a1960a8532eca12677202",
+      "elapsed_ms": 6702
+    },
+    {
+      "attempt": "attempt-02",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 3,
+        "threads": 256,
+        "swizzle": 64
+      },
+      "tir_sha256": "c49508615494abeb885334556e5befd1115fea96ea387493477bf27d529b7857",
+      "metal_sha256": "1ec81d09aa0b88455a305a6b0c0cc97564c23ea0d65f73ae7277279ff8937cbd",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 697,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 41,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 36,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "c98368b503776a30ec5c648274a5c73d5bc08ba1d85d8f07f6dd2da55ab12fd6",
+      "elapsed_ms": 2993
+    },
+    {
+      "attempt": "attempt-03",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "tir_sha256": "06dbfbdc659ffbd6812faf0f55ea20b86c1571be0af0fc59352074c8e1d48f1f",
+      "metal_sha256": "5dd5c9aa642339ff76b4ec58b19648bd7471d02d56431fa808e2c67c499cc4d0",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 1405,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 7,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 13,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "dff2cc4a63cad6cb93f96a8acd83e3409b1beb5934fc8982e7f3fd575dd75c5e",
+      "elapsed_ms": 6126
+    },
+    {
+      "attempt": "attempt-05",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 256,
+        "swizzle": 8
+      },
+      "tir_sha256": "0a36d73c3cf24091d3edf2b64d5240eab0bdfe1c809cc3a8f42499a66095893f",
+      "metal_sha256": "ab5b7b55f1e4337efd22ac1a707de842a591dc1dbb0f672b456c954e954686be",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 1143,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 35,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 46,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "67ec9f2b9a81e79b62d918992e6f6bbfb4180771a550a14e1806ede64f28141e",
+      "elapsed_ms": 3387
+    },
+    {
+      "attempt": "attempt-06",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 256,
+        "swizzle": 4
+      },
+      "tir_sha256": "988585c4a162419a96d09684f2c28892dc6507b72a83d714025a56af27daa923",
+      "metal_sha256": "ab5b7b55f1e4337efd22ac1a707de842a591dc1dbb0f672b456c954e954686be",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 1083,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 42,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 159,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "583a6151999dbdc92df70aa38508bcd43a44e1c42dd4774198a70be9ab07f42c",
+      "elapsed_ms": 5036
+    },
+    {
+      "attempt": "attempt-07",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 256,
+        "swizzle": 64
+      },
+      "tir_sha256": "d33dd857be04fb14537447f9fb2f30fe60cb179b4d67d85bcff8a1dc341ab6e8",
+      "metal_sha256": "ab5b7b55f1e4337efd22ac1a707de842a591dc1dbb0f672b456c954e954686be",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 1048,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 40,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 27,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "ce8d3024f8a336538e90abcc11acba9f80fe216f6b75017f29f3113424a5d8fd",
+      "elapsed_ms": 5333
+    },
+    {
+      "attempt": "attempt-08",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "tir_sha256": "48f9951f1329fbedbd2cb8f8a8fdf9f3f6f4733edc71be23fccb8d48efa46c17",
+      "metal_sha256": "778ab64a39f226e364942dd094ef023ce643076b62836d6650689ea4ea2c69c4",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 1523,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 58,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 46,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "17c85312314960e1fd097a4c2297e5e9ac5aef64e0fe908fff1b67bd89714d59",
+      "elapsed_ms": 6290
+    },
+    {
+      "attempt": "attempt-09",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "tir_sha256": "f24f8c0001f5a8bca56df0c0e66f0b03309a2792243bb37c2b84633cbf889d09",
+      "metal_sha256": "8fa1299ee06a3bba8decc55472ebf12678de72e539810ddfd047d1c8192a9630",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 890,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 27,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 7,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "329d23530b12e56306acb78aff83348c4fdcdcd3ad4d294add428e8cdb6abdac",
+      "elapsed_ms": 4622
+    },
+    {
+      "attempt": "attempt-10",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 4
+      },
+      "tir_sha256": "14648e21f1ac8d3e05a5b9ebec5048f4e221a4a0dc3842f0077735b4ce36ec8e",
+      "metal_sha256": "578cf8ac5cde2c10ab4333ff5fe8b977fd1c9cc35bdef33605e0cac965bd6787",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 3080,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 43,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 34,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "c9f077bf83bb3144bceb5f81f48c3fdf76ca51e92dc87e9e60ecd24c7a3b11b9",
+      "elapsed_ms": 10096
+    },
+    {
+      "attempt": "attempt-11",
+      "status": "passed",
+      "passed": true,
+      "checked_target": "metal",
+      "cuda_binary_executed": false,
+      "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config": {
+        "block_M": 64,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 8
+      },
+      "tir_sha256": "9f6c44b51a1cce34c0943dfc469ae4d1d2d79ea49aa4903b4165e24e1b3892d4",
+      "metal_sha256": "ea3953b88bf092567f8a5a217efa1ae8af4db891d09dfe23450dbf34c5c299c9",
+      "reference": "CPU PyTorch float64 full matmul rounded to float16",
+      "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+      "torch_version": "2.11.0",
+      "tilelang_version": "0.1.15",
+      "disk_kernel_cache_disabled": true,
+      "tolerance": {
+        "rtol": 0.02,
+        "atol": 0.002
+      },
+      "cases": [
+        {
+          "pattern": "normal",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 1802,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "normal",
+          "seed": 7,
+          "passed": true,
+          "max_abs_error": 0.001953125,
+          "mismatches": 0,
+          "elapsed_ms": 15,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        },
+        {
+          "pattern": "zero_rows_signed_columns",
+          "seed": 42,
+          "passed": true,
+          "max_abs_error": 0.0009765625,
+          "mismatches": 0,
+          "elapsed_ms": 11,
+          "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+        }
+      ],
+      "config_sha256": "d29ffa81e69c8469a676a7da55048e741db131cbd8078b0a48d5f60e950fa988",
+      "elapsed_ms": 6521
+    }
+  ]
+}

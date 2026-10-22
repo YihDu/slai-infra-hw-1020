@@ -1,0 +1,42 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      128,
+      256
+    ],
+    "block_K": [
+      64,
+      128
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 2,
+    "launches": 0.5,
+    "pipeline": 1.5,
+    "footprint": 1
+  },
+  "rationale": "History: baseline 128x64x64 s1 t256 sw0=3560.55us; 32x256x32 s1 t256 sw64=3518.99us; 32x256x32 s1 t128 sw64=2504.88us; 64x128x32 s2 t256 sw64=3989.52us; 32x256x32 s1 t64 sw64=2891.16us; 32x256x32 s1 t128 sw32=2503.47us (best, 278.9MB DRAM, 3 blocks/SM); 32x256x32 s1 t256 sw32=3443.78us. Lessons: threads=128 clearly dominates 64/256 at the winning tile (higher blocks/SM); block_N=256 with small block_M cuts DRAM and latency; swizzle 32 vs 64 barely differ, so further swizzle-only rounds are low value. Prior rounds kept re-selecting the same 32x256x32/s1 family; to force structural exploration I drop block_K=32 from the domain (best configs used it but it re-selects the same point) and narrow threads to {128} (measured winner), so the solver must pick block_K in {64,128} with stages spanning 1-4. block_M>=32 and block_N>=128 retained since narrow-M/wide-N won and low tiles were dropped. Stages widened back to [1,2,3,4] and pipeline weight raised to 1.5 to test whether larger block_K with deeper pipelining (untested at t128) can beat 2503us; traffic weight stays 2 since DRAM reduction tracked latency, launches 0.5 (4096^2 grid saturates), footprint 1 to keep estimate max(2*block_K*(block_M+block_N)*num_stages,4*block_M*block_N) plus hard 32768 cap meaningful. Next hypothesis: with block_K=64/128 at threads=128, does deeper pipeline plus panel swizzle reduce latency below the s1/block_K=32 best, or does larger K-chunk hurt occupancy? If block_K>=64 regresses, restore block_K=32 next round and instead explore t128 with block_N=128/block_M=64 for a different structural point. Scope: Metal checks execute exact source/config/TIR but do NOT execute the CUDA binary; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed."
+}

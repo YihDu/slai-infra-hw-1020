@@ -1,0 +1,40 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1.5,
+    "footprint": 0.5
+  },
+  "rationale": "Best is attempt-04 (64x128x32,s2,t128,sw64) at 462.42us; attempt-06 (same tile, sw32) tied at 462.54us. Simulated DRAM is invariant at 16.78MB across all runs, so the analytic panel-reuse/swizzle hypothesis is unsupported by simulator traffic; swizzle looks latency-neutral and weights keep traffic=1, pipeline upweighted 1.5 (stages=2 beat stages=1), footprint 0.5. Threads=64 (654.98us) and threads=256 (474.98us) both regressed versus 128, so fix threads=[128]. block_M=32 regressed twice, keep it dropped; keep block_M=[64,128], block_N=[64,128,256], block_K=[32,64] under the 32768 cap. Prior rounds have repeatedly selected stages=2 with the same tile/stage neighborhood; to spend this round on a structural change rather than an equivalent swizzle, shift num_stages to [3,4] and confirm whether deeper pipelining at block_M=128 or block_K=64 helps. Next hypothesis: block_M=128 with block_N=64/128, block_K=32/64, stages=3/4, threads=128 reduces simulated latency below 462.42us; if it regresses, deeper stages are not favored and the sweet spot is stages=2. Scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed."
+}

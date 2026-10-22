@@ -12,6 +12,22 @@ from test_baseline import PLAN
 
 
 class RunnerTests(unittest.TestCase):
+    def test_schema_failure_reason_reaches_next_model_request(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            workload=json.loads((Path(__file__).resolve().parents[1]/'third_party/gb10/workloads/gemm_32x4096x4096.json').read_text())
+            dump(root/'workload.json',workload)
+            requests=[]
+            def generate(config,request,**kwargs):
+                requests.append(request)
+                if len(requests)==2:raise TimeoutError('test ends after inspecting feedback')
+                return dict(text=json.dumps(dict(PLAN,shared_memory_limit=65536)),usage={})
+            argv=['runner','--workload',str(root/'workload.json'),'--output',str(root/'out'),'--rounds','2']
+            with patch.dict('os.environ',{'DEEPSEEK_API_KEY':'test-placeholder'}),patch('sys.argv',argv),patch('optimizer.runner.generate',side_effect=generate):
+                self.assertEqual(main(),0)
+            self.assertEqual(len(requests),2)
+            self.assertIn('Invalid resource budget',requests[1])
+
     def test_real_deadline_interrupts_model_wait(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)

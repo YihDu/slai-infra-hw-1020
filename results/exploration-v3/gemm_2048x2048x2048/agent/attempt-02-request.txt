@@ -1,0 +1,47 @@
+You are the formulation agent for a TileLang GEMM optimizer. Return only one JSON object.
+Your decisions define domains, a shared-memory budget and objective weights. HiGHS
+creates one binary variable per allowed tuple, selects exactly one, and minimizes
+weighted analytic costs subject to the shared-memory limit. Previously evaluated
+configurations are excluded to explore useful new points; this is not measured enumeration.
+Allowed domains: block_M [16,32,64,128], block_N [32,64,128,256], block_K [32,64,128],
+num_stages [1,2,3,4], threads [64,128,256], swizzle [0,4,8,16,32,64]. Choose nonempty subsets. Tiles must divide M,N,K.
+Shared bytes estimate = max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N).
+Explicit epilogue barriers separate lifetimes; the compiler aliases these buffers.
+Actual compiled memory is still checked; this is a scoped estimate, not a compiler proof.
+The extra FP32 epilogue permits the SAME source/TIR to execute on Mac Metal and
+compile for GB10. A hard 32768-byte portability cap is applied as well as your cap.
+Swizzle is a serpentine panel of tile rows, exactly matching the course simulator.
+For the INITIAL plan use swizzle=[0] to establish a conventional row-major baseline.
+After feedback, explore swizzle [0,4,8,16,32,64] alongside tile/stage/thread choices.
+The proxy does not explicitly price register pressure or warp layout. Thread counts
+with identical tile/stage/swizzle have tied costs: use feedback to choose thread domains.
+Large panels can exceed cache capacity; the monotone reuse proxy may misrank them.
+Revise the domain when larger panels lose. Small M often needs enough blocks to occupy
+the machine; do not assume a wider N tile is always faster. Explore different structural
+choices rather than spending every round on equivalent swizzles when M has one tile row.
+After the baseline, test a changed thread domain or block_K domain early, then use
+measured feedback to retain or reject that hypothesis. At least consider the expanded
+M/N tiles and stage=4; do not restrict the whole run to the example schema subsets.
+Analytic reuse=min(swizzle or 1,ceil(M/block_M));
+Features: traffic=2*M*N*K*(1/(block_M*reuse)+1/block_N)/1e8;
+launches=ceil(M/block_M)*ceil(N/block_N)/1000;
+pipeline=(K/block_K)/num_stages/100;
+footprint=shared_memory_bytes/49152.
+Weights: positive finite [0.001,100]. shared_memory_limit: integer [8192,49152].
+Required schema:
+{"domains":{"block_M":[32,64,128],"block_N":[64,128],"block_K":[32,64],"num_stages":[1,2,3],"threads":[128],"swizzle":[0]},"shared_memory_limit":32768,"weights":{"traffic":1,"launches":1,"pipeline":1,"footprint":1},"rationale":"Explain variables/domains, constraints, objective, observations, and the next hypothesis."}
+Use history to revise constraints/weights based on observed numerical, SMT, compile
+and simulator results. Broaden domains if exclusion makes a narrow domain infeasible.
+Seek lower GB10 simulated latency among numerically checked programs. This proxy cost
+is dimensionless; compare its ranking, never equate it to microseconds. Metal checks
+execute the exact source/config/TIR, but do not execute the CUDA binary; acknowledge
+that validation scope. GB10 values are simulator estimates, never hardware measurements.
+Describe what changed and why; do not invent observations or claim global optimality.
+
+The panel reuse feature is an analytical hypothesis, not measured truth. Inspect actual
+simulator traffic/latency and revise weights/domains if locality gains do not materialize.
+
+Workload:
+{"id": "gemm_2048x2048x2048", "operation": "C = A @ B", "inputs": {"A": {"shape": [2048, 2048], "dtype": "float16"}, "B": {"shape": [2048, 2048], "dtype": "float16"}}, "outputs": {"C": {"shape": [2048, 2048], "dtype": "float16"}}, "accumulation_dtype": "float32", "tolerance": {"rtol": 0.02, "atol": 0.002}, "evaluation": {"scope": "whole_workload"}, "baseline_config": {}}
+Observed history:
+[{"attempt": "attempt-00", "plan": {"domains": {"block_M": [32, 64, 128], "block_N": [64, 128, 256], "block_K": [32, 64], "num_stages": [1, 2, 3], "threads": [128, 256], "swizzle": [0]}, "shared_memory_limit": 32768, "weights": {"traffic": 1, "launches": 1, "pipeline": 1, "footprint": 1}, "rationale": "Initial plan. M=N=K=2048 is divisible by all chosen tiles. block_M in {32,64,128}, block_N in {64,128,256}, block_K in {32,64}, stages 1-3, threads 128/256 give a compact but non-trivial search under the 32KB portability cap. Shared estimate max(2*block_K*(block_M+block_N)*stages, 4*block_M*block_N) is checked by HiGHS against the limit. Swizzle fixed to [0] for a row-major baseline per instructions; serpentine panels deferred until feedback. Threads 128 and 256 included as a cheap early hypothesis on warp layout; block_N=256 probes wider-N alternatives and stage=3 approaches stage=4 without inflating footprint beyond cap for small tiles. Objective is equal weighting of traffic, launches, pipeline, footprint; will revise after simulator feedback on whether panel reuse or thread changes affect latency. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements."}, "selection": {"block_M": 128, "block_N": 64, "block_K": 64, "num_stages": 1, "threads": 256, "swizzle": 0}, "proxy_cost": 5.5251985066666665, "solver_status": "Optimal", "smt_bounds_passed": true, "numerical_status": "passed", "numerical_failure": null, "compilation_status": "compiled", "compilation_reason": null, "actual_resources": {"registers": 98, "smem_bytes": 32768, "threads": 256}, "simulation_status": "completed", "simulated_us": 316.972596203, "simulated_dram_mb": 16.777216, "simulated_blocks_per_sm": 2, "best_simulated_us": 316.972596203}, {"attempt": "attempt-01", "plan": {"domains": {"block_M": [32, 64, 128], "block_N": [64, 128, 256], "block_K": [32, 64, 128], "num_stages": [2, 3, 4], "threads": [128, 256], "swizzle": [0, 4, 8]}, "shared_memory_limit": 32768, "weights": {"traffic": 1, "launches": 0.5, "pipeline": 1, "footprint": 1.5}, "rationale": "Initial baseline selected block_M=128, block_N=64, block_K=64, stage=1, threads=256, swizzle=0 at 316.97us with 2 blocks/SM and full 32768B smem. Stage=1 likely under-pipelines K=2048, so this revision tests num_stages {2,3,4} (including stage=4, previously unexplored) to hide DRAM latency, and expands block_K to 128 as an early structural hypothesis. Since M=N=K=2048 is square and divisible by all tiles, wider block_N=256 and smaller block_M=32/64 are retained so launches can grow when block_M=128 yields only 16 tiles per dimension. Swizzle is now expanded beyond [0] to {0,4,8} to probe serpentine panel reuse; larger panels (16+) deferred because 2048/128=16 rows may make wide panels exceed cache, and swizzle benefit is a hypothesis not measured truth. Threads kept {128,256} since prior 256 worked; 64 excluded to avoid undersubscribed warps on 128x64 tiles. Launches weight lowered to 0.5 because 2048x2048 already has sufficient blocks at modest tiles, while footprint weight raised to 1.5 since baseline sat exactly at the 32KB cap and stage>=2 with larger block_K can breach it; HiGHS must trade stage depth against footprint. Traffic/pipeline remain 1. Validation scope unchanged: Metal numerical checks run exact source/TIR; CUDA binaries are not executed; GB10 numbers are simulator estimates, not hardware. Next hypothesis: stage>=2 plus swizzle>0 should reduce simulated latency via better K-pipelining and panel locality; if footprint dominates or swizzle=0/4/8 tie, shift budget toward block_K and stage before widening swizzle panels."}, "selection": {"block_M": 64, "block_N": 128, "block_K": 32, "num_stages": 2, "threads": 256, "swizzle": 8}, "proxy_cost": 3.2537216, "solver_status": "Optimal", "smt_bounds_passed": true, "numerical_status": "passed", "numerical_failure": null, "compilation_status": "compiled", "compilation_reason": null, "actual_resources": {"registers": 82, "smem_bytes": 32768, "threads": 256}, "simulation_status": "completed", "simulated_us": 232.88711697108477, "simulated_dram_mb": 16.777216, "simulated_blocks_per_sm": 2, "best_simulated_us": 232.88711697108477}]

@@ -1,0 +1,44 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 2,
+    "launches": 0.5,
+    "pipeline": 0.75,
+    "footprint": 1
+  },
+  "rationale": "History: baseline 128x64x64 s1 t256 sw0=3560.55us; 32x256x32 s1 t256 sw64=3518.99us; 32x256x32 s1 t128 sw64=2504.88us; 64x128x32 s2 t256 sw64=3989.52us; 32x256x32 s1 t64 sw64=2891.16us; 32x256x32 s1 t128 sw32=2503.47us (BEST, 278.9MB DRAM, 3 blocks/SM); 32x256x32 s1 t256 sw32=3443.78us; 64x128x64 s1 t128 sw64=2715.84us; 32x256x32 s1 t256 sw16=3450.96us; block_M=16 wide-N s1 t128 sw64 timed out with only 17408B smem (no result). Lessons: threads=128 is confirmed the measured winner at wide-N (3 blocks/SM); t256 recurs as analytically tied but loses ~900us in simulation, so 256 is retained only to break ties toward 128 and to avoid stalling on the excluded best family; block_M=16 caused a simulator timeout and is dropped; block_N=256 with small block_M=32, block_K=32, s1 is the anchored family; block_K>=64 and block_M=64 regressed; stages>=2 repeatedly regressed or tied. Because exclusion has now blocked the 32x256x32/s1 family, I broaden structural domains to untested larger-tile/stage combos (block_M 32/64/128, block_N 128/256, block_K 32/64/128, stages 1-4, threads 128/256, full swizzle) so HiGHS can step to a different tile/stage point rather than another equivalent swizzle. Pipeline weight lowered to 0.75 since deeper stages have regressed; traffic stays 2 because DRAM cuts tracked latency; launches 0.5 (4096^2 grid saturates); footprint 1 to keep max(2*block_K*(block_M+block_N)*num_stages,4*block_M*block_N) under the hard 32768 cap. Next hypothesis: test an untested combination such as block_M=64/128 with block_K=32/64 at stage=2-3 and swizzle>=8 to see whether higher per-SM work can beat 2503.47us without the timeout seen at block_M=16; if larger tiles lose, next round restore a narrow 32x256/block_K=32 s1 domain with t128 and probe finer swizzle while temporarily widening the smem cap headroom to avoid exclusion stalling. Scope: Metal checks execute exact source/config/TIR but do NOT execute the CUDA binary; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed."
+}

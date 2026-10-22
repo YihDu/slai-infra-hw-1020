@@ -1,0 +1,42 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Two failures (attempt-01 863.78us, attempt-02 679.45us) both selected block_M=32 with block_N=256 and swizzle=64; the baseline 128x64x64,s1,t128,sw0 remains best at 470.78us. Simulated DRAM stayed 16.78MB in all runs, so swizzle-driven panel reuse is not reflected in simulator traffic; analytic reuse hypothesis unsupported. Dropping block_M=32 to stop HiGHS re-picking the wide-N small-M corner, and keeping block_N=256 exploratory but hoping larger block_M wins. Reverting threads to [128] since 256 correlated with the worst result, isolating tile/stage/swizzle effects. Kept block_K [32,64], num_stages up to 4, and full swizzle set so HiGHS can still test stages=4 and moderate swizzle with wide-M tiles. Uniform weights retained because traffic proxy has not tracked latency; footprint may still matter through smem feasibility only. Next hypothesis: larger block_M (128) with moderate block_N and stages=2-3, threads=128, beats 470.78us. Validation scope: Metal executes exact source/config/TIR; GB10 numbers are simulator estimates, not hardware measurements; no global optimality claimed."
+}

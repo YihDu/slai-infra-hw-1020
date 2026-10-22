@@ -1,0 +1,44 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Attempt-00 baseline selected 128x64x64,stages=1,threads=128,swizzle=0, passing numerical/SMT/compile and simulating at 470.78us with 3 blocks/SM. Shared cap 32768 implied estimate max(2*block_K*(block_M+block_N)*num_stages,4*block_M*block_N); worked well so retained. Expanded swizzle to [0,4,8,16,32,64] to test panel-reuse hypothesis since M=4096 gives many tile rows. Added block_N=256 and num_stages=4 to probe wider N and deeper pipelines (HiGHS will reject infeasible smem combos). Added threads=256 alongside 128 to test the warp-layout/thread-domain hypothesis flagged by the proxy tie, early after baseline. Dropped none since exclusion is per-tuple, not per-value. Weights kept uniform for now; will downweight analytic traffic/footprint if measured simulator traffic/latency shows reuse gains not materializing. Next hypothesis: a swizzled panel or stages=2-3 with threads=256 reduces simulated latency versus the baseline 470.78us. Validation scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements."
+}

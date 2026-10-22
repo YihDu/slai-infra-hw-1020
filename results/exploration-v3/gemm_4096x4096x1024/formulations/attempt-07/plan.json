@@ -1,0 +1,42 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1.5,
+    "footprint": 0.5
+  },
+  "rationale": "Best remains attempt-04 (64x128x32,s2,t128,sw64) at 462.42us; attempt-06 (64x128x32,s2,t128,sw32) tied at 462.54us and attempt-03 (64x128x64,s1) was 470.76us, so stages=2 with block_M=64,block_N=128,block_K=32 is the current sweet spot. Simulated DRAM stayed invariant at 16.78MB in every run, so the analytic panel-reuse/swizzle hypothesis is still unsupported by simulator traffic; swizzle appears latency-neutral and weights keep traffic=1, pipeline=1.5, footprint=0.5. Threads=64 regressed badly (654.98us) so it is dropped; 256 previously correlated with the worst run but that attempt confounded small block_M and wide block_N, so re-add threads=256 to retest warp layout now that the tile/stage neighborhood is pinned near the sweet spot, rather than re-spending rounds on equivalent swizzles with M-block fixed. Keep block_M=[64,128] (32 regressed twice), block_N=[64,128,256], block_K=[32,64], stages=[2,3,4] (stages=1 excluded to stop reversal), all under the 32768 cap and 32768 hard portability limit. Next hypothesis: block_M=128 or stages=3/4 combined with threads=128/256 lowers latency below 462.42us; test block_K=64 at stages=2-3 to probe deeper pipelines. Validation scope: Metal executes exact source/config/TIR; GB10 numbers are simulator estimates, not hardware measurements; no global optimality claimed."
+}

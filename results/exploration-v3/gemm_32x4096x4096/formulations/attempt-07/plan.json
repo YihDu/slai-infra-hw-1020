@@ -1,0 +1,37 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      64,
+      128
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.3,
+    "launches": 1.5,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Seven attempts observed. Best 147.67us: M=32,N=64,K=64,st=2 with thr 128 or 256 (attempts 03/04). Block_K=32 lost twice (195.8us) so dropped. Attempts 02/05 show swizzle variants (64, and sw=32 SMT-infeasible) leave DRAM flat at 33.8 MB and never beat the incumbent: at M/block_M<=2 the serpentine panel reuse proxy yields no measured locality, so traffic weight lowered to 0.3. block_M in {16,32} only since 64/128 overshoot M=32. block_N {64,128,256} retained to test wider N once against N=64 winner; block_K {64,128} to probe deeper K; stages {2,3,4} with stage=4 still untested and prioritized; threads {128,256} tied so both kept. Key change this round: collapse swizzle to [0] because all non-zero swizzles reproduced identical latency/DRAM and attempt-05's sw=32 was SMT-infeasible; freeing the solver from swizzle noise lets it spend the single selection on the structural axes (K=128 vs N=128/256 vs stage=3/4). Next hypothesis: from the K=64/st=2/N=64/thr~256 winner, test block_K=128 with stages>=3 or block_N=128/256 to see if a wider/deeper tile beats 147.7us; if DRAM stays flat we further de-emphasize traffic. GB10 values are simulator estimates, not hardware measurements; Metal validates exact source/config/TIR numerically but the CUDA binary is not executed, so compile/memory status is a scoped estimate, not a hardware proof. No global optimality claimed."
+}

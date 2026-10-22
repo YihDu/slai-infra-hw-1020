@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[2,3,4],\"threads\":[128,256],\"swizzle\":[0,4,8]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":0.5,\"pipeline\":1.25,\"footprint\":1.5},\"rationale\":\"Best observed remains attempt-06/08 at 203.69us: block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle 8 or 4 (tied). Threads=128 confirmed as the win versus 256 (232.89us, 2 blocks/SM); threads=64 regressed to 295.78us with 200 registers, so 64 is dropped. Swizzle 4 and 8 tie and 16/32/64 regressed, so panel reuse is largely a proxy artifact; swizzle narrowed to {0,4,8} to keep a row-major reference and the tied values. block_M=32/block_N=256 dropped (attempt-03 440.81us regression); block_M/block_N kept {64,128} so 128x128/128x64 tiles with threads in {128,256} and stages 2-4 can finally be exercised alongside the confirmed 64x128 region. block_K {32,64} retained with 32 proven; 64 allowed to recheck wider-K footprint trade. Stages {2,3,4} keep depth exploration and satisfy stage=4 consideration; stage=1 excluded (under-pipelined 316.97us/440.81us). Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at 32768B cap, deeper K-pipelining helped, block counts ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and proxy cost is a dimensionless ranking only. Next hypothesis: block_M=128 with threads=128 or 256 and stage 2-3, or block_K=64 with stage>=3, may beat 203.69us if wider-M arithmetic intensity outweighs footprint; if swizzle=0 ties 4/8 at threads=128 the panel-reuse feature is confirmed non-materializing and can be retired. No claim of global optimality.\"}",
+  "usage": {
+    "prompt_tokens": 7296,
+    "completion_tokens": 547,
+    "total_tokens": 7843,
+    "prompt_tokens_details": {
+      "cached_tokens": 6400
+    },
+    "prompt_cache_hit_tokens": 6400,
+    "prompt_cache_miss_tokens": 896
+  },
+  "response_id": "a8ba7e7a-2310-4ece-b3a5-65f02e27cd58"
+}

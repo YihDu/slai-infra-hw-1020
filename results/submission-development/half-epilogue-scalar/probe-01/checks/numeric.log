@@ -1,0 +1,3 @@
+2026-10-22 14:14:12  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:137): TileLang begins to compile kernel `matmul` with `out_idx=[-1]`
+{"status": "error", "passed": false, "error_type": "InternalError", "reason": "coalesced_width should be an IntImmNode.", "checked_target": "metal", "cuda_binary_executed": false, "config_sha256": "f11c266fd1878fa9b05a922a140c93601a9eeed611dfbf567d80b97370d9ac4d", "elapsed_ms": 2484}
+[14:14:12] : Fatal: coalesced_width should be an IntImmNode.

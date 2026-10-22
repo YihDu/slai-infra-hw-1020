@@ -1,0 +1,43 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      64,
+      128,
+      256
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial plan with no prior feedback. Workload is tall-skinny: M=32, N=4096, K=4096, so only ceil(32/block_M) tile rows exist. Block domains include all allowed M/N/K tiles and stage/thread options to leave room for later exploration; swizzle is restricted to [0] to establish a conventional row-major baseline per instructions. Tiles must divide M,N,K: block_M in {16,32} divide 32, while 64/128 exceed M and divide it only as overshoot tiles; block_N and block_K given all divide 4096. Shared-memory estimate is max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N); with cap 32768 plus the hard portability cap, large block_M*block_N with multiple stages and/or block_K=128 will be limited, which is intentional to let the optimizer select feasible tuples. Weights are equal initially; because M has only 1-2 tile rows, reuse from swizzle cannot exceed 1-2 so traffic is dominated by 1/block_N, and launches are dominated by N/block_N. Next hypothesis after baseline: test changed thread or block_K domains, expanded N/stage choices, and swizzle>0 despite limited M to confirm whether the panel-reuse feature has any measurable effect; validate ranking against simulator traffic/latency and revise weights if locality gains do not materialize. Metal validates the exact source/config/TIR numerically but does not execute the CUDA binary; GB10 values are simulator estimates, not hardware measurements."
+}

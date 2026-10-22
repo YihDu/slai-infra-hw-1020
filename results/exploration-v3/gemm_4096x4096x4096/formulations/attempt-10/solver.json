@@ -1,0 +1,1778 @@
+{
+  "status": "Optimal",
+  "incumbent": 17.103939466666667,
+  "bound": 17.103939466666667,
+  "gap": 0.0,
+  "selected_index": 19,
+  "candidates": [
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 9216,
+      "features": {
+        "traffic": 32.21225472,
+        "launches": 8.192,
+        "pipeline": 1.28,
+        "footprint": 0.1875
+      },
+      "cost": 69.98800944
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 9216,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 8.192,
+        "pipeline": 1.28,
+        "footprint": 0.1875
+      },
+      "cost": 48.51317296
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 9216,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 8.192,
+        "pipeline": 1.28,
+        "footprint": 0.1875
+      },
+      "cost": 37.775754719999995
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 9216,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 8.192,
+        "pipeline": 1.28,
+        "footprint": 0.1875
+      },
+      "cost": 29.72269104
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 32.21225472,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 69.53550944
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 48.06067296
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 37.323254719999994
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 29.27019104
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 32.21225472,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 69.53550944
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 48.06067296
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 37.323254719999994
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 18432,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 8.192,
+        "pipeline": 0.64,
+        "footprint": 0.375
+      },
+      "cost": 29.27019104
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 32.21225472,
+        "launches": 8.192,
+        "pipeline": 0.32,
+        "footprint": 0.75
+      },
+      "cost": 69.59050943999999
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 8.192,
+        "pipeline": 0.32,
+        "footprint": 0.75
+      },
+      "cost": 48.11567296
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 8.192,
+        "pipeline": 0.32,
+        "footprint": 0.75
+      },
+      "cost": 37.378254719999994
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 8.192,
+        "pipeline": 0.32,
+        "footprint": 0.75
+      },
+      "cost": 29.32519104
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 17408,
+      "features": {
+        "traffic": 26.8435456,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3541666666666667
+      },
+      "cost": 57.369257866666665
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 17408,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3541666666666667
+      },
+      "cost": 35.894421386666664
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 17408,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3541666666666667
+      },
+      "cost": 25.157003146666668
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 17408,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3541666666666667
+      },
+      "cost": 17.103939466666667
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 26.8435456,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 57.08342453333333
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 35.60858805333333
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 24.871169813333335
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 16.818106133333334
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 26.8435456,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 57.08342453333333
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 35.60858805333333
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 24.871169813333335
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 34816,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.7083333333333334
+      },
+      "cost": 16.818106133333334
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 69632,
+      "features": {
+        "traffic": 26.8435456,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 1.4166666666666667
+      },
+      "cost": 57.471757866666664
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 69632,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 1.4166666666666667
+      },
+      "cost": 35.99692138666666
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 69632,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 1.4166666666666667
+      },
+      "cost": 25.259503146666667
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 69632,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 1.4166666666666667
+      },
+      "cost": 17.206439466666666
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 16384,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3333333333333333
+      },
+      "cost": 46.61100629333333
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 16384,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3333333333333333
+      },
+      "cost": 35.87358805333333
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 16384,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3333333333333333
+      },
+      "cost": 30.504878933333334
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 16384,
+      "features": {
+        "traffic": 11.40850688,
+        "launches": 4.096,
+        "pipeline": 1.28,
+        "footprint": 0.3333333333333333
+      },
+      "cost": 26.478347093333333
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 46.05433962666667
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 35.316921386666664
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 29.948212266666665
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 11.40850688,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 25.921680426666665
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 46.05433962666667
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 35.316921386666664
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 29.948212266666665
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 11.40850688,
+        "launches": 4.096,
+        "pipeline": 0.64,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 25.921680426666665
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 40960,
+      "features": {
+        "traffic": 21.47483648,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 0.8333333333333334
+      },
+      "cost": 46.15100629333333
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 40960,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 0.8333333333333334
+      },
+      "cost": 35.41358805333333
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 40960,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 0.8333333333333334
+      },
+      "cost": 30.044878933333333
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 40960,
+      "features": {
+        "traffic": 11.40850688,
+        "launches": 4.096,
+        "pipeline": 0.32,
+        "footprint": 0.8333333333333334
+      },
+      "cost": 26.018347093333333
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 1.28,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 35.18292138666666
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 2.048,
+        "pipeline": 1.28,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 24.445503146666667
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 2.048,
+        "pipeline": 1.28,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 19.076794026666665
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 34.62625472
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 23.888836480000002
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 18.52012736
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 6.03979776,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 14.49359552
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 34.62625472
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 23.888836480000002
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 18.52012736
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 6.03979776,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.75
+      },
+      "cost": 14.49359552
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 73728,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.5
+      },
+      "cost": 35.05625472
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 73728,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.5
+      },
+      "cost": 24.31883648
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 73728,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.5
+      },
+      "cost": 18.95012736
+    },
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 73728,
+      "features": {
+        "traffic": 6.03979776,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.5
+      },
+      "cost": 14.92359552
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 1.28,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 35.18292138666666
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 2.048,
+        "pipeline": 1.28,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 29.814212266666665
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 2.048,
+        "pipeline": 1.28,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 27.129857706666666
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 11.07296256,
+        "launches": 2.048,
+        "pipeline": 1.28,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 25.116591786666667
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 34.54292138666666
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 29.174212266666665
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 26.489857706666665
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 11.07296256,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 24.476591786666667
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 34.54292138666666
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 29.174212266666665
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 32768,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 2.048,
+        "pipeline": 0.64,
+        "footprint": 0.6666666666666666
+      },
+      "cost": 26.489857706666665
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 49152,
+      "features": {
+        "traffic": 16.10612736,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.0
+      },
+      "cost": 34.55625472
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 49152,
+      "features": {
+        "traffic": 13.4217728,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.0
+      },
+      "cost": 29.1875456
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 49152,
+      "features": {
+        "traffic": 12.07959552,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.0
+      },
+      "cost": 26.50319104
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 49152,
+      "features": {
+        "traffic": 11.07296256,
+        "launches": 2.048,
+        "pipeline": 0.32,
+        "footprint": 1.0
+      },
+      "cost": 24.489925120000002
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 1.024,
+        "pipeline": 1.28,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 24.600169813333334
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 1.024,
+        "pipeline": 1.28,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 19.231460693333332
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 1.024,
+        "pipeline": 1.28,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 16.547106133333333
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 5.70425344,
+        "launches": 1.024,
+        "pipeline": 1.28,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 14.533840213333333
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 23.960169813333334
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 18.59146069333333
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 15.907106133333333
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 5.70425344,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 13.893840213333332
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 23.960169813333334
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 18.59146069333333
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 15.907106133333333
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 65536,
+      "features": {
+        "traffic": 5.70425344,
+        "launches": 1.024,
+        "pipeline": 0.64,
+        "footprint": 1.3333333333333333
+      },
+      "cost": 13.893840213333332
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 4
+      },
+      "smem_bytes_estimate": 81920,
+      "features": {
+        "traffic": 10.73741824,
+        "launches": 1.024,
+        "pipeline": 0.32,
+        "footprint": 1.6666666666666667
+      },
+      "cost": 23.973503146666665
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 8
+      },
+      "smem_bytes_estimate": 81920,
+      "features": {
+        "traffic": 8.05306368,
+        "launches": 1.024,
+        "pipeline": 0.32,
+        "footprint": 1.6666666666666667
+      },
+      "cost": 18.604794026666664
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "smem_bytes_estimate": 81920,
+      "features": {
+        "traffic": 6.7108864,
+        "launches": 1.024,
+        "pipeline": 0.32,
+        "footprint": 1.6666666666666667
+      },
+      "cost": 15.920439466666666
+    },
+    {
+      "config": {
+        "block_M": 64,
+        "block_N": 256,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "smem_bytes_estimate": 81920,
+      "features": {
+        "traffic": 5.70425344,
+        "launches": 1.024,
+        "pipeline": 0.32,
+        "footprint": 1.6666666666666667
+      },
+      "cost": 13.907173546666666
+    }
+  ],
+  "cost_unit": "dimensionless analytic proxy; not latency",
+  "highs_version": "1.11.0",
+  "effective_shared_memory_limit": 32768,
+  "excluded_previously_evaluated": [
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 256,
+      "swizzle": 0
+    },
+    {
+      "block_M": 32,
+      "block_N": 256,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 256,
+      "swizzle": 64
+    },
+    {
+      "block_M": 32,
+      "block_N": 256,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 128,
+      "swizzle": 64
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 64
+    },
+    {
+      "block_M": 32,
+      "block_N": 256,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 64,
+      "swizzle": 64
+    },
+    {
+      "block_M": 32,
+      "block_N": 256,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 128,
+      "swizzle": 32
+    },
+    {
+      "block_M": 32,
+      "block_N": 256,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 256,
+      "swizzle": 32
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128,
+      "swizzle": 64
+    },
+    {
+      "block_M": 32,
+      "block_N": 256,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 256,
+      "swizzle": 16
+    }
+  ]
+}

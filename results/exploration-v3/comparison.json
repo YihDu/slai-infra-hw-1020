@@ -1,0 +1,670 @@
+{
+  "scope": "Development exploration; Metal numerical execution and GB10 simulated timing, no CUDA execution",
+  "cases": [
+    {
+      "workload": "gemm_128x4096x4096",
+      "previous_best_us": 156.32238763280637,
+      "exploration_best_us": 155.92133828093964,
+      "improvement_ratio": 1.002572126152125,
+      "keep": "exploration-v3",
+      "new_search": {
+        "workload": "gemm_128x4096x4096",
+        "elapsed_seconds": 252.234,
+        "initial": {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 64,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 256,
+            "swizzle": 0
+          },
+          "simulated_us": 157.29199806835695,
+          "features": {
+            "traffic": 1.00663296,
+            "launches": 0.064,
+            "pipeline": 0.64,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "da520ab0daa2992126d992f1ff6ab3238cfc6e643082c34b66da49a7570ae59d",
+            "tir_sha256": "40ce0124d803a576d0c9eb936123c3d24749daac317a518e0c974de7526419a2",
+            "sass_sha256": "2b4577401c35b7cd8c410ed16d3a32fb5ca5ffacc28fcfe144b87d561c6b739d",
+            "cubin_sha256": "7701d6cf701f9f5667fe9b2a537c2a38a51dd8752866bf825932f630abe08630"
+          }
+        },
+        "final": {
+          "attempt": "attempt-11",
+          "configuration": {
+            "block_M": 64,
+            "block_N": 64,
+            "block_K": 64,
+            "num_stages": 2,
+            "threads": 256,
+            "swizzle": 8
+          },
+          "simulated_us": 155.92133828093964,
+          "features": {
+            "traffic": 1.00663296,
+            "launches": 0.128,
+            "pipeline": 0.32,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "d29ffa81e69c8469a676a7da55048e741db131cbd8078b0a48d5f60e950fa988",
+            "tir_sha256": "9f6c44b51a1cce34c0943dfc469ae4d1d2d79ea49aa4903b4165e24e1b3892d4",
+            "sass_sha256": "7cd7618c4da0d83edf5ccfd9e33752df6235abbd84e59ffaa4e2e3cfecd29e41",
+            "cubin_sha256": "7cf6487fdc6d1511420879668600495e2ff9f99ac28af941caaa350f00013215"
+          }
+        },
+        "simulated_speedup": 1.0087907133335892,
+        "initial_proxy_preferred_attempt": "attempt-01",
+        "initial_proxy_preferred_us": 186.63730163943148,
+        "tested_candidates": 11,
+        "numeric_test_cases": 33,
+        "usage": {
+          "model_calls": 12,
+          "input_tokens": 64003,
+          "output_tokens": 7004,
+          "cached_tokens": 54016,
+          "reasoning_tokens": null,
+          "cache_creation_tokens": null,
+          "evaluations": 11,
+          "compilations": 11,
+          "simulations": 11,
+          "numerical_checks": 11,
+          "solver_calls": 12
+        },
+        "checked_target": "metal",
+        "cuda_binary_executed": false
+      }
+    },
+    {
+      "workload": "gemm_2048x2048x2048",
+      "previous_best_us": 203.6936494479265,
+      "exploration_best_us": 203.6936494479265,
+      "improvement_ratio": 1.0,
+      "keep": "submission-v2",
+      "new_search": {
+        "workload": "gemm_2048x2048x2048",
+        "elapsed_seconds": 183.319,
+        "initial": {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 64,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 256,
+            "swizzle": 0
+          },
+          "simulated_us": 316.972596203,
+          "features": {
+            "traffic": 4.02653184,
+            "launches": 0.512,
+            "pipeline": 0.32,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "da520ab0daa2992126d992f1ff6ab3238cfc6e643082c34b66da49a7570ae59d",
+            "tir_sha256": "b9f0ef5fa808a81cf46080136e16883f141ecbffba12da33dd3aef9a692fa7cd",
+            "sass_sha256": "26bca811461bb41c6da8deed28f3febb6b0d14a0e6bc59a800cd8fad625da1b4",
+            "cubin_sha256": "66a07b8e37b922b40fd76b8d1680ac27a7e6b34b51259787c289a88b01858a10"
+          }
+        },
+        "final": {
+          "attempt": "attempt-06",
+          "configuration": {
+            "block_M": 64,
+            "block_N": 128,
+            "block_K": 32,
+            "num_stages": 2,
+            "threads": 128,
+            "swizzle": 8
+          },
+          "simulated_us": 203.6936494479265,
+          "features": {
+            "traffic": 1.6777216,
+            "launches": 0.512,
+            "pipeline": 0.32,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "cb7952b8da15d610651736d8d03f64d96f11837d05c6924d30086531514e7507",
+            "tir_sha256": "75445cd516570662692ae32a0c7c0ed6b99ea56ac42bc96d4f7dc5f98e2dd462",
+            "sass_sha256": "be6e29daaeb568e1e1656d59fca2e60634673ada09fc75e79e2352664ee2677e",
+            "cubin_sha256": "ac36d80b5b7f3a4d696cd8027d8b85fff3f287be1fd3e4b470ff21ca3f157d08"
+          }
+        },
+        "simulated_speedup": 1.5561240964659178,
+        "initial_proxy_preferred_attempt": "attempt-03",
+        "initial_proxy_preferred_us": 440.80765160610184,
+        "tested_candidates": 10,
+        "numeric_test_cases": 30,
+        "usage": {
+          "model_calls": 12,
+          "input_tokens": 55559,
+          "output_tokens": 6421,
+          "cached_tokens": 46336,
+          "reasoning_tokens": null,
+          "cache_creation_tokens": null,
+          "evaluations": 10,
+          "compilations": 10,
+          "simulations": 10,
+          "numerical_checks": 10,
+          "solver_calls": 11
+        },
+        "checked_target": "metal",
+        "cuda_binary_executed": false
+      }
+    },
+    {
+      "workload": "gemm_32x4096x4096",
+      "previous_best_us": 147.66753212620162,
+      "exploration_best_us": 147.52388799198215,
+      "improvement_ratio": 1.0009737008438069,
+      "keep": "exploration-v3",
+      "new_search": {
+        "workload": "gemm_32x4096x4096",
+        "elapsed_seconds": 193.088,
+        "initial": {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 32,
+            "block_N": 64,
+            "block_K": 32,
+            "num_stages": 3,
+            "threads": 256,
+            "swizzle": 0
+          },
+          "simulated_us": 195.80587398606053,
+          "features": {
+            "traffic": 0.50331648,
+            "launches": 0.064,
+            "pipeline": 0.42666666666666664,
+            "footprint": 0.375
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "4e1efc9a77c068e0a5e61ec208e4ebc0b8bef8bcb6704ff81fd78cbda93c5df0",
+            "tir_sha256": "a7da218a2ba7007a07637b29db7ab9bb9370644b72056c1938d26f34b6820e28",
+            "sass_sha256": "b7bfd9eeb84be954d754ba6ca38f5bcde9c7911500a2546fc1b3feaef5a119fb",
+            "cubin_sha256": "ac96356478b99b8f2f50ab5c6519d08cb66c2fe7a9b18bc57e017081b6db9b02"
+          }
+        },
+        "final": {
+          "attempt": "attempt-11",
+          "configuration": {
+            "block_M": 16,
+            "block_N": 64,
+            "block_K": 64,
+            "num_stages": 2,
+            "threads": 128,
+            "swizzle": 0
+          },
+          "simulated_us": 147.52388799198215,
+          "features": {
+            "traffic": 0.8388608,
+            "launches": 0.128,
+            "pipeline": 0.32,
+            "footprint": 0.4166666666666667
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "8147c9c3d61ce6cb9714a0b17512cadff810a30ef7b166fb8ccdc2abc275fcf6",
+            "tir_sha256": "94b6e13e90192870dbac3344fd1cf07ce16a88a6e331791549ae8a1f631528be",
+            "sass_sha256": "8a4aa23f6d3ec9b38225008cd67c1d385c02ab8d0143d97edccf5b63c6804fe8",
+            "cubin_sha256": "94dc6fbcd5e6a795f5d11ecf0fa7219445487987320319dc76247e1792961e04"
+          }
+        },
+        "simulated_speedup": 1.327282494050743,
+        "initial_proxy_preferred_attempt": "attempt-01",
+        "initial_proxy_preferred_us": 176.4465272715398,
+        "tested_candidates": 9,
+        "numeric_test_cases": 27,
+        "usage": {
+          "model_calls": 12,
+          "input_tokens": 62137,
+          "output_tokens": 6478,
+          "cached_tokens": 51968,
+          "reasoning_tokens": null,
+          "cache_creation_tokens": null,
+          "evaluations": 9,
+          "compilations": 9,
+          "simulations": 9,
+          "numerical_checks": 9,
+          "solver_calls": 12
+        },
+        "checked_target": "metal",
+        "cuda_binary_executed": false
+      }
+    },
+    {
+      "workload": "gemm_4096x4096x1024",
+      "previous_best_us": 399.54490791347746,
+      "exploration_best_us": 399.54490791347746,
+      "improvement_ratio": 1.0,
+      "keep": "submission-v2",
+      "new_search": {
+        "workload": "gemm_4096x4096x1024",
+        "elapsed_seconds": 275.559,
+        "initial": {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 64,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 128,
+            "swizzle": 0
+          },
+          "simulated_us": 470.77649749065046,
+          "features": {
+            "traffic": 8.05306368,
+            "launches": 2.048,
+            "pipeline": 0.16,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "a2f4d13ddcabafbba063a13ce79635ad80c6b505a28ca32ab9eac8020d04979d",
+            "tir_sha256": "162b9075e8a62e5f62d301c12a10611ad3b4b9e09228151bdbc86c768ed171b1",
+            "sass_sha256": "0eca44769ec334e3be420f26e9c3dc016a7028f748669a98b7140339cefb8f0c",
+            "cubin_sha256": "d1036065c235d26693cbc5e33601f9f48d8b9961d8cd7bdf7c872e3ecb770611"
+          }
+        },
+        "final": {
+          "attempt": "attempt-09",
+          "configuration": {
+            "block_M": 64,
+            "block_N": 128,
+            "block_K": 32,
+            "num_stages": 2,
+            "threads": 128,
+            "swizzle": 16
+          },
+          "simulated_us": 399.54490791347746,
+          "features": {
+            "traffic": 3.01989888,
+            "launches": 2.048,
+            "pipeline": 0.16,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "f11c266fd1878fa9b05a922a140c93601a9eeed611dfbf567d80b97370d9ac4d",
+            "tir_sha256": "29e0ad670b2916bf156826ab0f2afe182efe643c699f36e0b604d4b4e9aa7ba7",
+            "sass_sha256": "12cbb985bf7d8664fd519c42d01dd874c115260472fe7e4f6cfd0f64d7e94d7d",
+            "cubin_sha256": "8aa63a9a9ce98ec454d9cd0ef6b686221a9b18365eecf2205c697141fe25a886"
+          }
+        },
+        "simulated_speedup": 1.1782818105458082,
+        "initial_proxy_preferred_attempt": "attempt-01",
+        "initial_proxy_preferred_us": 863.7826583761033,
+        "tested_candidates": 11,
+        "numeric_test_cases": 33,
+        "usage": {
+          "model_calls": 12,
+          "input_tokens": 53748,
+          "output_tokens": 4768,
+          "cached_tokens": 45696,
+          "reasoning_tokens": null,
+          "cache_creation_tokens": null,
+          "evaluations": 11,
+          "compilations": 11,
+          "simulations": 11,
+          "numerical_checks": 11,
+          "solver_calls": 11
+        },
+        "checked_target": "metal",
+        "cuda_binary_executed": false
+      }
+    },
+    {
+      "workload": "gemm_4096x4096x4096",
+      "previous_best_us": 1597.229841263918,
+      "exploration_best_us": 2500.8498620297273,
+      "improvement_ratio": 0.6386748223132365,
+      "keep": "submission-v2",
+      "new_search": {
+        "workload": "gemm_4096x4096x4096",
+        "elapsed_seconds": 1105.579,
+        "initial": {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 64,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 256,
+            "swizzle": 0
+          },
+          "simulated_us": 3560.55115622482,
+          "features": {
+            "traffic": 32.21225472,
+            "launches": 2.048,
+            "pipeline": 0.64,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "da520ab0daa2992126d992f1ff6ab3238cfc6e643082c34b66da49a7570ae59d",
+            "tir_sha256": "4ca5a21eabd833488cb884fe5f882ae329c4b0516a90ecd271c9ed67842a494e",
+            "sass_sha256": "eb3e7ecf472fa427789153724c9e3621e62f4b9a45df38e37a9ba37eeffc15b0",
+            "cubin_sha256": "31f430405bc1a77d6c1b7f622eabe7dc9c6fbcda0831ffb9243db35a83791f01"
+          }
+        },
+        "final": {
+          "attempt": "attempt-11",
+          "configuration": {
+            "block_M": 32,
+            "block_N": 256,
+            "block_K": 32,
+            "num_stages": 1,
+            "threads": 128,
+            "swizzle": 16
+          },
+          "simulated_us": 2500.8498620297273,
+          "features": {
+            "traffic": 8.05306368,
+            "launches": 2.048,
+            "pipeline": 1.28,
+            "footprint": 0.6666666666666666
+          },
+          "identity": {
+            "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+            "config_sha256": "9b2502b7b32fcdc23192e51332b5f9f4877e1aa6424a6794df65cef83e1cf3b1",
+            "tir_sha256": "ca75332cf37c26918f227d9cd9b9496472720b5bb3776d05d8aded5e2459b8af",
+            "sass_sha256": "ebad107c42c292d39a23656abd65368177776fc11cb43f1a115a3137ad6598b6",
+            "cubin_sha256": "84aa0a882b06d4fcf7b5f7b37c7ba7635f7114fd0977f1dcd37affcc863ac9bb"
+          }
+        },
+        "simulated_speedup": 1.423736470663226,
+        "initial_proxy_preferred_attempt": "attempt-02",
+        "initial_proxy_preferred_us": 3518.98693712401,
+        "tested_candidates": 10,
+        "numeric_test_cases": 33,
+        "usage": {
+          "model_calls": 12,
+          "input_tokens": 54884,
+          "output_tokens": 6963,
+          "cached_tokens": 45312,
+          "reasoning_tokens": null,
+          "cache_creation_tokens": null,
+          "evaluations": 11,
+          "compilations": 11,
+          "simulations": 11,
+          "numerical_checks": 11,
+          "solver_calls": 11
+        },
+        "checked_target": "metal",
+        "cuda_binary_executed": false
+      }
+    }
+  ],
+  "development_probes": [
+    {
+      "family": "expanded-family",
+      "probe": "probe-00",
+      "config": {
+        "block_M": 16,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 147.52388799198215,
+      "path": "results/submission-development/expanded-family/probe-00/probe.json"
+    },
+    {
+      "family": "expanded-family",
+      "probe": "probe-01",
+      "config": {
+        "block_M": 32,
+        "block_N": 256,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 242.06377091926993,
+      "path": "results/submission-development/expanded-family/probe-01/probe.json"
+    },
+    {
+      "family": "expanded-family",
+      "probe": "probe-02",
+      "config": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 128,
+        "num_stages": 1,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 147.77530719891948,
+      "path": "results/submission-development/expanded-family/probe-02/probe.json"
+    },
+    {
+      "family": "expanded-family",
+      "probe": "probe-03",
+      "config": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 64,
+        "swizzle": 0
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 147.77509118131977,
+      "path": "results/submission-development/expanded-family/probe-03/probe.json"
+    },
+    {
+      "family": "expanded-family",
+      "probe": "probe-04",
+      "config": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 0
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 147.6802486616347,
+      "path": "results/submission-development/expanded-family/probe-04/probe.json"
+    },
+    {
+      "family": "half-epilogue",
+      "probe": "probe-00",
+      "config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "numeric": "error",
+      "numeric_reason": "Check failed: (dtype == DataType::Float(16) || dtype == DataType::Float(32) || dtype == DataType::BFloat(16)) is false: Only float16, float32, and bfloat16 are supported, but got float32x4",
+      "simulated_us": null,
+      "path": "results/submission-development/half-epilogue/probe-00/probe.json"
+    },
+    {
+      "family": "half-epilogue",
+      "probe": "probe-01",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "numeric": "error",
+      "numeric_reason": "Check failed: (dtype == DataType::Float(16) || dtype == DataType::Float(32) || dtype == DataType::BFloat(16)) is false: Only float16, float32, and bfloat16 are supported, but got float32x4",
+      "simulated_us": null,
+      "path": "results/submission-development/half-epilogue/probe-01/probe.json"
+    },
+    {
+      "family": "half-epilogue-scalar",
+      "probe": "probe-00",
+      "config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "numeric": "error",
+      "numeric_reason": "coalesced_width should be an IntImmNode.",
+      "simulated_us": null,
+      "path": "results/submission-development/half-epilogue-scalar/probe-00/probe.json"
+    },
+    {
+      "family": "half-epilogue-scalar",
+      "probe": "probe-01",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "numeric": "error",
+      "numeric_reason": "coalesced_width should be an IntImmNode.",
+      "simulated_us": null,
+      "path": "results/submission-development/half-epilogue-scalar/probe-01/probe.json"
+    },
+    {
+      "family": "direct-epilogue",
+      "probe": "probe-00",
+      "config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "numeric": "error",
+      "numeric_reason": "program_source:405:32: error: cannot convert 'metal::simdgroup_float8x8' (aka 'simdgroup_matrix<float, 8, 8>') to 'half' without a conversion operator\n        C_local_cast[vec_4] = ((half)acc[(((i_8 * 512) + (((int)threadIdx.x) * 4)) + vec_4)]);\n                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",
+      "simulated_us": null,
+      "path": "results/submission-development/direct-epilogue/probe-00/probe.json"
+    },
+    {
+      "family": "direct-epilogue",
+      "probe": "probe-01",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16
+      },
+      "numeric": "error",
+      "numeric_reason": "program_source:273:32: error: cannot convert 'metal::simdgroup_float8x8' (aka 'simdgroup_matrix<float, 8, 8>') to 'half' without a conversion operator\n        C_local_cast[vec_4] = ((half)acc[(((i_8 * 512) + (((int)threadIdx.x) * 4)) + vec_4)]);\n                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",
+      "simulated_us": null,
+      "path": "results/submission-development/direct-epilogue/probe-01/probe.json"
+    },
+    {
+      "family": "large-panels",
+      "probe": "probe-00",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 32
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 1870.5557326177068,
+      "path": "results/submission-development/large-panels/probe-00/probe.json"
+    },
+    {
+      "family": "large-panels",
+      "probe": "probe-01",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 64
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 2841.787118065337,
+      "path": "results/submission-development/large-panels/probe-01/probe.json"
+    },
+    {
+      "family": "large-panels",
+      "probe": "probe-02",
+      "config": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 32
+      },
+      "numeric": "passed",
+      "numeric_reason": null,
+      "simulated_us": 2889.5914119613744,
+      "path": "results/submission-development/large-panels/probe-02/probe.json"
+    },
+    {
+      "family": "warp-policy",
+      "probe": "probe-00",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16,
+        "warp_policy": 1
+      },
+      "numeric": "failed",
+      "numeric_reason": null,
+      "simulated_us": null,
+      "path": "results/submission-development/warp-policy/probe-00/probe.json"
+    },
+    {
+      "family": "warp-policy",
+      "probe": "probe-01",
+      "config": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 16,
+        "warp_policy": 2
+      },
+      "numeric": "failed",
+      "numeric_reason": null,
+      "simulated_us": null,
+      "path": "results/submission-development/warp-policy/probe-01/probe.json"
+    }
+  ]
+}

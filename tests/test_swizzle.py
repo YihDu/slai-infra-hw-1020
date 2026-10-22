@@ -11,7 +11,7 @@ class SwizzleTests(unittest.TestCase):
     def test_exact_order_matches_unmodified_course_model_including_partial_panels(self):
         for rows in [1,2,3,9,32,128]:
             for cols in [1,3,64]:
-                for panel in [0,4,8,16]:
+                for panel in [0,4,8,16,32,64]:
                     mapping=[launch_coordinate(i,rows,cols,panel) for i in range(rows*cols)]
                     self.assertEqual(mapping,list(launch_order(rows,cols,panel)))
                     self.assertEqual(len(set(mapping)),rows*cols)

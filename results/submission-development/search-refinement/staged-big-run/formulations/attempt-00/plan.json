@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial baseline plan per staged policy. Core portable domains only: block_M [32,64,128], block_N [64,128], block_K [32,64], num_stages [1,2,3], threads [128], swizzle [0]. All tiles divide M=N=K=4096. Shared-memory cap 32768 bytes (within allowed [8192,49152], also satisfying the hard portability cap) gates the largest tiles: e.g. 2*block_K*(block_M+block_N)*num_stages and 4*block_M*block_N must fit; largest candidates like 128x128x64x3 exceed the cap and will be excluded by HiGHS. Weights are equal (1 each) to avoid workload-specific bias before any measurements; traffic, launches, pipeline, and footprint contribute symmetrically so the first solve reveals structural tradeoffs rather than encoding a guess. Swizzle is restricted to 0 (row-major) to establish the conventional baseline; locality via serpentine panels will be explored in the next plan with swizzle [4,8,16]. No observations yet: this is the first plan with empty history, so no exclusions are applied and no numerical, simulator, or compile claims are made. Next hypothesis: after this baseline, retain core tile/stage/thread domains and introduce swizzle [4,8,16] to test whether panel locality improves the traffic proxy without exceeding the 32 KB shared-memory estimate."
+}

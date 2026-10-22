@@ -1,0 +1,71 @@
+{
+  "config": {
+    "block_M": 64,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128,
+    "swizzle": 16,
+    "warp_policy": 2
+  },
+  "development_only": true,
+  "numeric": {
+    "status": "failed",
+    "passed": false,
+    "checked_target": "metal",
+    "cuda_binary_executed": false,
+    "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+    "source_sha256": "77fe5d3b29773b8d012d58903c92f9df294e2d4dcf18069b93654bc90a56f2f4",
+    "config": {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 16,
+      "warp_policy": 2
+    },
+    "tir_sha256": "20d17cf53ac13e00972d7ad53a6d35618486555238b2450392a1baecc37bc7c9",
+    "metal_sha256": "57f463dbe080af491e6f4672a07af7e8477f9ffe2ed377ffe6c126c6a2311388",
+    "reference": "CPU PyTorch float64 full matmul rounded to float16",
+    "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "torch_version": "2.11.0",
+    "tilelang_version": "0.1.15",
+    "disk_kernel_cache_disabled": true,
+    "tolerance": {
+      "rtol": 0.02,
+      "atol": 0.002
+    },
+    "cases": [
+      {
+        "pattern": "normal",
+        "seed": 42,
+        "passed": false,
+        "max_abs_error": 4.990234375,
+        "mismatches": 14561109,
+        "elapsed_ms": 2611,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      },
+      {
+        "pattern": "normal",
+        "seed": 7,
+        "passed": false,
+        "max_abs_error": 4.998046875,
+        "mismatches": 14560771,
+        "elapsed_ms": 989,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      },
+      {
+        "pattern": "zero_rows_signed_columns",
+        "seed": 42,
+        "passed": false,
+        "max_abs_error": 5.1884765625,
+        "mismatches": 14583859,
+        "elapsed_ms": 961,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      }
+    ],
+    "config_sha256": "1da759042e1cde0f8aadefe06ed5655f4a4d0ccf4c3fb9c3f47a6fac0eb720b6",
+    "elapsed_ms": 11948
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1.5,
+    "footprint": 0.5
+  },
+  "rationale": "Best is attempt-04 (64x128x32,s2,t128,sw64) at 462.42us. Deeper pipelining helped; swizzle has been latency-neutral with DRAM invariant at 16.78MB across all runs, so the panel-reuse hypothesis remains unsupported and weights keep traffic=1, pipeline upweighted to 1.5, footprint 0.5. Attempt-05 with threads=64 regressed to 654.98us, so revert threads to [128]; block_M=32 corner regressed twice so keep it dropped. Restrict num_stages to [2,3,4] to stop HiGHS reverting to stages=1 now that stages=2 won, and keep block_M=[64,128], block_N=[64,128,256], block_K=[32,64], full swizzle under the 32768 cap. Next hypothesis: block_M=128 with stages=3-4, threads=128 reduces latency below 462.42us; also probe block_N=128 vs 64 at stage 3. Scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements; no global optimality claimed."
+}

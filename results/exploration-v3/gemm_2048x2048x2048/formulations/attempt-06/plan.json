@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      64,
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 0.5,
+    "pipeline": 1.25,
+    "footprint": 1.5
+  },
+  "rationale": "Best observed remains attempt-01 at 232.89us (block_M=64, block_N=128, block_K=32, stage=2, threads=256, swizzle=8); attempt-05 reproduced the exact same latency with swizzle=4, suggesting swizzle 4 vs 8 is tied in this region and panel locality beyond that does not materialize as a win. Attempt-03 (block_M=32, block_N=256, stage=1, swizzle=64) regressed to 440.81us; attempt-04 (swizzle=16) regressed to 244.33us. Revision: keep block_M {64,128} and block_N {64,128} around the confirmed-good region, retaining block_M=128 so the 128x128 / 128x64 tiles with stages 2-4 can be exercised as the untested wider-M hypothesis. block_K stays {32,64}; 32 is the proven winner, 64 allowed but rarely favored. Stages {2,3,4} retained to keep depth exploration and satisfy the stage=4 consideration; stage=1 excluded because it under-pipelined in attempts 00/03. Threads expanded to {64,128,256} to finally exercise the changed-thread-domain hypothesis that attempt-04 added but HiGHS never selected (it favored 256), while 256 remains the confirmed incumbent. Swizzle narrowed to {0,4,8}: include swizzle=0 to re-establish the row-major reference in the improved pipeline region and to test whether locality actually helps versus the monotone proxy, while 4 and 8 cover the confirmed-good narrow panel range; 16/32/64 dropped since 16 regressed and wide panels exceed cache. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5) since footprint binds at the 32KB cap and deeper K-pipelining has helped. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 figures are simulator estimates, not hardware measurements, and proxy cost is a dimensionless ranking only. Next hypothesis: with threads {64,128,256} finally in play and block_M=128 tiles plus stage 3-4 now selectable, a different warp layout or wider-M tile may beat 232.89us; if swizzle=0 ties swizzle=4/8 at the improved config, the panel-reuse proxy is not materializing and swizzle can be retired to free domain width for tile/thread/stage exploration."
+}

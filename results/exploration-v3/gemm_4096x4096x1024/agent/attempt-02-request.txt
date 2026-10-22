@@ -1,0 +1,47 @@
+You are the formulation agent for a TileLang GEMM optimizer. Return only one JSON object.
+Your decisions define domains, a shared-memory budget and objective weights. HiGHS
+creates one binary variable per allowed tuple, selects exactly one, and minimizes
+weighted analytic costs subject to the shared-memory limit. Previously evaluated
+configurations are excluded to explore useful new points; this is not measured enumeration.
+Allowed domains: block_M [16,32,64,128], block_N [32,64,128,256], block_K [32,64,128],
+num_stages [1,2,3,4], threads [64,128,256], swizzle [0,4,8,16,32,64]. Choose nonempty subsets. Tiles must divide M,N,K.
+Shared bytes estimate = max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N).
+Explicit epilogue barriers separate lifetimes; the compiler aliases these buffers.
+Actual compiled memory is still checked; this is a scoped estimate, not a compiler proof.
+The extra FP32 epilogue permits the SAME source/TIR to execute on Mac Metal and
+compile for GB10. A hard 32768-byte portability cap is applied as well as your cap.
+Swizzle is a serpentine panel of tile rows, exactly matching the course simulator.
+For the INITIAL plan use swizzle=[0] to establish a conventional row-major baseline.
+After feedback, explore swizzle [0,4,8,16,32,64] alongside tile/stage/thread choices.
+The proxy does not explicitly price register pressure or warp layout. Thread counts
+with identical tile/stage/swizzle have tied costs: use feedback to choose thread domains.
+Large panels can exceed cache capacity; the monotone reuse proxy may misrank them.
+Revise the domain when larger panels lose. Small M often needs enough blocks to occupy
+the machine; do not assume a wider N tile is always faster. Explore different structural
+choices rather than spending every round on equivalent swizzles when M has one tile row.
+After the baseline, test a changed thread domain or block_K domain early, then use
+measured feedback to retain or reject that hypothesis. At least consider the expanded
+M/N tiles and stage=4; do not restrict the whole run to the example schema subsets.
+Analytic reuse=min(swizzle or 1,ceil(M/block_M));
+Features: traffic=2*M*N*K*(1/(block_M*reuse)+1/block_N)/1e8;
+launches=ceil(M/block_M)*ceil(N/block_N)/1000;
+pipeline=(K/block_K)/num_stages/100;
+footprint=shared_memory_bytes/49152.
+Weights: positive finite [0.001,100]. shared_memory_limit: integer [8192,49152].
+Required schema:
+{"domains":{"block_M":[32,64,128],"block_N":[64,128],"block_K":[32,64],"num_stages":[1,2,3],"threads":[128],"swizzle":[0]},"shared_memory_limit":32768,"weights":{"traffic":1,"launches":1,"pipeline":1,"footprint":1},"rationale":"Explain variables/domains, constraints, objective, observations, and the next hypothesis."}
+Use history to revise constraints/weights based on observed numerical, SMT, compile
+and simulator results. Broaden domains if exclusion makes a narrow domain infeasible.
+Seek lower GB10 simulated latency among numerically checked programs. This proxy cost
+is dimensionless; compare its ranking, never equate it to microseconds. Metal checks
+execute the exact source/config/TIR, but do not execute the CUDA binary; acknowledge
+that validation scope. GB10 values are simulator estimates, never hardware measurements.
+Describe what changed and why; do not invent observations or claim global optimality.
+
+The panel reuse feature is an analytical hypothesis, not measured truth. Inspect actual
+simulator traffic/latency and revise weights/domains if locality gains do not materialize.
+
+Workload:
+{"id": "gemm_4096x4096x1024", "operation": "C = A @ B", "inputs": {"A": {"shape": [4096, 1024], "dtype": "float16"}, "B": {"shape": [1024, 4096], "dtype": "float16"}}, "outputs": {"C": {"shape": [4096, 4096], "dtype": "float16"}}, "accumulation_dtype": "float32", "tolerance": {"rtol": 0.02, "atol": 0.002}, "evaluation": {"scope": "whole_workload"}, "baseline_config": {}}
+Observed history:
+[{"attempt": "attempt-00", "plan": {"domains": {"block_M": [32, 64, 128], "block_N": [64, 128, 256], "block_K": [32, 64], "num_stages": [1, 2, 3], "threads": [128], "swizzle": [0]}, "shared_memory_limit": 32768, "weights": {"traffic": 1, "launches": 1, "pipeline": 1, "footprint": 1}, "rationale": "Initial plan for 4096x4096x1024 FP16 GEMM with FP32 accumulation. Chosen tiles all divide M=4096, N=4096, K=1024. Baseline swizzle=[0] as required to establish row-major reference. Shared estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) kept under 32768-byte portability cap; e.g. 128x256x32x3 gives 2*32*384*3=73728 > cap so large N with stages will be rejected by HiGHS, steering selection toward feasible combos like 64x128 and 128x128 across stages 1-3. threads=[128] single-domain baseline to isolate tile/stage effects before testing thread alternatives post-feedback. M has 4096 so many tile rows exist; reuse proxy favors larger block_M and swizzle >1, so the next round should expand swizzle [0,4,8,16,32,64] and test a changed block_K or thread domain, then retain/reject based on measured simulator traffic and latency rather than the analytic reuse hypothesis. Validation scope: Metal executes exact source/config/TIR; GB10 numbers are simulator estimates, not hardware measurements."}, "selection": {"block_M": 128, "block_N": 64, "block_K": 64, "num_stages": 1, "threads": 128, "swizzle": 0}, "proxy_cost": 10.927730346666666, "solver_status": "Optimal", "smt_bounds_passed": true, "numerical_status": "passed", "numerical_failure": null, "compilation_status": "compiled", "compilation_reason": null, "actual_resources": {"registers": 122, "smem_bytes": 32768, "threads": 128}, "simulation_status": "completed", "simulated_us": 470.77649749065046, "simulated_dram_mb": 16.777216, "simulated_blocks_per_sm": 3, "best_simulated_us": 470.77649749065046}, {"attempt": "attempt-01", "plan": {"domains": {"block_M": [32, 64, 128], "block_N": [64, 128, 256], "block_K": [32, 64], "num_stages": [1, 2, 3, 4], "threads": [128, 256], "swizzle": [0, 4, 8, 16, 32, 64]}, "shared_memory_limit": 32768, "weights": {"traffic": 1, "launches": 1, "pipeline": 1, "footprint": 1}, "rationale": "Attempt-00 baseline selected 128x64x64,stages=1,threads=128,swizzle=0, passing numerical/SMT/compile and simulating at 470.78us with 3 blocks/SM. Shared cap 32768 implied estimate max(2*block_K*(block_M+block_N)*num_stages,4*block_M*block_N); worked well so retained. Expanded swizzle to [0,4,8,16,32,64] to test panel-reuse hypothesis since M=4096 gives many tile rows. Added block_N=256 and num_stages=4 to probe wider N and deeper pipelines (HiGHS will reject infeasible smem combos). Added threads=256 alongside 128 to test the warp-layout/thread-domain hypothesis flagged by the proxy tie, early after baseline. Dropped none since exclusion is per-tuple, not per-value. Weights kept uniform for now; will downweight analytic traffic/footprint if measured simulator traffic/latency shows reuse gains not materializing. Next hypothesis: a swizzled panel or stages=2-3 with threads=256 reduces simulated latency versus the baseline 470.78us. Validation scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates, not hardware measurements."}, "selection": {"block_M": 32, "block_N": 256, "block_K": 32, "num_stages": 1, "threads": 256, "swizzle": 64}, "proxy_cost": 4.544616106666667, "solver_status": "Optimal", "smt_bounds_passed": true, "numerical_status": "passed", "numerical_failure": null, "compilation_status": "compiled", "compilation_reason": null, "actual_resources": {"registers": 88, "smem_bytes": 32768, "threads": 256}, "simulation_status": "completed", "simulated_us": 863.7826583761033, "simulated_dram_mb": 16.777216, "simulated_blocks_per_sm": 2, "best_simulated_us": 470.77649749065046}]

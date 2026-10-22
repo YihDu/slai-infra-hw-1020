@@ -1,0 +1,8 @@
+{
+  "block_M": 64,
+  "block_N": 128,
+  "block_K": 32,
+  "num_stages": 2,
+  "threads": 128,
+  "swizzle": 64
+}

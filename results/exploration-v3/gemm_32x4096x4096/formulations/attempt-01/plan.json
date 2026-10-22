@@ -1,0 +1,41 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      64,
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Attempt-00 baseline (block_M=32,block_N=64,block_K=32,stages=3,threads=256,swizzle=0) passed numerical/compile checks at 195.8 us simulated, using 18.4 KB smem and 50 regs. Since M=32 with block_M=32 there is exactly one tile row, so swizzle-based panel reuse (capped at ceil(M/block_M)=1) cannot help traffic; broaden block_N to include 256 to cut launches and 1/block_N traffic, and test block_K variants (32/64/128) since larger block_K may cut pipeline overhead but raises smem. Keep block_M in {16,32} (both divide M; 64/128 overshoot M and are dropped). Stages rise to {2,3,4} to test deeper pipelining given K=4096; stage=1 dropped since it loses pipeline overlap with no offsetting traffic benefit. Explicitly add a small non-zero swizzle domain [0,4,8] to test the panel-reuse hypothesis the instructions describe, acknowledging it should be neutral at M/block_M=1 for block_M=32 but may matter for block_M=16 (2 tile rows). Equal weights retained for now; next hypothesis after feedback: if traffic locality does not materialize (expected, given one tile row), re-weight toward pipeline and launches and consider changing the thread domain (e.g. drop 64 or keep 128/256) based on measured simulator latency. Scope note: Metal numerically validates exact source/TIR for the selected config; GB10 numbers are simulator estimates, not hardware measurements, and CUDA binaries are not executed here."
+}

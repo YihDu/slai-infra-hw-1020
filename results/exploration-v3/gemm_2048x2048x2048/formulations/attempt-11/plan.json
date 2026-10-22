@@ -1,0 +1,37 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      4,
+      8
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 0.5,
+    "pipeline": 1.25,
+    "footprint": 1.5
+  },
+  "rationale": "Incumbent is 203.69us at block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle 4 or 8 (attempts 06/08 tied). Attempt-10 tested swizzle=0 at the same config and regressed to 222.18us, so a nonzero panel does help slightly and the tied swizzle=8 row is retained as the reference; swizzle=0 is dropped since it is dominated here. Attempt-09 (block_N=64, threads=256) regressed to 269.76us, so block_N=64 is dropped and block_N raised to {128,256} to probe wider-N arithmetic intensity with the confirmed 128-thread layout. block_M kept {64,128} so 128x128 and 128x256 tiles with threads=128 can finally be exercised; block_M=32 stays excluded (attempt-03 regression). block_K {32,64} with 32 proven; 64 retained for a wider-K footprint trade. Stages {2,3,4} keep depth exploration including stage=4; stage=1 excluded (under-pipelined 316.97us/440.81us). Threads {128,256} since 128 won and 256 is a cheap wider-warp check at wider block_N; 64 dropped (200 registers, 295.78us). Weights unchanged: footprint binds at the 32768B cap, deeper K-pipelining has helped, block counts are ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not run; GB10 values are simulator estimates, not hardware measurements, and proxy cost is only a dimensionless ranking. Next hypothesis: block_M=128 or block_N=256 with threads=128 and stage 2-3 may beat 203.69us if wider tiles raise arithmetic intensity without breaching the footprint cap; otherwise retain the 64x128x32/stage2/threads128/swizzle8 incumbent. No claim of global optimality."
+}

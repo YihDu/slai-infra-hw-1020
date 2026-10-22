@@ -1,0 +1,259 @@
+{
+  "attempt": "attempt-02",
+  "configuration": {
+    "block_M": 16,
+    "block_N": 64,
+    "block_K": 64,
+    "num_stages": 3,
+    "threads": 128,
+    "swizzle": 4
+  },
+  "identity": {
+    "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "config_sha256": "7677a170b7cf78a0d49c0e98fb051b78cc510451739b9458277da46763775e86",
+    "tir_sha256": "e491bf166ccdd3b1f6ba55cd4aa0f512e1a88b5690048166f3ca5796d1bcc849",
+    "sass_sha256": "9d8ebdd2a850f330f139fb9ff5bdcfa473d7b04bff6980b53715f538a8f11708",
+    "cubin_sha256": "19b743ae523dfece8d1db44662b9cb6cd02fb4a8311a6cbaa5f7f06a0803a3eb"
+  },
+  "smt": {
+    "property": "Tiled indices stay in bounds; serpentine launch map covers each tile exactly once",
+    "assumptions": "Fixed shape/config; selected tiles divide tensor dimensions; physical launch indices cover the whole grid",
+    "shape": [
+      32,
+      4096,
+      4096
+    ],
+    "config": {
+      "block_M": 16,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 3,
+      "threads": 128,
+      "swizzle": 4
+    },
+    "code_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "results": [
+      {
+        "dimension": "M",
+        "status": "unsat",
+        "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_M () Int)\n(declare-fun local_M () Int)\n(assert\n (>= block_M 0))\n(assert\n (< block_M 2))\n(assert\n (>= local_M 0))\n(assert\n (< local_M 16))\n(assert\n (or (< (+ (* block_M 16) local_M) 0) (>= (+ (* block_M 16) local_M) 32)))\n(check-sat)\n"
+      },
+      {
+        "dimension": "N",
+        "status": "unsat",
+        "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_N () Int)\n(declare-fun local_N () Int)\n(assert\n (>= block_N 0))\n(assert\n (< block_N 64))\n(assert\n (>= local_N 0))\n(assert\n (< local_N 64))\n(assert\n (or (< (+ (* block_N 64) local_N) 0) (>= (+ (* block_N 64) local_N) 4096)))\n(check-sat)\n"
+      },
+      {
+        "dimension": "K",
+        "status": "unsat",
+        "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_K () Int)\n(declare-fun local_K () Int)\n(assert\n (>= block_K 0))\n(assert\n (< block_K 64))\n(assert\n (>= local_K 0))\n(assert\n (< local_K 64))\n(assert\n (or (< (+ (* block_K 64) local_K) 0) (>= (+ (* block_K 64) local_K) 4096)))\n(check-sat)\n"
+      },
+      {
+        "dimension": "swizzled_tile_bounds",
+        "status": "unsat",
+        "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun offset () Int)\n(declare-fun panel_index () Int)\n(assert\n (let ((?x69 (div offset 2)))\n(let (($x77 (= (mod panel_index 2) 1)))\n(let ((?x61 (ite $x77 (- 63 ?x69) ?x69)))\n(let (($x23 (or (< (+ (* panel_index 4) (mod offset 2)) 0) (>= (+ (* panel_index 4) (mod offset 2)) 2) (< ?x61 0) (>= ?x61 64))))\n(let (($x31 (>= offset 0)))\n(let (($x73 (= panel_index 0)))\n(let (($x71 (and $x73 $x31 (< offset 128))))\n(let (($x24 (and $x71 $x23)))\n(let ((?x72 (div offset 4)))\n(let ((?x57 (ite $x77 (- 63 ?x72) ?x72)))\n(let (($x45 (or (< (+ (* panel_index 4) (mod offset 4)) 0) (>= (+ (* panel_index 4) (mod offset 4)) 2) (< ?x57 0) (>= ?x57 64))))\n(let (($x28 (>= panel_index 0)))\n(let (($x27 (and $x28 (< panel_index 0) $x31 (< offset 256))))\n(let (($x104 (and $x27 $x45)))\n(or $x104 $x24))))))))))))))))\n(check-sat)\n"
+      }
+    ],
+    "finite_mapping_check": {
+      "bijective": true,
+      "grid_tiles": 128,
+      "method": "Complete finite enumeration of coordinates, not performance evaluation"
+    },
+    "scope": "Integer bounds only; not floating-point correctness, pipeline safety or lowering correctness",
+    "config_sha256": "7677a170b7cf78a0d49c0e98fb051b78cc510451739b9458277da46763775e86"
+  },
+  "compilation": {
+    "status": "compiled",
+    "target": "sm_121a",
+    "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "config_sha256": "7677a170b7cf78a0d49c0e98fb051b78cc510451739b9458277da46763775e86",
+    "gpu_execution": false,
+    "stage": "complete",
+    "versions": {
+      "tilelang": "0.1.15",
+      "torch": "2.11.0+cpu",
+      "nvidia-cuda-nvcc": "13.0.88",
+      "nvidia-cuda-nvdisasm": "13.4.92"
+    },
+    "device_attributes": [
+      {
+        "target": "{\"kind\":\"cuda\",\"tag\":\"\",\"keys\":[\"cuda\",\"gpu\"],\"max_num_threads\":1024,\"thread_warp_size\":32,\"arch\":\"sm_121a\"}",
+        "tirx.noalias": "True",
+        "tl.non_restrict_params": "()",
+        "tl.readonly_param_indices": "(0, 1)",
+        "tirx.is_global_func": "T.bool(True)",
+        "calling_conv": "2",
+        "tirx.kernel_launch_params": "(\"blockIdx.x\", \"blockIdx.y\", \"threadIdx.x\", \"threadIdx.y\", \"threadIdx.z\", \"tirx.use_dyn_shared_memory\")",
+        "global_symbol": "matmul_kernel",
+        "thread_extent": "{\"blockIdx.x\": 64, \"blockIdx.y\": 2, \"threadIdx.x\": 128, \"threadIdx.y\": 1, \"threadIdx.z\": 1}",
+        "dyn_shared_memory_buf": "30720"
+      }
+    ],
+    "command": [
+      "nvcc",
+      "-std=c++20",
+      "-arch=sm_121a",
+      "-cubin",
+      "/out/kernel.cu",
+      "-o",
+      "/out/kernel.cubin",
+      "-Xptxas",
+      "-v",
+      "-O3",
+      "--expt-relaxed-constexpr",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/../src",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/cutlass/include",
+      "-I/usr/local/lib/python3.12/site-packages/nvidia/cu13/include"
+    ],
+    "kernel": "matmul_kernel",
+    "registers": 62,
+    "threads": 128,
+    "static_smem_bytes": 0,
+    "dynamic_smem_bytes": 30720,
+    "smem_bytes": 30720,
+    "cubin_sha256": "19b743ae523dfece8d1db44662b9cb6cd02fb4a8311a6cbaa5f7f06a0803a3eb",
+    "sass_sha256": "9d8ebdd2a850f330f139fb9ff5bdcfa473d7b04bff6980b53715f538a8f11708",
+    "elapsed_ms": 8211,
+    "container_image": "slai-gb10-compiler:0.1.15",
+    "container_image_id": "sha256:bf3f7ba6bd1027687bb11c7b3c41231907b96acc08d6140dffe8694c3062f987"
+  },
+  "simulation": {
+    "status": "completed",
+    "source": "gb10_instruction_simulator",
+    "unit": "us",
+    "value": 147.55014783450181,
+    "source_commit": "a628c9d963cf9c029fa596b872d6e8920ca883e8",
+    "audit": [
+      {
+        "warps": 12,
+        "warps_done": 12,
+        "cycles": 368173.37549963465
+      }
+    ],
+    "scope": "Timing simulation only; not numerical correctness",
+    "opcode_counts": {
+      "LDC": 4,
+      "S2R": 2,
+      "S2UR": 2,
+      "LDCU": 1,
+      "MOV": 3,
+      "CS2R": 4,
+      "USHF": 2,
+      "ULOP3": 2,
+      "SHF": 6,
+      "IMAD": 37,
+      "LEA": 24,
+      "LOP3": 29,
+      "UMOV": 1,
+      "ULEA": 1,
+      "IADD3": 25,
+      "IADD": 16,
+      "LDS": 11,
+      "LDGSTS": 20,
+      "LDGDEPBAR": 5,
+      "BAR": 8,
+      "PRMT": 4,
+      "ISETP": 1,
+      "DEPBAR": 4,
+      "LDSM": 32,
+      "HMMA": 32,
+      "NOP": 23,
+      "BRA": 2,
+      "STS": 4,
+      "F2FP": 4,
+      "STG": 2,
+      "EXIT": 1
+    },
+    "raw": {
+      "source": "gb10_instruction_simulator",
+      "unit": "us",
+      "sass_sha256": "9d8ebdd2a850f330f139fb9ff5bdcfa473d7b04bff6980b53715f538a8f11708",
+      "simulation": {
+        "us": 147.55014783450181,
+        "tiles": 128,
+        "blocks_per_sm": 3,
+        "waves": 1,
+        "dram_MB": 33.816576,
+        "parts": [
+          {
+            "counts": {},
+            "blocks": 128,
+            "per_sm": 3,
+            "miss_frac": 0.403,
+            "dram_GBs": 234.7,
+            "us": 144.95,
+            "busy": {
+              "tensor": 0.27,
+              "smem": 0.11,
+              "fill": 0.28,
+              "alu": 0.09,
+              "fma": 0.04,
+              "lsu": 0.04,
+              "dram": 0.99,
+              "stg": 0.0
+            }
+          }
+        ]
+      }
+    }
+  },
+  "correctness": {
+    "status": "passed",
+    "passed": true,
+    "checked_target": "metal",
+    "cuda_binary_executed": false,
+    "scope": "Exact TileLang source/configuration executed on Metal; CUDA backend numerical execution not performed",
+    "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "config": {
+      "block_M": 16,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 3,
+      "threads": 128,
+      "swizzle": 4
+    },
+    "tir_sha256": "e491bf166ccdd3b1f6ba55cd4aa0f512e1a88b5690048166f3ca5796d1bcc849",
+    "metal_sha256": "4588a376a5b5d3b1ac3500c3b65291017bb3046ea0ac6e9cd415df22974cda61",
+    "reference": "CPU PyTorch float64 full matmul rounded to float16",
+    "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "torch_version": "2.11.0",
+    "tilelang_version": "0.1.15",
+    "disk_kernel_cache_disabled": true,
+    "tolerance": {
+      "rtol": 0.02,
+      "atol": 0.002
+    },
+    "cases": [
+      {
+        "pattern": "normal",
+        "seed": 42,
+        "passed": true,
+        "max_abs_error": 0.0009765625,
+        "mismatches": 0,
+        "elapsed_ms": 2534,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      },
+      {
+        "pattern": "normal",
+        "seed": 7,
+        "passed": true,
+        "max_abs_error": 0.0009765625,
+        "mismatches": 0,
+        "elapsed_ms": 8,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      },
+      {
+        "pattern": "zero_rows_signed_columns",
+        "seed": 42,
+        "passed": true,
+        "max_abs_error": 0.0009765625,
+        "mismatches": 0,
+        "elapsed_ms": 10,
+        "timing_source": "Metal compile/execution/copy wall time; not GB10 performance"
+      }
+    ],
+    "config_sha256": "7677a170b7cf78a0d49c0e98fb051b78cc510451739b9458277da46763775e86",
+    "elapsed_ms": 7627
+  },
+  "identical_input_tir": true
+}

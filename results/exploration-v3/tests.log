@@ -1,0 +1,9 @@
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 6.804s
+
+OK
+{"status": "no_valid_result", "workload_id": "small", "elapsed_ms": 390, "usage": {"model_calls": 1, "input_tokens": 1, "output_tokens": 1, "cached_tokens": null, "reasoning_tokens": null, "evaluations": 0, "cpu_diagnostics": 1, "compilations": 0, "simulations": 0}}
+{"status": "no_valid_result", "workload_id": "small", "elapsed_ms": 9, "usage": {"model_calls": 1, "input_tokens": null, "output_tokens": null, "cached_tokens": null, "reasoning_tokens": null, "evaluations": 0, "cpu_diagnostics": 0, "compilations": 0, "simulations": 0}}
+{"status": "checked", "workload_id": "small", "elapsed_ms": 44, "usage": {"model_calls": 2, "input_tokens": 2, "output_tokens": 4, "cached_tokens": null, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 2, "compilations": 2, "simulations": 2, "numerical_checks": 2, "solver_calls": 2}}
+{"status": "no_valid_result", "workload_id": "gemm_32x4096x4096", "elapsed_ms": 904, "usage": {"model_calls": 1, "input_tokens": null, "output_tokens": null, "cached_tokens": null, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 0, "compilations": 0, "simulations": 0, "numerical_checks": 0, "solver_calls": 0}}

@@ -1,0 +1,41 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 0.5,
+    "pipeline": 1,
+    "footprint": 1.5
+  },
+  "rationale": "Initial baseline selected block_M=128, block_N=64, block_K=64, stage=1, threads=256, swizzle=0 at 316.97us with 2 blocks/SM and full 32768B smem. Stage=1 likely under-pipelines K=2048, so this revision tests num_stages {2,3,4} (including stage=4, previously unexplored) to hide DRAM latency, and expands block_K to 128 as an early structural hypothesis. Since M=N=K=2048 is square and divisible by all tiles, wider block_N=256 and smaller block_M=32/64 are retained so launches can grow when block_M=128 yields only 16 tiles per dimension. Swizzle is now expanded beyond [0] to {0,4,8} to probe serpentine panel reuse; larger panels (16+) deferred because 2048/128=16 rows may make wide panels exceed cache, and swizzle benefit is a hypothesis not measured truth. Threads kept {128,256} since prior 256 worked; 64 excluded to avoid undersubscribed warps on 128x64 tiles. Launches weight lowered to 0.5 because 2048x2048 already has sufficient blocks at modest tiles, while footprint weight raised to 1.5 since baseline sat exactly at the 32KB cap and stage>=2 with larger block_K can breach it; HiGHS must trade stage depth against footprint. Traffic/pipeline remain 1. Validation scope unchanged: Metal numerical checks run exact source/TIR; CUDA binaries are not executed; GB10 numbers are simulator estimates, not hardware. Next hypothesis: stage>=2 plus swizzle>0 should reduce simulated latency via better K-pipelining and panel locality; if footprint dominates or swizzle=0/4/8 tie, shift budget toward block_K and stage before widening swizzle panels."
+}

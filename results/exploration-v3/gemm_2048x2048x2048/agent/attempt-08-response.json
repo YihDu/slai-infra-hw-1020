@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[2,3,4],\"threads\":[128,256],\"swizzle\":[0,4,8]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":0.5,\"pipeline\":1.25,\"footprint\":1.5},\"rationale\":\"Best observed is attempt-06 at 203.69us: block_M=64, block_N=128, block_K=32, stage=2, threads=128, swizzle=8, achieving 3 blocks/SM. Attempt-07 with threads=64 regressed to 295.78us (registers 200, same blocks/SM), so 64 threads oversubscribes registers and is dropped; threads=128 is confirmed and 256 retained to recheck whether wider warp counts help with block_M=128 tiles at higher register pressure. History shows stage=1 under-pipelines (316.97us, 440.81us), swizzle=4 tied swizzle=8, swizzle=16 regressed, and swizzle=32/64 with narrow-M/wide-N regressed badly - panel reuse is largely a proxy artifact, so swizzle is narrowed to {0,4,8} to re-establish the row-major reference at the new 128-thread config and test whether locality materializes there. block_M=32 and block_N=256 are dropped (attempt-03 regression, narrow-M high-launch regime); block_M/block_N kept to {64,128} around the confirmed region so the untested 128x128 and 128x64 tiles with threads=128 and stages 2-4 can be exercised. block_K {32,64} retained with 32 the proven winner; 64 allowed but rarely favored given footprint. Stages {2,3,4} keep depth exploration and satisfy the stage=4 consideration. Weights unchanged (traffic 1, launches 0.5, pipeline 1.25, footprint 1.5): footprint binds at the 32KB cap, deeper K-pipelining has helped, block counts are ample at 2048 square. Validation scope: Metal numerical checks execute exact source/TIR; CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements, and proxy cost is only a dimensionless ranking. Next hypothesis: block_M=128 with threads=128 and stage 2-3 may beat 203.69us if wider-M tiling raises arithmetic intensity without exceeding footprint; if swizzle=0 ties 4/8 at 128 threads, panel locality is confirmed non-materializing and swizzle can be retired to free domain width for tile/stage/thread exploration. No claim of global optimality.\"}",
+  "usage": {
+    "prompt_tokens": 6447,
+    "completion_tokens": 604,
+    "total_tokens": 7051,
+    "prompt_tokens_details": {
+      "cached_tokens": 5504
+    },
+    "prompt_cache_hit_tokens": 5504,
+    "prompt_cache_miss_tokens": 943
+  },
+  "response_id": "fc44f208-4eac-43cf-bb7a-57892a66c792"
+}

@@ -1,0 +1,48 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      64,
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Attempt-00 compiled and passed numerical checks at 128x64x64, stage=1, threads=256, swizzle=0, reaching ~3560.55 us simulated with 766.5 MB DRAM and 2 blocks/SM. Attempt-01 produced a schema ValueError, so this plan fixes schema validity by returning the full required JSON shape with all domains nonempty and a valid shared-memory limit. I broaden domains: swizzle now includes [0,4,8,16,32,64] to test the serpentine panel reuse hypothesis since M=4096 has multiple tile rows so reuse=min(swizzle,ceil(M/block_M)) can matter; block_K adds 128; block_M adds 16; block_N/stages/threads remain broad. The 32768-byte cap and the estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) will prune oversized combos (e.g. 128x256 with high stages). Weights stay uniform because no prior evidence distinguishes traffic, launches, pipeline, or footprint dominating simulated latency. Threads with identical tile/stage/swizzle tie analytically, so feedback should decide between 64/128/256. Scope note: Metal checks simulate exact source/config/TIR; CUDA binaries are not executed and GB10 numbers are simulator estimates, not hardware measurements. Next hypothesis: test a changed thread or block_K domain alongside swizzle>0 to see whether panel locality reduces simulated DRAM/latency versus the row-major baseline."
+}

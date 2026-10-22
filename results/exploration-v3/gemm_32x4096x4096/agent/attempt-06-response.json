@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[16,32],\"block_N\":[64,128,256],\"block_K\":[64,128],\"num_stages\":[2,3,4],\"threads\":[128,256],\"swizzle\":[0,4,8,16,32,64]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":0.3,\"launches\":1.5,\"pipeline\":1,\"footprint\":1},\"rationale\":\"Best remains 147.67us from attempts 03/04 (M=32,N=64,K=64,st=2, thr 256/128, sw=64); attempt-05 with sw=32 failed SMT bounds so never ran. Observations: DRAM flat at 33.8 MB across all variants including swizzle changes, so panel-reuse proxy yields no measured locality at M/block_M<=2; traffic down-weighted to 0.3. block_K=32 lost twice and is dropped. block_M={16,32} only (M=32). block_N kept {64,128,256} to test whether wider N ever beats the N=64 winner. block_K kept {64,128} to probe deeper K. Stages {2,3,4}: stage=4 still untested and now explicitly prioritized. Threads {128,256} since they tied at the best tuple; keep both to test thread hypothesis against wider-N/K=128 variants. Swizzle full domain retained but low traffic weight so it cannot dominate selection; swizzle=32 caused an SMT-bound failure previously, so the solver may naturally avoid it. shared_memory_limit 32768 with hard portability cap; footprint weight 1 penalizes stage=4+K=128+N=256 under the 32 KB cap. Next hypothesis: from the 147.7us K=64/st=2 winner, test (a) block_K=128 with stages>=3, (b) block_N=128/256, and (c) stage=4 at N=64, to see if any beats the incumbent. GB10 numbers are simulator estimates, not hardware measurements; Metal validates exact source/TIR numerically but does not execute the CUDA binary, so compile/memory status is a scoped estimate rather than a hardware proof. No global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 5695,
+    "completion_tokens": 488,
+    "total_tokens": 6183,
+    "prompt_tokens_details": {
+      "cached_tokens": 4864
+    },
+    "prompt_cache_hit_tokens": 4864,
+    "prompt_cache_miss_tokens": 831
+  },
+  "response_id": "17d421e7-e0ce-4fa5-9107-c0fc54d4fe31"
+}
