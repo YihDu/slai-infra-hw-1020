@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1.5,\"launches\":0.5,\"pipeline\":2,\"footprint\":1.5},\"rationale\":\"Only one prior datapoint exists (attempt-00: 128x64x64, stages=1, threads=128; compiled with smem_bytes=32768 exactly at the cap; numerically passed; simulated 234.82 us as the current best). No narrowing is warranted yet since the feasible domain is broad and untested points (e.g., block_M=64, block_N=128, block_K=32 with more stages) remain. Constraints stay at the 32 KiB portability cap because actual smem matched the estimate exactly (32768) at 128x64x64/stages=1, confirming the estimate is tight for stage>=1 combinations that satisfy 2*block_K*(block_M+block_N)*num_stages <= cap; larger tiles therefore require small K and low stages. Domains remain full since 2048 divides all candidates and exclusion is not narrow. Weight changes reflect the observed feasibility pressure: the single feasible chosen point sat exactly at the memory cap, so I raise footprint weight (1 -> 1.5) to steer future selections toward configurations with slack (e.g., block_M=64/128, block_K=32, more stages) and raise pipeline weight (1 -> 2) because stages=1 was selected only because stages>=2 at 128x64x64 likely exceeded the cap, leaving pipeline depth untested; heavier pipeline weight promotes deeper-pipelined configurations once feasible. Traffic weight rises slightly (1 -> 1.5) to retain preference for larger tiles within the cap. Launches weight drops (1 -> 0.5) since launch overhead over 2048x2048 grids is small (~16-32 tiles per dim scaled to /1000 metric) and traffic/pipeline more directly affect rank. This is a proxy score only, not measured latency; the 234.82 us is a GB10 simulator estimate, and Metal checks execute exact source/TIR without executing the CUDA binary, so validation scope is limited. Next hypothesis: the solver should explore block_K=32 with num_stages=2 or 3 and larger blocks (128x128 or 64x128) that satisfy 2*block_K*(block_M+block_N)*num_stages <= 32768 and the 4*block_M*block_N <= 32768 epilogue constraint, which may reduce pipeline stalls and improve simulated latency versus the 128x64x64/stages=1 baseline; the next datapoint will be used to recalibrate weights and possibly tighten the cap if actual smem again saturates it.\"}",
+  "usage": {
+    "prompt_tokens": 1235,
+    "completion_tokens": 617,
+    "total_tokens": 1852,
+    "prompt_tokens_details": {
+      "cached_tokens": 640
+    },
+    "prompt_cache_hit_tokens": 640,
+    "prompt_cache_miss_tokens": 595
+  },
+  "response_id": "0df4e72f-7b44-43a3-8bfb-e8bc67b94b1a"
+}

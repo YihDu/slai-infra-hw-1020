@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1.5,\"launches\":0.3,\"pipeline\":4,\"footprint\":0.5},\"rationale\":\"Five numerically-passed, compiled datapoints, all SMT-bounded and all hitting exactly smem=32768 (estimate matches compiler). Best remains 128x64x32/stages=2 at 222.05 us (proxy 7.94); 64x128x32/stages=2 tied closely at 222.18 us; stages=1 variants (128x64x64 234.82, 64x128x64 233.20, 128x64x32 303.28) ranked worse. Key signal: num_stages>=2 with block_K=32 dominates, and attempt-04's stages=1 drop to 303 us shows the proxy is sensitive to pipeline depth. Domains stay full because 2048 is divisible by all candidates and only five tuples are excluded; no narrowing needed. Cap stays at the hard 32768 portability ceiling since actual smem saturated it exactly at every chosen point. Changes vs attempt-04: pipeline 3->4 to strongly prioritize num_stages=3 configurations (64x64x32/stages=3 est 24576; 32x128x32/stages=3 est 30720; 32x64x32/stages=3 est 18432) that remain untested, given stages has now clearly separated simulated outcomes; footprint 0.8->0.5 since cap-saturating large tiles are the best performers and footprint pressure only risks steering away from them; traffic 2->1.5 to slightly relax tile-size preference so deeper pipelining at modest tiles can win; launches stays 0.3 as 2048x2048 grid overhead is minor. Caveat: 222.05 us is a GB10 simulator estimate, not hardware measurement; Metal checks execute the exact source/TIR and config but do not run the CUDA binary, so validation scope is limited to numerical and compile checks plus proxy ranking. Next hypothesis: solver should select a stages=3 point such as 64x64x32 or 32x128x32 to test whether the additional pipeline depth the current cap permits improves simulated latency beyond the 222.05 us best; if stages=3 underperforms, I will rebalance toward traffic and consider that stages=2 at 128x64x32/64x128x32 may already be near-cap optimum.\"}",
+  "usage": {
+    "prompt_tokens": 4256,
+    "completion_tokens": 573,
+    "total_tokens": 4829,
+    "prompt_tokens_details": {
+      "cached_tokens": 3456
+    },
+    "prompt_cache_hit_tokens": 3456,
+    "prompt_cache_miss_tokens": 800
+  },
+  "response_id": "e2f8bb37-b400-4ccb-8ba1-67c971129954"
+}

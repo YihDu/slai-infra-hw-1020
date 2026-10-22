@@ -1,5 +1,7 @@
 # 无 GPU 编译与 GB10 模拟接入
 
+> 阶段记录：后续正式实现与最终实测结果见根目录 report.md；本页保留当时的计划或事实。
+
 2026-10-22。已在 Apple M4 / 16 GB 上完成真实 TileLang → CUDA → cubin → 编码 SASS →
 课程模拟器链路；运行容器没有 NVIDIA GPU、没有网络。数值验证仍只执行 CPU shadow，
 因此没有 `checked` GPU 实现，也不把模拟改进当作已经验证的正确实现加速比。

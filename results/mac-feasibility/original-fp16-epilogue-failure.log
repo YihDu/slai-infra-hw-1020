@@ -1,0 +1,131 @@
+input_tir_sha256 9317f1883cda69198f53b7b377d696b61328b40d5c04b52cea1df4a8656d15c1
+2026-10-22 11:26:57  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:137): TileLang begins to compile kernel `matmul` with `out_idx=[-1]`
+Traceback (most recent call last):
+  File "/tmp/hw-probe-metal.py", line 14, in <module>
+    kernel=tilelang.compile(program,target='metal',execution_backend='torch')
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/__init__.py", line 164, in compile
+    return cached(
+        func=func,
+    ...<6 lines>...
+        compile_flags=compile_flags,
+    )
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/cache/__init__.py", line 90, in cached
+    return cache.cached(
+           ~~~~~~~~~~~~^
+        func,
+        ^^^^^
+    ...<5 lines>...
+        compile_flags=compile_flags,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/cache/kernel_cache.py", line 427, in cached
+    kernel = JITKernel(
+        func,
+    ...<7 lines>...
+        backend_context=backend_context,
+    )
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/kernel.py", line 140, in __init__
+    adapter = self._compile_and_create_adapter(func, out_idx)
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/kernel.py", line 275, in _compile_and_create_adapter
+    adapter = self._create_adapter_from_artifact(
+        tilelang_func,
+    ...<3 lines>...
+        compile_metadata,
+    )
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/kernel.py", line 392, in _create_adapter_from_artifact
+    adapter = create_adapter(
+        MetalKernelAdapter,
+    ...<9 lines>...
+        # compile_flags=compile_flags,
+    )
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/kernel.py", line 336, in create_adapter
+    return adapter_cls(**kwargs)
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/adapter/torch/metal.py", line 52, in __init__
+    super().__init__(func_or_mod, result_idx=result_idx, params=params)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/adapter/base.py", line 31, in __init__
+    self._post_init()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/adapter/base.py", line 134, in _post_init
+    self.func = self._convert_torch_func()
+                ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/tilelang/jit/adapter/torch/metal.py", line 67, in _convert_torch_func
+    _kernel = getattr(torch.mps.compile_shader(self.kernel_global_source), self.kernel_name)
+                      ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/torch/mps/__init__.py", line 163, in compile_shader
+    return torch._C._mps_compileShader(source)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+SyntaxError: program_source:94:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[0], (&(C[(((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32))])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+program_source:95:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[1], (&(C[((((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32)) + 8)])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+program_source:96:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[2], (&(C[((((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32)) + 16)])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+program_source:97:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[3], (&(C[((((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32)) + 24)])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+program_source:98:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[4], (&(C[((((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32)) + 512)])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+program_source:99:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[5], (&(C[((((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32)) + 520)])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+program_source:100:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[6], (&(C[((((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32)) + 528)])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+program_source:101:3: error: no matching function for call to 'simdgroup_store'
+  simdgroup_store(acc[7], (&(C[((((((int)__simd_group_id) & 1) * 1024) + ((((int)__simd_group_id) >> 1) * 32)) + 536)])), 64, 0, (bool)0);
+  ^~~~~~~~~~~~~~~
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:174:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, threadgroup T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.884/include/metal/metal_simdgroup_matrix:179:17: note: candidate template ignored: deduced conflicting types for parameter 'T' ('float' vs. 'half')
+METAL_FUNC void simdgroup_store(simdgroup_matrix<T, Cols, Rows> a, device T *dst, ulong elements_per_row = Cols, ulong2 matrix_origin = ulong2(0, 0), bool transpose_matrix = false)
+                ^
+

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":2,\"launches\":0.3,\"pipeline\":3,\"footprint\":0.8},\"rationale\":\"Four numerically-passed, compiled datapoints; all satisfied SMT bounds and hit exactly smem=32768. Best is 128x64x32/stages=2 at 222.05 us (proxy 7.94); attempt-03 64x128x32/stages=2 gave 222.18 us, nearly tied, while stages=1 variants (128x64x64 and 64x128x64) were ~233-235 us. So block_K=32 with num_stages>=2 clearly ranks better in the GB10 simulator proxy, and larger square-ish tiles plus stages=3 remain unexplored. Domains stay full because 2048 is divisible by all candidates and only four tuples are excluded; no narrowing is warranted. I keep the 32 KiB cap: it is the hard portability ceiling and actual smem matched it exactly at every chosen point, so raising it is not justified. Weight changes vs attempt-03: footprint 1->0.8 to stop penalizing large tiles that sit at the cap (both best points saturate cap yet rank best); pipeline stays 3 to keep pushing stages=3 feasible configurations (e.g., 64x64x32/stages=3 est 24576, 32x128x32/stages=3 est 30720, 128x64x32/stages=3 est 36864 excluded by cap); traffic stays 2 to reward 128x128x32/stages<=2 (est 16384) if the solver can reach it; launches stays 0.3 since 2048x2048 grid overhead is minor. Caveat: 222.05 us is a GB10 simulator estimate, not hardware; Metal checks execute the exact source/TIR but not the CUDA binary. Next hypothesis: with footprint deweighted and pipeline emphasized, the solver should pick either 128x128x32/stages=2 (if traffic+tile gains dominate) or a stages=3 point like 64x64x32 or 32x128x32 to test whether deeper pipelining at smaller tiles improves the simulator ranking beyond the current 222 us best; the next datapoint will discriminate these trade-offs.\"}",
+  "usage": {
+    "prompt_tokens": 3506,
+    "completion_tokens": 541,
+    "total_tokens": 4047,
+    "prompt_tokens_details": {
+      "cached_tokens": 2688
+    },
+    "prompt_cache_hit_tokens": 2688,
+    "prompt_cache_miss_tokens": 818
+  },
+  "response_id": "86cf6fbc-97c8-4e89-baf6-f1c7b2cfd0c1"
+}

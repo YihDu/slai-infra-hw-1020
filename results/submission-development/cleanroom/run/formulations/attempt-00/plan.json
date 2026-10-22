@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial plan with swizzle=[0] for a row-major baseline, as required. M=32 is small, so block_M in [32,64,128] all divide M except 64/128 do not divide 32; constraint 'tiles must divide M,N,K' means only block_M=32 is admissible for this workload, and block_N/block_K must divide N=4096 and K=4096, so all listed values are valid. Shared bytes = max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N). With block_M=32, block_N=128, block_K=64, num_stages=3: max(2*64*160*3, 4*32*128)=max(61440,16384)=61440 > 32768 cap, so stage/block_K pressure must be limited; the cap forces smaller num_stages or block_K for large block_N. Swizzle baseline [0] gives reuse=1. Weights equal to start; traffic dominated by block_N term since reuse=1. Next hypothesis: after feedback, explore swizzle [0,4,8,16] and stages/tiles that fit the 32768 cap; inspect whether serpentine reuse reduces simulator traffic and whether lowering stages or block_K to satisfy shared-memory cap helps latency despite pipeline cost."
+}

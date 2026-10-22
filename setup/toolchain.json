@@ -1,0 +1,9 @@
+{
+  "uv": "uv 0.12.18 (01cb90c1a 2026-09-22 aarch64-apple-darwin)",
+  "docker": "Docker version 29.9.1, build dfc520dcc2",
+  "colima": "colima version 0.10.3\ngit commit: 00f6c297e92a82c04a4ab507db0a61435650d7e8",
+  "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.1\nBuildVersion:\t\t25F80",
+  "mac_cpu": "Apple M4",
+  "memory_bytes": 17179869184,
+  "compiler_image_id": "sha256:bf3f7ba6bd1027687bb11c7b3c41231907b96acc08d6140dffe8694c3062f987"
+}

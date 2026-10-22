@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial plan for gemm_128x4096x4096 (M=128,N=K=4096, FP16 inputs, FP32 accum). Allowed domains cover block_M 32/64/128 (all divide M=128), block_N 64/128 (divide N=4096), block_K 32/64 (divide K=4096), num_stages 1-3, threads fixed at 128, and swizzle restricted to [0] per instruction to establish a row-major baseline. Shared-memory cap set to 32768 bytes to respect the hard portability cap for Mac Metal vs GB10; estimated footprint per candidate = max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N), with epilogue buffer aliasing assumed. Objective weights are equal (1) across traffic, launches, pipeline and footprint to keep the first comparison unbiased. Hypothesis/history: no prior evaluations, so no exclusions applied and domains kept broad within the allowed sets; the next hypothesis to test is whether analytic swizzle reuse (serpentine panels) actually lowers simulator traffic/latency for this tall-skinny M=128 shape, which is why later rounds will open swizzle to [0,4,8,16]; the tall-skinny GEMM has very few M-tiles (ceil(128/block_M) in {1,2,4}), so launch and reuse effects on block_M may dominate and weights may be revisited after feedback. This proxy cost is dimensionless and only used for ranking, never interpreted as microseconds; Metal checks execute the exact source/config/TIR but do not run the CUDA binary, and GB10 values are simulator estimates only, not hardware measurements."
+}

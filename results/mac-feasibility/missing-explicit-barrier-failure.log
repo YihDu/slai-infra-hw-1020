@@ -1,0 +1,13 @@
+2026-10-22 11:28:43  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:137): TileLang begins to compile kernel `matmul` with `out_idx=[-1]`
+2026-10-22 11:28:44  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:145): TileLang completes to compile kernel `matmul`
+Traceback (most recent call last):
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-feasibility/probe.py", line 24, in <module>
+    torch.testing.assert_close(actual,reference,rtol=w['tolerance']['rtol'],atol=w['tolerance']['atol'])
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yihdu/Documents/个人/课程/Infra课程/hw-1021/.cache/mac-check/lib/python3.13/site-packages/torch/testing/_comparison.py", line 1600, in assert_close
+    raise error_metas[0].to_error(msg)
+AssertionError: Tensor-likes are not close!
+
+Mismatched elements: 171040 / 524288 (32.6%)
+Greatest absolute difference: nan at index (12, 2208) (up to 0.002 allowed)
+Greatest relative difference: nan at index (12, 2208) (up to 0.02 allowed)

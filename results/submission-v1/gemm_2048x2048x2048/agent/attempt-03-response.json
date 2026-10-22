@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":2,\"launches\":0.3,\"pipeline\":3,\"footprint\":1},\"rationale\":\"History: 3 numerically-passed, compiled points. Best is 128x64x32/stages=2 at 222.05 us (proxy 7.94); 128x64x64/stages=1 gave 234.82 us and 64x128x64/stages=1 gave 233.20 us, both saturated at smem=32768. So deeper pipelining with smaller block_K helped, while a non-square 64x128 tile with stages=1 did not beat the best. All three trials hit exactly 32768 bytes, consistent with the estimate formula, so the cap remains binding but the compiler didn't exceed it. Domains stay full (no exclusions yet, 2048 divisible by all candidates), but the solver has been forced to stages<=2 with block_K=32 and cannot reach stages=3 under the current 32 KiB cap combined with large tiles; I keep the cap because it is the hard portability ceiling. Weight changes vs attempt-02: pipeline 2.5->3 to prioritize getting stages=3 feasible (small block_M/block_N with block_K=32), traffic stays 2 to still reward larger tiles within the cap, footprint stays 1 since winners sit at the cap and higher footprint weight would bias away from useful large-tile points, launches stays 0.3 as grid overhead is minor. Caveat: the 222.05 us figure is a GB10 simulator estimate, not hardware, and Metal checks execute the exact source/TIR but not the CUDA binary. Next hypothesis: with heavier pipeline weight the solver should pick a stages=3 combination such as 64x64x32/stages=3 (est 2*32*128*3=24576) or 32x128x32/stages=3 (est 2*32*160*3=30720) to test whether deeper pipelining improves simulated latency; if stages=3 underperforms, rebalance toward traffic and consider that the current best already sits near the cap optimum.\"}",
+  "usage": {
+    "prompt_tokens": 2793,
+    "completion_tokens": 504,
+    "total_tokens": 3297,
+    "prompt_tokens_details": {
+      "cached_tokens": 2048
+    },
+    "prompt_cache_hit_tokens": 2048,
+    "prompt_cache_miss_tokens": 745
+  },
+  "response_id": "df01705d-77e9-485c-aa0d-ce6273ab2ef7"
+}

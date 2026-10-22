@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      32
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.5,
+    "launches": 0.5,
+    "pipeline": 2,
+    "footprint": 1
+  },
+  "rationale": "Four observed points (attempt-00 147.72us/18KB/5 blocks-per-SM; attempts 01-03 all 147.67us/24KB/4 blocks-per-SM) are latency-flat within ~0.05us and share identical simulated DRAM 33.816576MB regardless of swizzle (0/4/8/16) or block_K (32/64). With M=32 and block_M=32, reuse=min(swizzle or 1, ceil(32/32))=1 always, so the serpentine panel-reuse hypothesis cannot reduce A reloads; DRAM is dominated by the fixed B read. I therefore keep block_M pinned to 32 (only divisor of M=32), keep swizzle [0,4,8,16] to let HiGHS still test the hypothesis, but downweight traffic to 0.5 since it is invariant across observed tuples. Pipeline weight stays 2 (deeper overlap was the only lever producing even a tiny improvement, stages=3 in attempt-00). Footprint weight raised back to 1.0 to bias toward the 18KB/stages-3/block_K-32 region (5 blocks/SM) which matched the best latency with a smaller footprint, versus the 24KB points; shared_memory_limit kept at the hard 32768-byte portability cap, and the estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) must also satisfy divisibility of N=4096, K=4096. Launches stays 0.5 because ceil(32/32)=1 makes it nearly constant. Next hypothesis: try block_N=128 and block_K=32/stages=3 combinations (not yet observed) alongside swizzle variants; if simulated_us remains ~147.7us and DRAM unchanged, treat this shape as latency/bandwidth-flat and prefer the smallest-footprint config for occupancy. Scope: simulated_us/simulated_dram_mb are GB10 simulator estimates, not hardware measurements; Metal numerically checks the exact source/TIR/config but does not execute the CUDA binary. Local revision from four observed points, not a global optimality claim."
+}

@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.75,
+    "launches": 1,
+    "pipeline": 1.25,
+    "footprint": 1
+  },
+  "rationale": "Two evaluated points: attempt-00 (128x64x64, stages=1, swizzle=0) at 234.82 us and attempt-01 (64x128x64, stages=1, swizzle=16) at 235.12 us. Both compiled, passed numerical checks, and used exactly 32768 smem with 3 blocks/SM. Simulated DRAM was identical at 16.78 MB for both, so opening swizzle to [0,4,8,16] produced no locality gain and no latency improvement — the analytic panel-reuse feature did not materialize in simulator traffic. I therefore reduce traffic weight from 1.5 back toward 0.75 (since DRAM did not differentiate) and raise pipeline to 1.25 to push HiGHS toward larger block_K or num_stages>1, which the two stage=1 samples have not yet explored; footprint stays at 1 because both samples saturate the cap and the actual 32768 result matches the estimator. Keep the hard 32768 portability cap, keep threads fixed at 128, keep full tile and stage domains since M=N=K=2048 is divisible by all and exclusion so far only removes two points. Swizzle remains [0,4,8,16] to continue probing the hypothesis alongside deeper pipelines; if stage>1 selections repeatedly fail SMT/compile or show no gain, I will reconsider. Metal checks execute exact source/config/TIR; CUDA binary execution is not validated, and GB10 values are simulator estimates, not hardware measurements. This is exploratory, not a claim of global optimality."
+}

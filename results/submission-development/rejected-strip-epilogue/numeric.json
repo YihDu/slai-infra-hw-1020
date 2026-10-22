@@ -1,0 +1,10 @@
+{
+  "status": "error",
+  "passed": false,
+  "error_type": "RuntimeError",
+  "reason": "Failed to created pipeline state object, error: Error Domain=AGXMetalG16G_B0 Code=3 \"Threadgroup memory size (49152) exceeds the maximum threadgroup memory allowed (32768)\" UserInfo={NSLocalizedDescription=Threadgroup memory size (49152) exceeds the maximum threadgroup memory allowed (32768)}",
+  "checked_target": "metal",
+  "cuda_binary_executed": false,
+  "config_sha256": "16cc70f87a4c5e3e88f24e0add417f688c3591ba1f7add344bc88444f5566542",
+  "elapsed_ms": 4187
+}

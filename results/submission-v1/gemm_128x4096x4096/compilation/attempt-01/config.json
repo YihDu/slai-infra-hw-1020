@@ -1,0 +1,7 @@
+{
+  "block_M": 64,
+  "block_N": 64,
+  "block_K": 64,
+  "num_stages": 2,
+  "threads": 128
+}

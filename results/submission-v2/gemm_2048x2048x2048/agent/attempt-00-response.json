@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128],\"swizzle\":[0]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1,\"footprint\":1},\"rationale\":\"Initial plan: no prior evaluations, so all allowed tile and stage values are included, threads fixed at 128, and swizzle restricted to [0] to establish a conventional row-major baseline per instructions. M=N=K=2048 is divisible by all listed block_M (32/64/128), block_N (64/128), and block_K (32/64), so the divide constraint is nonbinding. Shared-memory cap is set to the hard 32768-byte portability limit; the estimator max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) plus compiler aliasing will be filtered naturally by HiGHS's byte constraint, with compiled memory still checked later. Equal unit weights keep traffic, launch count, pipeline depth, and footprint balanced for an unbiased first comparison. The analytic reuse term is treated as a hypothesis only; after feedback I will inspect simulator traffic/latency, broaden swizzle to [0,4,8,16] if locality gains appear or if exclusions narrow the feasible set, and retune weights/domains based on numerical checks, SMT/compile results, and simulator estimates. Metal checks execute exact source/config/TIR; CUDA binary execution is not validated, and GB10 latencies are simulator estimates, not hardware measurements. This is exploratory, not a claim of global optimality.\"}",
+  "usage": {
+    "prompt_tokens": 855,
+    "completion_tokens": 374,
+    "total_tokens": 1229,
+    "prompt_tokens_details": {
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 343
+  },
+  "response_id": "727fed63-e93e-49b1-a43c-aa2c8c1ed9a9"
+}

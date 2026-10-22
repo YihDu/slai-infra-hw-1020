@@ -1,111 +1,134 @@
-# Agentic AI Infrastructure Optimizer
+# Agent + HiGHS + TileLang optimizer for GB10
 
-已接入 DeepSeek → HiGHS → TileLang → CUDA sm_121a 编译 → GB10 时序模拟 → Agent 反馈。
-Mac 通过独立 Linux ARM64 虚拟机完成编译，不需要 NVIDIA GPU。数值检查目前仍为
-CPU shadow，因此结果保持 `no_valid_result`；GPU 内核的数值正确性尚未验证。
+This workspace runs a real DeepSeek/API formulation agent, HiGHS MIP selection,
+TileLang numerical checks, GB10 cross-compilation and the supplied timing simulator.
+The supported development environment is **Apple Silicon macOS with Metal**, plus
+an ARM64 Linux Docker VM for CUDA compilation. No NVIDIA GPU is required locally.
 
-开发顺序见 [开发计划](docs/development-plan.md)，实测结果和限制见 [报告](report.md)。
+**Validation scope:** `checked` records the exact TileLang source/configuration
+executed on Metal against an independent CPU float64 reference. The CUDA compiler
+receives byte-identical input TileLang IR; its sm_121a SASS is timing-simulated.
+The CUDA binary is **not executed**. Every result explicitly records
+`checked_target: metal`, `cuda_binary_executed: false` and its source/IR/artifact hashes.
+Cross-backend testing does not prove CUDA lowering correctness. The course document
+does not explicitly specify acceptance of this validation scope; the report discloses it.
 
-## 运行 baseline
+## Prepare the environment before timing
 
-设置 `DEEPSEEK_API_KEY` 后：
-
-```sh
-./run.sh --workload third_party/gb10/workloads/gemm_32x4096x4096.json \
-  --model-config configs/deepseek.json --output results/new-run
-```
-
-输出目录必须为空，防止覆盖证据。默认两轮，最长 1200 秒；可用 `--rounds 1`
-和 `--budget-seconds 60` 控制开发运行。`run.sh` 不下载依赖，也不访问模型服务之外的网络。
-它只加载仓库中的模型驱动、提示词与代码，不加载个人 Agent 设置。
-真实模型服务需要联网和运行时凭据。默认使用已构建的 Docker 编译镜像；
-`--compiler none` 只运行旧 CPU 诊断流程。运行中不构建或拉取镜像。
-
-```sh
-.venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python tools/summarize_baseline.py
-```
-
-新的编译模拟记录位于 `results/compiled-baseline/`，初始 CPU 记录位于 `results/gemm_*/`。每次运行保留模型请求/可见响应、token 用量、
-LP/MPS、HiGHS 状态与 gap、配置和源码哈希、Z3 范围证明、CPU 误差、编译/模拟状态和失败原因。
-`state/source/` 保存与当次 manifest 哈希一致的代码快照。第一次空模型响应失败也保留。
-
-## 已准备
-
-- `third_party/gb10/`：课程原始模拟器、参数、5 个 GEMM workload；保留 SOURCE.json。
-- `requirements-cpu.lock`、`setup/cpu.sh`：固定全部直接和间接 CPU 依赖与安装入口。
-- `tools/doctor.py`：工具、求解器、模拟器检查；结果存入 `setup/environment.json`。
-- `optimizer/trace.py`：追加式 JSONL 事件记录与输出目录内的证据路径检查。
-- `configs/model.example.json`：模型接口配置示例，不含凭据。
-
-安装和检查：
+Tested: Apple M4, 16 GiB, macOS 26.5.1; Python 3.13.13 (host), Python 3.12.12
+(compiler); uv 0.12.18, Colima 0.10.3, Docker CLI 29.9.1.
+Exact versions are recorded in `setup/toolchain.json` and dependency lock files.
+Install uv, Docker CLI and Colima beforehand, then:
 
 ```sh
 sh setup/cpu.sh
-.venv/bin/python tools/doctor.py --output setup/environment.json
-```
-
-当前本机 CPU 环境已安装并通过 HiGHS、Z3、模拟器 CLI 检查，版本见 `setup/environment.json`。
-重新获取本机安装包可运行 `python3 tools/fetch_wheels.py --direct`；下载后核对 SHA-256。
-安装阶段需要网络。离线安装可提前将对应平台的所有依赖 wheel 放入 `wheelhouse/`。
-`.venv/`、缓存与 wheelhouse 不纳入提交。
-
-## Mac 上的无 GPU 编译环境
-
-本机已创建独立 Colima 实例 `slai-compiler`：4 CPU、6 GiB 内存、40 GiB 虚拟磁盘。
-默认 Docker context 未改动。重新开机后启动该实例即可：
-
-```sh
-colima start slai-compiler
-# 首次安装环境时才需要构建；本机已经完成
+sh setup/mac-numeric.sh
+colima start slai-compiler --vm-type vz --arch aarch64 --cpu 4 --memory 6 \
+  --disk 40 --mount-type virtiofs --activate=false
 sh setup/compiler-build.sh
 ```
 
-编译镜像固定 TileLang 0.1.15、CPU PyTorch 2.11.0、CUDA nvcc 13.0.88，目标 sm_121a；
-Python 依赖版本见 `setup/compiler-python.lock`。容器运行时禁止联网、不挂载 GPU，
-保存 CUDA 源码、真实 cubin、编码 SASS、寄存器/共享内存用量与镜像 ID。
-镜像构建默认使用本机代理映射 `192.168.5.2:25662`，可用 `SLAI_BUILD_PROXY` 覆盖。
-`SLAI_DOCKER_CONTEXT` 和 `SLAI_COMPILER_IMAGE` 可覆盖 context 和镜像名。
-普通 Linux Docker 可将 `SLAI_DOCKER_CONTEXT` 设为 `default`。
+`setup/cpu.sh` creates `.venv`; `setup/mac-numeric.sh` creates `.venv-metal`.
+The image `slai-gb10-compiler:0.1.15` contains TileLang 0.1.15, CPU PyTorch,
+CUDA nvcc 13.0.88 and nvdisasm 13.4.92. CUDA containers run with `--network=none`
+and no GPU. Base image digest and Python dependencies are pinned; the built image
+ID is saved in each result. apt package resolution is not a historical snapshot.
+The macOS wheel supplies Metal execution through `torch.mps.compile_shader`; a full
+Xcode installation was not needed on the tested machine.
 
-模拟器原文件不改动；外层校验来源哈希及所有 warp 完成状态，排除未完成/超时/资源无效结果。
-它只估计耗时、不计算输出。CPU shadow 通过不能证明 GPU 实现正确。
-详细工具链、实测结果和下一步见 [编译接入记录](docs/compiler-integration.md)。
-不用时可执行 `colima stop slai-compiler` 释放 VM 内存。
+The build script's default proxy is the local development proxy forwarded to
+`192.168.5.2:25662`. Override `SLAI_BUILD_PROXY` for your network (an empty value means
+no build proxy). It is an installation-time setting, not a model credential.
+Use `SLAI_DOCKER_CONTEXT` / `SLAI_COMPILER_IMAGE` to select a prepared compiler;
+`SLAI_NUMERIC_PYTHON` selects the prepared native numerical Python interpreter.
+A generic Linux CPU-only machine cannot execute the Metal numerical backend.
 
-## 模型配置
+## Required execution interface
 
-当前默认开发配置为 `configs/deepseek.json`，使用 DeepSeek 官方端点和 `deepseek-flash`。
-API 已通过一次真实连通性测试，证据见 `setup/deepseek-connectivity.json`。
-已验证 Python HTTP 客户端端到端调用并返回 OK（2026-10-22）；通用配置模板仍保留。
-`optimizer/model.py` 支持三种协议的纯文本请求，模型需能输出代码和结构化决策；
-已实现有限域建模与编译、模拟反馈循环。不读取个人 Agent 配置，不将密钥写入项目。
-
-```sh
-.venv/bin/python tools/check_model_config.py configs/model.example.json
-# 填好配置并在运行环境设置指定密钥变量后，显式发起一次测试：
-.venv/bin/python tools/check_model_config.py configs/model.example.json --ping
-```
-
-默认检查不会发起模型调用。端点应包含服务所需的版本前缀（如 `/v1`）。
-HTTP 客户端默认不继承系统代理；DeepSeek 配置显式设置 `trust_env: true`。
-DeepSeek 使用 `max_tokens` 字段，通用 Chat Completions 配置默认使用 `max_completion_tokens`。
-开发配置显式设置 `thinking: disabled`，避免有限输出预算全部用于推理而没有结构化正文。
-密钥通过 `DEEPSEEK_API_KEY` 环境变量提供，不保存在仓库。开发时可从指定文件安全加载：
+Provide the credential through the environment variable named in the config, then:
 
 ```sh
-.venv/bin/python tools/with_deepseek_key.py --credential-file /path/to/API -- \
-  .venv/bin/python tools/check_model_config.py configs/deepseek.json --ping
+./run.sh --workload /cases/example/workload.json \
+  --model-config /evaluation/model.json --output /results/example
 ```
 
-该开发工具只读取 `# DeepSeek-yihang` 节的 `key=`，不执行凭据文件，
-不会作为提交系统的隐式依赖；正式运行应直接设置配置指定的环境变量。
-DeepSeek 接口文档：https://api-docs.deepseek.com/api/create-chat-completion/
-接口字段参考官方文档：
-https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create
-https://developers.openai.com/api/reference/resources/responses/methods/create
+Default configuration is `configs/deepseek.json` (DeepSeek Flash, Chat Completions).
+There is no implicit dependency on the developer's credential file, personal agent
+settings, conversation history, MCP servers or global skills. Credentials are never
+packaged. This is a custom Python/httpx harness, chosen to control reproducible state,
+strict model configuration, tool calls and the workload deadline directly.
 
-下载来源：
-http://10.204.87.113:8001/agentic-optimizer/downloads/gb10-simulator-inputs-v2.zip
+Supported protocols: `openai_responses`, `openai_chat_completions`,
+`anthropic_messages`. Honor `base_url`, `model`, `api_key_env`; the model must return
+structured JSON with domains, resource constraints, weights and a rationale.
+All three adapters have fixture tests; real public-case runs use DeepSeek.
+Optional `max_tokens_field`, `trust_env` and `thinking` extensions are documented by
+`configs/deepseek.json`. Model responses and provider usage are saved without headers.
 
-精确 GPU 内核数值验证和最终提交验收仍待完成；本目录尚不满足最终作业全部要求。
+Output must be new or empty. Eight rounds are attempted by default, bounded by 1200
+seconds. `--rounds N` and `--budget-seconds S` are available for experiments.
+Disk TileLang/autotuning caches are explicitly disabled, and cleanup time is reserved
+within the workload deadline. The timed entry point never installs dependencies or retrieves external knowledge;
+only requests to the configured model service are needed. It returns 0 for `checked`
+or `no_valid_result`, and nonzero for an execution error without a retained result.
+
+## Workload and search scope
+
+The current family implements `C = A @ B`: rank-2 FP16 inputs/output, FP32 accumulation.
+It reads tensor sizes and tolerance from the workload, not the case ID. Tile domains
+are M={32,64,128}, N={64,128}, K={32,64}, stages={1,2,3}, threads={128}, serpentine row-panel swizzle={0,4,8,16}.
+The first Agent plan uses conventional row-major swizzle=0 as the comparison baseline.
+Subsequent plans search tile/stage/swizzle choices. Only divisible tuples are searched; workloads with no supported tuple are recorded
+as no valid result, without pretending to support arbitrary operators.
+Case-side reference/baseline/README files are resolved relative to workload.json and
+retained; this family replaces any supplied starting implementation and uses its
+own independent full-matrix CPU reference. A general network importer is not included.
+
+DeepSeek chooses domains, a memory cap and objective weights. HiGHS creates binary
+choices, enforces one choice and resource limits, and exports LP/MPS and solver status,
+bound and gap. Previously evaluated configurations are excluded. The proxy objective
+is dimensionless, not predicted microseconds. Numerical, SMT, compiler and simulator
+feedback drives further formulation changes. No measured exhaustive winner is encoded
+as a MIP. A panel-locality term models possible B-tile reuse; it is tested against real simulated
+traffic and latency. SMT checks tile bounds, and a finite mapping check ensures every
+output tile is covered once; the mapping matches the original simulator.
+The best eligible candidate is checkpointed before continuing the search.
+
+A portable FP32 shared-memory epilogue and explicit synchronization are prewritten.
+The compiler reuses epilogue/pipeline storage; the MIP estimates the maximum of the two
+lifetimes, then actual compilation checks resources. Z3 verifies fixed, divisible
+integer tile bounds only. Single GEMM has no graph-fusion opportunity; the bundled
+TVM is used for TileLang lowering, not a claimed graph-level speedup.
+
+## Evidence, verification and packaging
+
+The final ZIP places public-case runs under `results/<workload-id>/`. In the development
+repository the latest batch is under `results/submission-v2/`; older CPU and compiled
+runs remain separate, and are not retroactively relabeled. Each run saves:
+
+- `result.json`, `checks.json`, `evaluation.json`: selected identity, validation scope,
+  numerical errors, usable simulator values and model/tool usage.
+- `implementation/`, `formulations/`: executable source/configuration, LP/MPS, solver decisions.
+- `compilation/`: actual CUDA source, cubin, SASS, actual resources and raw simulator evidence.
+- `trace.jsonl`, `state/`: model/tool actions, failures, feedback, source snapshots and hashes.
+
+```sh
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python tools/validate_submission.py --results results/submission-v2
+.venv/bin/python tools/build_submission.py --results results/submission-v2
+```
+
+In the extracted ZIP, use `--results results` (or omit it) for these tools.
+
+Tests include real Metal execution and a deliberately incorrect shader that must fail,
+MIP infeasibility, Z3 counterexamples, best-result retention on timeout, model adapters,
+and container timeout cleanup. `report.md` describes results, the decision trace,
+proxy/model limitations, resource use and remaining validation boundaries.
+
+Course source: `homework-agentic-optimizer.md`; original simulator and hashes:
+`third_party/gb10/SOURCE.json`. The simulator is unchanged; an outer audit rejects
+unfinished warp execution. Failed/unsupported/timed-out simulations do not enter rankings.
+
+The ZIP excludes credentials, virtual environments, caches and Git internals. It has
+no enclosing directory or symbolic links. Save the portal receipt after uploading.
+Use `colima stop slai-compiler` when finished to release the VM's memory.

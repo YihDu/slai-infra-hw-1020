@@ -1,0 +1,57 @@
+{
+  "attempt": "attempt-05",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32,
+        64,
+        128
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1,
+      "launches": 1,
+      "pipeline": 3,
+      "footprint": 1
+    },
+    "rationale": "History (5 configs, all numerically/SMT/compile clean at exactly 32768 smem bytes; simulated GB10 estimates, not hardware): best is 64x128x32 s2 ~461.8us, then 128x64x32 s2 ~462.4us; block_K=64 with s1 (470.8us, 470.4us) and 128x64x32 s1 (483.9us) are worse. Observation: both sub-463us points use num_stages=2 with block_K=32, while the up-weighted-pipeline solve in attempt-04 selected num_stages=1 (128x64x32 s1) and regressed to ~483.9us, so s1 points are being solved when they should be de-prioritized. Change: restrict num_stages to [2,3] to cut stale s1 tuples from the domain and bias toward deeper pipelining, which the observed 5-point history associates with lower simulated latency. block_M, block_N, block_K stay at full allowed sets since all tiles divide M=4096,N=4096,K=1024 and narrowing them could remove untested shapes (e.g., 32x128, 64x64). threads stays [128] as allowed. Cap stays 32768 (hard portability limit; all feasible points sit exactly on it, no memory-failure evidence; estimator 4*block_M*block_N<=32768 and 2*block_K*(block_M+block_N)*num_stages<=32768 continue to bound tuples). Weights: pipeline retained at 3 per attempt-03's improvement; traffic/launches/footprint at 1 to avoid confounding on a small history. Prior tuples (128x64x64 s1, 128x64x32 s2, 64x128x64 s1, 64x128x32 s2, 128x64x32 s1) excluded to force new points. Next hypothesis: with s1 removed, the solver should pick an unvisited deeper-pipelined tuple such as 64x128x32 s3, 128x64x32 s3, 64x64x64 s2/s3, 32x128x32 s2/s3, or 128x64x64 restricted-feasibility check; if simulated latency falls below ~461.8us, pipeline+stage restriction is supported; if it stagnates at s2/s3, revisit footprint/traffic weighting next. Validation scope: Metal checks execute exact source/config/TIR; GB10 values are simulator estimates only, the CUDA binary is not executed here, and no global optimality is claimed."
+  },
+  "selection": {
+    "block_M": 64,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128
+  },
+  "proxy_cost": 15.646751573333333,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 84,
+    "smem_bytes": 16384,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 527.5102188584385,
+  "best_simulated_us": 461.79655789748654
+}

@@ -12,7 +12,7 @@ from optimizer.baseline import main
 from optimizer.model import ModelConfig
 
 
-PLAN=dict(domains=dict(block_M=[32,64],block_N=[64],block_K=[32],num_stages=[1,2],threads=[128]),
+PLAN=dict(domains=dict(block_M=[32,64],block_N=[64],block_K=[32],num_stages=[1,2],threads=[128],swizzle=[0]),
           shared_memory_limit=16384,weights=dict(traffic=1,launches=1,pipeline=1,footprint=1),rationale='test')
 
 

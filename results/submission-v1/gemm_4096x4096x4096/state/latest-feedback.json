@@ -1,0 +1,58 @@
+{
+  "attempt": "attempt-05",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32,
+        64,
+        128
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        1,
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1.0,
+      "launches": 0.5,
+      "pipeline": 3.0,
+      "footprint": 1.0
+    },
+    "rationale": "Five attempts observed; all passed numerical checks, compiled, and completed in simulator. Actual shared memory is pinned at exactly 32768 bytes for every evaluated tuple, so the 32768-byte portability cap is binding and the analytic footprint term cannot discriminate once saturated. Best simulated latency remains attempt-01 (block_M=128, block_N=64, block_K=32, num_stages=2) at 2544.21 us, followed by attempt-00 (128,64,64,1) at 2558.09 us, attempt-03 (64,128,32,2) at 2575.61 us, attempt-02 (64,128,64,1) at 2592.58 us, and attempt-04 (128,64,32,1) at 2624.01 us. The observed ordering associates the best point with block_M=128, block_N=64, block_K=32, num_stages=2, while block_M=64 and num_stages=1 variants were slower. The proxy ranking has not tracked simulated latency well (attempt-01 had a higher proxy than attempt-00 yet lower latency; attempt-02 had the highest proxy and worse latency), so weights are revised cautiously rather than fitted. I keep the pipeline weight high (3.0) because deeper staging with block_K=32 is the only observed correlate of improvement, retain a modest traffic weight (1.0) for reuse, lower launches (0.5) because grid granularity is already fine and did not track latency, and keep footprint at 1.0 as a weak tie-breaker since it is saturated. Domains remain the full allowed sets: no tuple was excluded for infeasibility, all tiles divide 4096, and retaining block_N=128 and block_M=32 keeps unexplored alternatives available. shared_memory_limit stays at the hard 32768-byte portability cap. Previously evaluated tuples are excluded via the solver history mechanism to force a new point. Next hypothesis: untested deeper-staging tuples such as (128,64,32,3), (128,128,32,2/3), or (64,64,32,3) within the shared-memory estimate may reduce GB10 simulated latency under the cap; the revised weights favor pipeline depth and reuse while de-emphasizing launch count. Validation scope: Metal executes the exact source/config/TIR but the CUDA binary is not executed; GB10 values are simulator estimates, not hardware measurements, and proxy costs are dimensionless ranking aids only, not claims of global optimality or microseconds."
+  },
+  "selection": {
+    "block_M": 64,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 1,
+    "threads": 128
+  },
+  "proxy_cost": 37.742921386666666,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 130,
+    "smem_bytes": 32768,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 2650.738622192298,
+  "best_simulated_us": 2544.2088524201577
+}

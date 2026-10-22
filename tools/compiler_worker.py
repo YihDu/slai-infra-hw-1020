@@ -72,7 +72,7 @@ def main():
             report['status']='resource_invalid'
         m,k=w['inputs']['A']['shape'];n=w['inputs']['B']['shape'][1]
         request=dict(path='cpasync',sass='kernel.sass',kernel=symbol.group(1),shape=dict(M=m,N=n,K=k),
-                     holes={**config,'swizzle':0},regs=int(regs.group(1)),smem_bytes=static+dynamic,warm=True,split=1)
+                     holes={**config,'swizzle':config.get('swizzle',0)},regs=int(regs.group(1)),smem_bytes=static+dynamic,warm=True,split=1)
         (out/'simulation-input.json').write_text(json.dumps(request,indent=2)+'\n')
     except Exception as exc:
         report.update(status='error',error_type=type(exc).__name__,reason=str(exc))

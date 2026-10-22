@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.5,
+    "launches": 0.5,
+    "pipeline": 1.5,
+    "footprint": 0.75
+  },
+  "rationale": "Four attempts all compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (simulator estimates only; no CUDA binary executed, no hardware measurement). Attempt-00 (128,64,64,1) 157.05us; attempt-01 (64,64,64,2) best at 156.26us smem 32768 proxy 3.384; attempt-02 (64,64,32,3) regressed 157.63us smem 24576; attempt-03 (128,64,32,2) regressed 157.80us smem 32768. The analytic proxy is not monotone with simulated latency, so ranking is treated cautiously and no global optimality is claimed. block_N=128 remains untested across all attempts, and the tall-N shape (N=4096) makes wider block_N the clearest unexplored traffic lever; attempt-02 showed deeper stage-3 pipelines with small block_K regress, so the pipeline weight is eased from 2.5 to 1.5 to de-emphasize untested deep staging while traffic stays at 1.5 to reward the untested block_N=128 cut. Domains kept fully nonempty (block_M divides 128; block_N and block_K divide 4096; threads=128) so HiGHS still owns tuple selection and explores unmeasured points. Shared-memory limit retained at 32768 (portability cap) since attempts 00/01/03 saturated it and the 4*block_M*block_N epilogue term dominates large tiles. Next hypothesis: a (block_M=64 or 128, block_N=128, block_K=32 or 64, num_stages=2) tuple may lower simulated_us by reducing traffic relative to attempt-01 while staying under the 32768 cap; verify compiled smem and Metal-executed source/TIR, treat simulated_us as a ranking proxy only."
+}

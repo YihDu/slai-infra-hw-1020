@@ -1,0 +1,56 @@
+{
+  "attempt": "attempt-04",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        1,
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1.5,
+      "launches": 0.25,
+      "pipeline": 1.5,
+      "footprint": 1.5
+    },
+    "rationale": "History (all simulator estimates, not hardware; Metal ran exact source/config/TIR, CUDA binary not executed; no global-optimality claim): attempt-00 (32x64x32,s3) passed at 147.72, attempt-01 (32x64x64,s2) best at 147.67, attempt-02 (32x128x32,s3) regressed to 148.28, attempt-03 (32x128x64,s1) clearly regressed to 196.54. Best region is block_N=64 with shallow-moderate staging; wider block_N=128 and block_K=64,s1 hurt, so widen footprint weight to 1.5 to penalize large smem/register tiles and tall-skinny register pressure, and ease pipeline weight to 1.5 since s1 was bad but s2/s3 within block_N=64 is the promising band. Launches stay 0.25 (M=32 already caps grid). M=32 forces block_M=32 (64/128 do not divide M), so domain [32]; other domains nonempty and feasible under shared_bytes=max(2*block_K*(block_M+block_N)*num_stages,4*block_M*block_N)<=32768 plus hard 32768 cap. Next hypothesis: exploit the unexplored block_N=64 block_K=64 num_stages=3 region (2*64*96*3=36864 exceeds cap for s3, so cap will exclude; instead test block_N=128 block_K=32 s2: 2*32*160*2=20480 fits, versus block_N=64 block_K=32 s3) to see whether footprint weight selects a lower-smem tuple that beats 147.67; if it does not, next round narrow block_N to [64] and keep block_K=[32,64], num_stages=[2,3]."
+  },
+  "selection": {
+    "block_M": 32,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128
+  },
+  "proxy_cost": 2.10597472,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 66,
+    "smem_bytes": 12288,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 147.69697930952321,
+  "best_simulated_us": 147.66753212620162
+}

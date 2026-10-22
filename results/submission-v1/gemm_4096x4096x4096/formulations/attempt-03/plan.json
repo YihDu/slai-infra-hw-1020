@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.5,
+    "launches": 0.25,
+    "pipeline": 2.5,
+    "footprint": 1.5
+  },
+  "rationale": "Three attempts observed, all numerically passed, compiled, and simulator-completed; best simulated latency remains attempt-01 (128,64,32,2) at 2544.21 us, followed by attempt-00 (128,64,64,1) at 2558.09 us and attempt-02 (64,128,64,1) at 2592.58 us. All saturate actual shared memory at exactly 32768 bytes, confirming the portability cap is binding and the estimate does not distinguish tuples once saturated. The proxy ranking has been poorly aligned with simulated latency: attempt-01 had the highest proxy (67.41) yet the best latency, and attempt-02 had the highest again (99.12) with the worst latency. Block size 64x128 with stages=1 regressed, suggesting block_N=128 without deeper staging is not favorable here, and 128x64 with num_stages=2 and block_K=32 remains the best-ranked point. Revision: increase pipeline weight to 2.5 to favor deeper staging and smaller block_K (the only factor correlated with the observed improvement), keep traffic at 1.5 for reuse, keep footprint at 1.5 since smem is saturated and acts as a tie-breaker, and keep launches low at 0.25 because coarse grid differences on a square 4096 workload do not track observed latency. Domains unchanged and full since no exclusion caused infeasibility and all tiles divide 4096; shared_memory_limit stays at the hard 32768 portability cap. Previously evaluated tuples excluded via history to force exploration. Next hypothesis: 128x64 or 128x128 with num_stages=2 or 3 and block_K=32 may reduce simulated latency by deepening the software pipeline while remaining within the shared-memory cap; the revised weights steer toward pipeline depth. Validation scope: Metal executes the exact source/TIR/config but the CUDA binary is not executed; GB10 values are simulator estimates, not hardware measurements, and proxy costs are dimensionless ranking aids only, not claims of global optimality."
+}

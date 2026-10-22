@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial baseline plan with no prior observations. Domains cover standard GEMM tile sizes; block_M {32,64,128}, block_N {64,128}, block_K {32,64}, num_stages {1,2,3}, fixed threads=128, and swizzle=[0] to establish a conventional row-major baseline before exploring serpentine locality. All tiles divide M=4096, N=4096, K=1024. Shared-memory cap set to 32768 bytes, matching the hard portability cap (also within the 8192-49152 range), so the estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) must stay under 32KB; larger tiles/stages will be pruned by HiGHS accordingly. Weights are uniform at 1 to avoid biasing traffic, launch count, pipeline depth, or footprint before any simulator feedback. The swizzle reuse term is an untested analytical hypothesis; after feedback we will compare simulated traffic/latency and broaden swizzle to [0,4,8,16] or adjust weights if locality gains are not visible. Validation scope: Mac Metal checks run the exact source/config/TIR, but CUDA binaries are not executed on GB10; GB10 values are simulator estimates, not hardware measurements. No global optimality is claimed."
+}

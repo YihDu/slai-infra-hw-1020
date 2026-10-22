@@ -1,0 +1,10 @@
+{
+  "experiment": "Mac cross-backend feasibility, manually selected configuration; not an Agent optimization run",
+  "source_sha256": "f0f4e84fdb833f1410c09665eae1040b12b8a85f7b6bfec38614f461badffaa3",
+  "checked_target": "metal",
+  "cuda_binary_executed": false,
+  "all_five_identical_input_tir": true,
+  "native_environment": ".cache/mac-check",
+  "original_probe_output": ".cache/mac-feasibility",
+  "warning": "These records do not replace existing no_valid_result runs or establish CUDA binary correctness."
+}

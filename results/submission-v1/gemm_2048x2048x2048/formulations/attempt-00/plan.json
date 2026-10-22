@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "No prior observations exist, so I start from the full allowed domains and keep all tiles and stage counts eligible since 2048 is divisible by every candidate block_M/block_N/block_K. The 32 KiB cap matches the explicit portability ceiling and is well below the 49152 maximum, ensuring the shared-buffer estimate 2*block_K*(block_M+block_N)*num_stages stays within Metal/GB10-friendly bounds for the feasible candidates. Objective weights are uniform to let traffic, launch count, pipeline depth, and footprint compete without prior bias; footprint uses the same 49152-byte normalization. The FP32 epilogue is assumed to enable buffer aliasing via epilogue barriers, but compiled shared memory will still be validated. Next hypothesis: the solver will favor larger tiles (e.g., 128x128 or 128x64) for traffic reduction, with block_K/num_stages combinations that minimize pipeline stalls while respecting the 32 KiB cap; the first evaluated datapoint will be used to reweight traffic vs. pipeline and to potentially narrow num_stages if estimate/simulator mismatch appears."
+}

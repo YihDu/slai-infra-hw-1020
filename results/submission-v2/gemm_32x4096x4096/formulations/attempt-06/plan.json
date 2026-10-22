@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      32
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.3,
+    "launches": 0.3,
+    "pipeline": 1.5,
+    "footprint": 1
+  },
+  "rationale": "Six observed points are latency-flat within ~0.05us (147.6675-147.7160us) and share identical 33.816576MB simulated DRAM regardless of swizzle 0/4/8/16 and block_K 32/64. With M=32 and block_M=32, reuse=min(swizzle or 1, ceil(32/32))=1 always, so the serpentine panel-reuse hypothesis has no structural leverage and observed DRAM confirms it does not materialize; traffic/launches stay downweighted (0.3 each) as they are observed-invariant. block_M pinned to 32 (only exact divisor of M=32). Retain swizzle [0,4,8,16] so the solver is not artificially narrowed. Num_stages restricted to {2,3} since both observed stage-2 (24KB, 4 blocks/SM) and stage-3 (18KB, 5 blocks/SM) points passed and stage-1 is clearly under-pipelined; pipeline weight 1.5 keeps favor for deeper overlap, footprint weight 1 biases toward the high-occupancy 18KB region. shared_memory_limit stays at the hard 32768 portability cap; estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) plus exact divisibility of N=K=4096 bound feasibility. Unexplored differentiating tuples: block_N=128 (halves N tiles, larger B tile footprint, may change block count/occupancy), block_K=64 with stages=3, and block_K=32 with stages=2. Next hypothesis: block_N=128 combinations may shift block count/occupancy enough to break the latency plateau; if simulator stays ~147.7us with unchanged DRAM, treat this shape as latency-flat and finalize the smallest-footprint stages-3 point. Scope: simulated_us/simulated_dram_mb are GB10 simulator estimates, not hardware measurements; Metal numerically checks the exact source/TIR/config but does not execute the CUDA binary. Local revision from six observed points, not a global optimality claim."
+}

@@ -1,0 +1,36 @@
+{
+  "property": "Unguarded tiled index stays within tensor extent for this divisible shape",
+  "assumptions": "0<=block<ceil(extent/tile), 0<=local<tile; selected tile divides extent",
+  "shape": [
+    4096,
+    4096,
+    4096
+  ],
+  "config": {
+    "block_M": 128,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128
+  },
+  "code_sha256": "d07e34fc773ce470e6a60c82eca87810a86633ed3e5dd617e1509e59bcc34ffe",
+  "results": [
+    {
+      "dimension": "M",
+      "status": "unsat",
+      "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_M () Int)\n(declare-fun local_M () Int)\n(assert\n (>= block_M 0))\n(assert\n (< block_M 32))\n(assert\n (>= local_M 0))\n(assert\n (< local_M 128))\n(assert\n (or (< (+ (* block_M 128) local_M) 0) (>= (+ (* block_M 128) local_M) 4096)))\n(check-sat)\n"
+    },
+    {
+      "dimension": "N",
+      "status": "unsat",
+      "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_N () Int)\n(declare-fun local_N () Int)\n(assert\n (>= block_N 0))\n(assert\n (< block_N 64))\n(assert\n (>= local_N 0))\n(assert\n (< local_N 64))\n(assert\n (or (< (+ (* block_N 64) local_N) 0) (>= (+ (* block_N 64) local_N) 4096)))\n(check-sat)\n"
+    },
+    {
+      "dimension": "K",
+      "status": "unsat",
+      "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_K () Int)\n(declare-fun local_K () Int)\n(assert\n (>= block_K 0))\n(assert\n (< block_K 128))\n(assert\n (>= local_K 0))\n(assert\n (< local_K 32))\n(assert\n (or (< (+ (* block_K 32) local_K) 0) (>= (+ (* block_K 32) local_K) 4096)))\n(check-sat)\n"
+    }
+  ],
+  "scope": "Integer bounds only; not floating-point correctness, pipeline safety or lowering correctness",
+  "config_sha256": "dc55e5593d988963778ddb6c7923946e3bb9c6477f41ffc227cad7f05b3aaccd"
+}

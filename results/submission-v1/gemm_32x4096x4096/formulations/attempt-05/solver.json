@@ -1,0 +1,66 @@
+{
+  "status": "Infeasible",
+  "incumbent": null,
+  "bound": null,
+  "gap": null,
+  "selected_index": null,
+  "candidates": [
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 3,
+        "threads": 128
+      },
+      "smem_bytes_estimate": 36864,
+      "features": {
+        "traffic": 0.50331648,
+        "launches": 0.064,
+        "pipeline": 0.21333333333333332,
+        "footprint": 0.75
+      },
+      "cost": 2.2159747199999997
+    }
+  ],
+  "cost_unit": "dimensionless analytic proxy; not latency",
+  "highs_version": "1.11.0",
+  "effective_shared_memory_limit": 32768,
+  "excluded_previously_evaluated": [
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 3,
+      "threads": 128
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 128
+    },
+    {
+      "block_M": 32,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 3,
+      "threads": 128
+    },
+    {
+      "block_M": 32,
+      "block_N": 128,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128
+    }
+  ]
+}

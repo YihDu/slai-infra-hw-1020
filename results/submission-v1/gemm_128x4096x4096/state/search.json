@@ -1,0 +1,436 @@
+{
+  "history": [
+    {
+      "attempt": "attempt-00",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 1,
+          "pipeline": 1,
+          "footprint": 1
+        },
+        "rationale": "No prior configurations have been evaluated, so all listed domains are kept nonempty and the shared-memory cap is set to the portability cap of 32768 bytes. For M=128, N=4096, K=4096, block_M must divide 128, block_N must divide 4096, and block_K must divide 4096, so all domain values are feasible. Equal weights give a neutral initial objective across memory traffic, launch count, pipeline depth, and shared-memory footprint. The estimate uses max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N), with explicit epilogue barriers ensuring buffer aliasing; actual compiled memory is still checked. Next hypothesis: larger block_M and block_N should reduce traffic and launches, while stages and footprint trade off against pipeline efficiency within the 32KB cap. Validation scope: any Metal checks would execute the exact source/config/TIR, but no CUDA binary is executed; GB10 values are simulator estimates, not hardware measurements."
+      },
+      "selection": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 2.3772996266666664,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 126,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 157.0476407439803,
+      "best_simulated_us": 157.0476407439803
+    },
+    {
+      "attempt": "attempt-01",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1.5,
+          "launches": 0.5,
+          "pipeline": 2,
+          "footprint": 1
+        },
+        "rationale": "Attempt-00 selected (block_M=128, block_N=64, block_K=64, num_stages=1) with proxy_cost 2.377, actual smem 32768 bytes (= cap), 126 registers, compiled and numerically passed on the exact source/TIR, simulated_us 157.05 (GB10 simulator estimate, not hardware; no CUDA binary executed). Domains kept full so HiGHS still owns tuple selection: block_M divides 128, block_N and block_K divide 4096, threads fixed at 128 per allowed domain. Shared-memory cap retained at 32768 (the portability cap) because actual compiled smem already hit it and larger caps risk Metal portability; the 4*block_M*block_N epilogue term plus the hard 32768 portability cap jointly constrain large-tile choices. Weight revision: the stage-1 choice leaves pipeline unresolved, so pipeline is raised to 2 to favor more stages (multi-stage pipelining tends to shorten K-loop stalls); traffic is raised to 1.5 since the wide-M, tall-N shape keeps traffic reductions valuable; launches is lowered to 0.5 because the current tiling already yields modest launch counts relative to traffic/footprint; footprint stays at 1 to keep pressure off the 32768 cap. Since only attempt-00 exists, exclusion is not yet needed and all tuples remain eligible; HiGHS explores unmeasured points rather than measured enumeration. Next hypothesis: with pipeline weight increased, a (block_M=64 or 128, block_N=64, block_K=32, num_stages=2 or 3) tuple with the same or smaller footprint may lower the analytic proxy while compiling under the cap and passing numerical checks; verify Metal-executed source/TIR validity and treat GB10 simulated_us as ranking proxy only, not hardware latency, and do not claim global optimality."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "proxy_cost": 3.383932586666667,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 88,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 156.2588274982834,
+      "best_simulated_us": 156.2588274982834
+    },
+    {
+      "attempt": "attempt-02",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1.5,
+          "launches": 0.5,
+          "pipeline": 3,
+          "footprint": 0.75
+        },
+        "rationale": "Attempts 00 and 01 both compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (estimates only, no CUDA binary executed, no hardware measurement). Attempt-00 (128,64,64,1) gave 157.05 us at smem 32768 and proxy 2.377; attempt-01 (64,64,64,2) improved to 156.26 us at smem 32768 and proxy 3.384, showing the analytic proxy is not monotone with simulated latency here, so the ranking must stay cautious rather than claiming global optimality. Both selections hit the 32768 actual-smem cap, confirming the portability cap binds and that the 4*block_M*block_N epilogue term dominates large tiles. Domains kept fully nonempty and feasible for M=128, N=4096, K=4096 (block_M divides 128; block_N and block_K divide 4096; threads fixed 128), so HiGHS still owns tuple selection and explores unmeasured points. Weight revision: pipeline raised to 3 because stage-1 attempt-00 and stage-2 attempt-01 differ by only ~0.8 us, so deeper pipelining remains the cheapest untested lever; footprint lowered to 0.75 to relax pressure given both prior winners sat exactly at the cap; traffic held at 1.5 since the wide-M/tall-N shape still rewards traffic cuts; launches held at 0.5 since current launch counts are already small relative to traffic/pipeline. Shared-memory limit retained at 32768 (portability cap). Next hypothesis: a (block_M=128, block_N=64, block_K=32, num_stages=3) or (64,128,32,3) tuple may fit under 32768 via the pipeline term while trading footprint, and could lower simulated_us; verify Metal-executed source/TIR and compiled smem, and treat simulated_us as a ranking proxy only."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 3,
+        "threads": 128
+      },
+      "proxy_cost": 3.73226592,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 106,
+        "smem_bytes": 24576,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 157.63176811088496,
+      "best_simulated_us": 156.2588274982834
+    },
+    {
+      "attempt": "attempt-03",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1.5,
+          "launches": 0.5,
+          "pipeline": 2.5,
+          "footprint": 0.75
+        },
+        "rationale": "Three prior attempts all compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (estimates only; no CUDA binary executed, no hardware measurement). Attempt-00 (128,64,64,1) gave 157.05us smem 32768 proxy 2.377; attempt-01 (64,64,64,2) improved to 156.26us smem 32768 proxy 3.384; attempt-02 (64,64,32,3) regressed to 157.63us smem 24576 proxy 3.732. The analytic proxy is not monotone with simulated latency, so ranking is used cautiously and no global optimality is claimed. Attempt-02 was the first to fit below the cap (24576 bytes) via block_K=32, showing footprint is reducible without lifting the 32768 portability cap, but its deeper stage-3 pipeline with smaller block_K performed worse. Attempt-01, the current best, mixes block_M=64 with block_N=64 at stages=2, so block_N=128 remains untested and could cut traffic given the tall-N shape. Domains kept fully nonempty (block_M divides 128; block_N and block_K divide 4096; threads fixed 128) so HiGHS still owns tuple selection and explores unmeasured points. Weight revision: pipeline eased from 3 to 2.5 since the stage-3 attempt regressed and stage-2 currently leads; traffic held at 1.5 to keep rewarding the untested block_N=128 traffic cut; launches held at 0.5; footprint held at 0.75 to discourage further cap-saturating tiles. Shared-memory limit retained at 32768 (portability cap) because attempts 00/01 already saturate it and the 4*block_M*block_N epilogue term dominates large tiles. Next hypothesis: a (block_M=64, block_N=128, block_K=64 or 32, num_stages=2) tuple may lower simulated_us by cutting traffic relative to attempt-01 while staying under the portability cap; verify compiled smem and Metal-executed source/TIR, and treat simulated_us as a ranking proxy only."
+      },
+      "selection": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "proxy_cost": 3.64194944,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 123,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 157.80051632321738,
+      "best_simulated_us": 156.2588274982834
+    },
+    {
+      "attempt": "attempt-04",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1.5,
+          "launches": 0.5,
+          "pipeline": 1.5,
+          "footprint": 0.75
+        },
+        "rationale": "Four attempts all compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (simulator estimates only; no CUDA binary executed, no hardware measurement). Attempt-00 (128,64,64,1) 157.05us; attempt-01 (64,64,64,2) best at 156.26us smem 32768 proxy 3.384; attempt-02 (64,64,32,3) regressed 157.63us smem 24576; attempt-03 (128,64,32,2) regressed 157.80us smem 32768. The analytic proxy is not monotone with simulated latency, so ranking is treated cautiously and no global optimality is claimed. block_N=128 remains untested across all attempts, and the tall-N shape (N=4096) makes wider block_N the clearest unexplored traffic lever; attempt-02 showed deeper stage-3 pipelines with small block_K regress, so the pipeline weight is eased from 2.5 to 1.5 to de-emphasize untested deep staging while traffic stays at 1.5 to reward the untested block_N=128 cut. Domains kept fully nonempty (block_M divides 128; block_N and block_K divide 4096; threads=128) so HiGHS still owns tuple selection and explores unmeasured points. Shared-memory limit retained at 32768 (portability cap) since attempts 00/01/03 saturated it and the 4*block_M*block_N epilogue term dominates large tiles. Next hypothesis: a (block_M=64 or 128, block_N=128, block_K=32 or 64, num_stages=2) tuple may lower simulated_us by reducing traffic relative to attempt-01 while staying under the 32768 cap; verify compiled smem and Metal-executed source/TIR, treat simulated_us as a ranking proxy only."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 3.0019494399999997,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 134,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 157.3045177533963,
+      "best_simulated_us": 156.2588274982834
+    },
+    {
+      "attempt": "attempt-05",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.5,
+          "pipeline": 2,
+          "footprint": 1.25
+        },
+        "rationale": "Five attempts compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (estimates only; no CUDA binary executed, no hardware measurement). Best remains attempt-01 (64,64,64,2) at 156.26us smem 32768 proxy 3.384; others: (128,64,64,1) 157.05us, (64,64,32,3) 157.63us smem 24576, (128,64,32,2) 157.80us, (64,128,64,1) 157.30us. Every block_N=128 probe (attempt-04) and the only stage-3 probe (attempt-02) underperformed the (64,64,64,2) point, so the analytic proxy is clearly not monotone with simulated latency; ranking stays cautious and no global optimality is claimed. Observations: stage-2 mixes lead; block_K=32 at stages 2-3 regressed, suggesting block_K=64 is the productive K-tile; block_N=128 did not help despite the tall-N shape, so traffic is eased from 1.5 to 1.0 to stop over-rewarding wide-N tuples. Pipeline kept at 2 (stage-2 is the current leader) and footprint raised to 1.25 to discourage the cap-saturating 32768-byte tiles that dominate attempts 00/01/03/04, favoring tuples that leave headroom. Launches lowered to 0.5 since launch counts remain small relative to traffic/pipeline for this wide-M tall-N shape. Domains remain fully nonempty and feasible (block_M divides 128; block_N and block_K divide 4096; threads fixed 128), so HiGHS still owns tuple selection and explores unmeasured points; shared-memory limit kept at 32768 (portability cap). Next hypothesis: untested (block_M=32 or 128, block_N=64, block_K=64, num_stages=2) or (32,128,64,2) tuples may beat the (64,64,64,2) leader now that footprint pressure favors sub-cap tiles and traffic/launch pressure is reduced; verify compiled smem and Metal-executed source/TIR, and treat simulated_us as a ranking proxy only, never as hardware latency."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 3.102843946666667,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 94,
+        "smem_bytes": 16384,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 156.2808747423779,
+      "best_simulated_us": 156.2588274982834
+    }
+  ],
+  "excluded": [
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    },
+    {
+      "block_M": 64,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 128
+    },
+    {
+      "block_M": 64,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 3,
+      "threads": 128
+    },
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    },
+    {
+      "block_M": 64,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    }
+  ],
+  "best": {
+    "attempt": "attempt-01",
+    "eligible": true,
+    "implementation": "implementation/attempt-01/kernel.py",
+    "configuration": {
+      "block_M": 64,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 128
+    },
+    "identity": {
+      "source_sha256": "d07e34fc773ce470e6a60c82eca87810a86633ed3e5dd617e1509e59bcc34ffe",
+      "config_sha256": "72891f2c675a555cc9770fed316bc7aba5d93bd0cccffc355b58f9a2df08d574",
+      "tir_sha256": "f5e59c649c21496addff182c07d3617bc7d07c333f9f7a48ac77d4cc7deafd3d",
+      "sass_sha256": "da39e9f7ed401be5c8fa0516398098fd3468a457b6ab4d8a66ae03d936b099bf",
+      "cubin_sha256": "c78a5927c6a2d5b40d725dd6dc87f9ecc7cd90950a648bfdfd50904007744633"
+    },
+    "simulated_us": 156.2588274982834
+  },
+  "initial": {
+    "attempt": "attempt-00",
+    "eligible": true,
+    "implementation": "implementation/attempt-00/kernel.py",
+    "configuration": {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    },
+    "identity": {
+      "source_sha256": "d07e34fc773ce470e6a60c82eca87810a86633ed3e5dd617e1509e59bcc34ffe",
+      "config_sha256": "b6108274ea5f006f07f876e0032110c947fe0f705af7fba4f0e5945a36351737",
+      "tir_sha256": "2991b15541d4e4dd263f6a1cbe50b402423602b73b2f8be2ce2c2e3ebd36db1d",
+      "sass_sha256": "a020a5f56358d7daf380fdab42e02723004f711cf6da5e00d7aec64e22dc2219",
+      "cubin_sha256": "797f8434d0257622ddce71b3a7381e5849dac8a9aa80d63f14dc59abeb062e7c"
+    },
+    "simulated_us": 157.0476407439803
+  }
+}

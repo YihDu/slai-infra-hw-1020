@@ -10,3 +10,6 @@ __pycache__/
 *.key
 setup/environment.json
 wheelhouse/
+
+.venv-metal/
+dist/

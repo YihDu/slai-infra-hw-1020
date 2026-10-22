@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Baseline attempt-00 (128,64,64,stages=1,swizzle=0) passed SMT/numerics/compile at 32768 B actual smem and 122 registers, simulated 2558.09 us with 531.63 MB DRAM and 3 blocks/SM. Now broaden swizzle to [0,4,8,16] per feedback rules to test the serpentine panel reuse hypothesis while keeping tile/stage domains intact (all divide 4096). Keep equal unit weights since only one point exists and the analytic traffic hypothesis is untested; prior exclusion removes the baseline tuple so HiGHS must pick a new point. Shared-memory cap stays at the 32768-byte portability limit, matching observed compiled smem headroom. Next hypothesis: swizzle>0 with stages>=2 may reduce simulated DRAM/latency via reuse and pipelining; if simulator traffic/latency do not improve, reduce traffic weight or revert swizzle. GB10 values are simulator estimates, not hardware measurements; Metal executes the exact source/config/TIR but CUDA binaries are not executed, and no global optimality is claimed."
+}

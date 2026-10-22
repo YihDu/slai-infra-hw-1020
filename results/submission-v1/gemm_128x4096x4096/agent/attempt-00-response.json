@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1,\"footprint\":1},\"rationale\":\"No prior configurations have been evaluated, so all listed domains are kept nonempty and the shared-memory cap is set to the portability cap of 32768 bytes. For M=128, N=4096, K=4096, block_M must divide 128, block_N must divide 4096, and block_K must divide 4096, so all domain values are feasible. Equal weights give a neutral initial objective across memory traffic, launch count, pipeline depth, and shared-memory footprint. The estimate uses max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N), with explicit epilogue barriers ensuring buffer aliasing; actual compiled memory is still checked. Next hypothesis: larger block_M and block_N should reduce traffic and launches, while stages and footprint trade off against pipeline efficiency within the 32KB cap. Validation scope: any Metal checks would execute the exact source/config/TIR, but no CUDA binary is executed; GB10 values are simulator estimates, not hardware measurements.\"}",
+  "usage": {
+    "prompt_tokens": 714,
+    "completion_tokens": 292,
+    "total_tokens": 1006,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 714
+  },
+  "response_id": "8f2f9bdb-db7b-4513-a3b2-775b70620fd7"
+}

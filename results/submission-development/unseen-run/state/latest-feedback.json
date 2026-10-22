@@ -1,0 +1,67 @@
+{
+  "attempt": "attempt-02",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32,
+        64,
+        128
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        1,
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ],
+      "swizzle": [
+        0,
+        4,
+        8,
+        16
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1,
+      "launches": 1,
+      "pipeline": 1,
+      "footprint": 1
+    },
+    "rationale": "Workload 96x192x96 FP16 GEMM with FP32 accumulation; shared-memory estimate max(2*block_K*(block_M+block_N)*num_stages,4*block_M*block_N), capped at 32768 for portability and below the 49152 hard max. Domains kept broad (block_M {32,64,128}, block_N {64,128}, block_K {32,64}, stages {1,2,3}, threads 128, swizzle {0,4,8,16}); the divide constraint prunes tuples whose tiles do not divide M=96,N=192,K=96, so feasible points include block_M=32 or 64 (96/64 not integer, so 64 is filtered), block_N=64 (128 does not divide 192, filtered), block_K=32 (64 does not divide 96, filtered). Prior attempts 00 and 01 both selected block_M=32,block_N=64,block_K=32,stages=1 with swizzle 0 then 16, each yielding identical simulated 3.6996us (8 blocks/SM, 0 DRAM MB, 8192 smem bytes, 58 regs) — swizzle had no observable effect, consistent with min(swizzle,ceil(M/block_M)) saturating at ceil(96/32)=3 so swizzle 4/8/16 all give reuse=3 versus swizzle 0 giving reuse=1, yet no simulator latency change; this suggests the analytic traffic hypothesis is not materializing for this small workload and simulated DRAM is already zero, so traffic weight is less relevant. I keep swizzle {0,4,8,16} allowed to test with other tile/stage combos, keep equal weights since no dimension has yet shown dominance, and hold the 32768 cap. Next hypothesis: vary block_K and num_stages (e.g., num_stages=2/3 or block_K=64) may shift pipeline/footprint costs and alter simulated latency more than swizzle did; if further swizzle changes remain flat in simulator I will down-weight traffic and up-weight pipeline/footprint. No global optimality claimed; GB10 values are simulator estimates, not hardware measurements; Metal numeric checks execute exact source/config/TIR but do not execute the CUDA binary."
+  },
+  "selection": {
+    "block_M": 32,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 1,
+    "threads": 128,
+    "swizzle": 4
+  },
+  "proxy_cost": 0.20658826666666666,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 58,
+    "smem_bytes": 8192,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 3.6996062992125993,
+  "simulated_dram_mb": 0.0,
+  "simulated_blocks_per_sm": 8,
+  "best_simulated_us": 3.6996062992125993
+}

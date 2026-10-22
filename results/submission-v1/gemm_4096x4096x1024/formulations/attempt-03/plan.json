@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 3,
+    "footprint": 1
+  },
+  "rationale": "History: three passes (128x64x64 s1 at ~470.8us, 128x64x32 s2 at ~462.4us, 64x128x64 s1 at ~470.4us) all passed numerics/SMT/compile, each at exactly 32768 smem bytes, with identical proxy_cost 10.9277. Key observation: under equal weights the proxy ties all three while simulated latency does not, and the one clear improvement (462.4us) came from the deeper-pipelined candidate (num_stages=2). This suggests the pipeline term should be up-weighted so the solver prefers deeper pipelining, which the limited evidence associates with lower simulated GB10 latency. Domains are kept at the full allowed sets since every tile divides M=4096, N=4096, K=1024 and narrowing would needlessly risk infeasibility; threads stays [128] as allowed. The 32768 cap is retained because it equals the hard portability cap, every feasible point sat exactly on it, and there is no memory-failure evidence justifying a change; note 4*block_M*block_N<=32768 and 2*block_K*(block_M+block_N)*num_stages<=32768 jointly bound tuples, so large-tile/high-stage combos remain excluded by the estimator. Weights: traffic/launches/footprint stay 1, pipeline raised to 3 to reflect that deeper pipelining correlates with the single observed latency improvement. Prior tuples (128x64x64 s1, 128x64x32 s2, 64x128x64 s1) are excluded to force new points. Next hypothesis: with pipeline up-weighted, the solver should pick an unvisited deeper-pipelined tuple such as 128x64x32 s3, 64x128x32 s3, or 64x64x64 s2-3 whose estimate fits the cap, and if it repeats ~462us or better, pipeline weighting is confirmed useful; otherwise revisit footprint/traffic weighting. Validation scope: Metal executes the exact source/config/TIR; GB10 values are simulator estimates only, not hardware measurements; the CUDA binary is not executed here and no global optimality is claimed."
+}

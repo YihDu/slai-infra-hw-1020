@@ -1,0 +1,1 @@
+{"status": "checked", "workload_id": "gemm_32x4096x4096", "elapsed_ms": 17924, "usage": {"model_calls": 2, "input_tokens": 2327, "output_tokens": 786, "cached_tokens": 1408, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 2, "compilations": 2, "simulations": 2, "numerical_checks": 2, "solver_calls": 2}}

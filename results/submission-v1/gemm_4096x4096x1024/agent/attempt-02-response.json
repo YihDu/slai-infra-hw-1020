@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1,\"footprint\":1},\"rationale\":\"History: attempt-00 (128x64x64, 1 stage) and attempt-01 (128x64x32, 2 stages) both passed numerics/SMT/compile and hit exactly 32768 smem bytes; simulated GB10 latency improved from ~470.8us to ~462.4us. Both share identical proxy_cost (10.9277) yet differ in simulated latency, so the proxy is not currently discriminating between equally-ranked tuples; that is the key observation. Domains are retained unchanged (full allowed sets, all tiles divide M=4096, N=4096, K=1024) to keep feasibility and avoid prematurely narrowing below solver-explored alternatives. The 32768 cap is kept because it is the hard portability limit and both feasible points sit exactly on it; relaxing it would be a no-op and there is no memory-failure evidence yet. Weights remain equal since no single feature has demonstrated a ranking advantage over the other; the attempt-00/01 tie under equal weights argues against reweighting on a 2-point history and in favor of exploring unvisited tuples (e.g., block_M=32/64 with block_N=128 or block_K=64, and num_stages=3) whose pipeline-term estimate stays within cap, to test whether deeper pipelining or different tile shapes lower simulated latency meaningfully. Explicitly exclude prior-evaluated tuples to force new points. Next hypothesis: a deeper-pipelined or smaller-block_M configuration (e.g., 64x128x32 stage 3, or 32x128x64 stage 2) may beat 462us while respecting the 32768 portability cap. Validation scope: Metal executes exact source/config/TIR; GB10 values are simulator estimates only, not hardware measurements; no global optimality is claimed.\"}",
+  "usage": {
+    "prompt_tokens": 1857,
+    "completion_tokens": 457,
+    "total_tokens": 2314,
+    "prompt_tokens_details": {
+      "cached_tokens": 1152
+    },
+    "prompt_cache_hit_tokens": 1152,
+    "prompt_cache_miss_tokens": 705
+  },
+  "response_id": "4a2d405a-e17b-42db-9dae-42e89bd447b0"
+}

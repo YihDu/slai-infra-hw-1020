@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Initial plan with no prior observations. Domains cover the allowed tile sizes (block_M 32/64/128, block_N 64/128, block_K 32/64), stages 1-3, fixed threads=128, and swizzle=[0] as required for a conventional row-major baseline before any feedback. All listed tiles divide M=N=K=4096. Shared-memory budget is set to the 32768-byte portability cap (also within the 8192-49152 integer range); the estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) is checked against actual compiled memory anyway. Objective uses equal unit weights across traffic, launches, pipeline, and footprint since no simulator results exist yet to indicate which analytic term dominates GB10 latency; the proxy is dimensionless and will be used only for ranking. The analytic reuse=min(swizzle or 1, ceil(M/block_M)) equals 1 for swizzle=0, so traffic initially reflects no serpentine locality gain. Next hypothesis: after feedback, explore swizzle [0,4,8,16] with tile/stage variants to test whether the serpentine reuse hypothesis reduces simulated traffic/latency, and adjust weights or tighten domains if locality gains do not materialize or if exclusions narrow feasibility. Validation scope acknowledged: Metal checks execute exact source/config/TIR, but CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements, and no global optimality is claimed."
+}

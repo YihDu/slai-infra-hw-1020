@@ -1,0 +1,35 @@
+{
+  "unit_tests": 17,
+  "unit_status": "passed",
+  "unit_log_sha256": "8979f29db678b0fab2be849c271674a24c4de48cffd8ca4e77418ea27394f8e7",
+  "public_cases": 5,
+  "checked_target": "metal",
+  "cuda_binary_executed": false,
+  "numerical_cases": 117,
+  "full_run_usage": {
+    "model_calls": 40,
+    "input_tokens": 133909,
+    "output_tokens": 20038,
+    "cached_tokens": 103168,
+    "reasoning_tokens": null,
+    "cache_creation_tokens": null,
+    "evaluations": 39,
+    "compilations": 39,
+    "simulations": 39,
+    "numerical_checks": 39,
+    "solver_calls": 40
+  },
+  "unseen_case_result": "results/submission-development/unseen-run/result.json",
+  "cleanroom_status": "passed",
+  "cleanroom_result": "results/submission-development/cleanroom/run/result.json",
+  "cleanroom_rc_sha256": "e34b2af935db801e1c8fc2366513f24874646cebdd931628a322fd385623fa17",
+  "cleanroom_manifest_verified": true,
+  "cleanroom_fresh_environments": [
+    ".venv",
+    ".venv-metal"
+  ],
+  "cleanroom_reused": "Same Mac and prepared Docker compiler image; dependencies installed before timed run",
+  "cleanroom_model_api_key_env": "EVAL_MODEL_API_KEY",
+  "cleanroom_original_key_env_absent": true,
+  "cleanroom_elapsed_seconds": 17.924
+}

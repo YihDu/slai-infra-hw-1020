@@ -1,0 +1,40 @@
+# from tvm.script import tirx as T
+
+@T.prim_func
+def matmul(A: T.handle, B: T.handle, C_handle: T.handle):
+    T.func_attr({"tilelang_out_idx": [-1]})
+    A_1 = T.match_buffer(A, (4096, 1024), "float16", strides=(1024, 1))
+    B_1 = T.match_buffer(B, (1024, 4096), "float16", strides=(4096, 1))
+    C = T.match_buffer(C_handle, (4096, 4096), "float16", strides=(4096, 1))
+    # with T.sblock("root"):
+    for bx in T.thread_binding(32, thread="blockIdx.x"):
+        for by in T.thread_binding(64, thread="blockIdx.y"):
+            tx: T.int32 = T.launch_thread_idx(0)
+            ty: T.int32 = T.launch_thread_idx(1)
+            tz: T.int32 = T.launch_thread_idx(2)
+            with T.sblock("tilelang_root"):
+                T.reads()
+                T.writes()
+                T.sblock_attr({"tl.launch_threads": [128, 1, 1]})
+                a_s = T.sblock_alloc_buffer((64, 64), "float16", scope="shared.dyn")
+                b_s = T.sblock_alloc_buffer((64, 128), "float16", scope="shared.dyn")
+                acc = T.sblock_alloc_buffer((64, 128), scope="local.fragment")
+                c_s = T.sblock_alloc_buffer((64, 128), scope="shared.dyn")
+                linear: T.int32 = by * 32 + bx
+                panel_index: T.int32 = linear // 128
+                offset: T.int32 = linear % 128
+                stride: T.int32 = T.min(4, 64 - panel_index * 4)
+                by_1: T.int32 = panel_index * 4 + offset % stride
+                bx_1: T.int32 = T.if_then_else(panel_index % 2 == 1, 31 - offset // stride, offset // stride)
+                T.fill(T.region(acc[0, 0], 2, 64, 128), 0)
+                for p in T.serial(16, annotations={"num_stages": 1}):
+                    T.copy(T.region(A_1[by_1 * 64, p * 64], 1, 64, 64), T.region(a_s[0, 0], 2, 64, 64), disable_tma=T.bool(True))
+                    T.copy(T.region(B_1[p * 64, bx_1 * 128], 1, 64, 128), T.region(b_s[0, 0], 2, 64, 128), disable_tma=T.bool(True))
+                    T.gemm(T.region(a_s[0, 0], 1, 64, 64), T.region(b_s[0, 0], 1, 64, 128), T.region(acc[0, 0], 3, 64, 128), T.bool(False), T.bool(False), 64, 128, 64, 0, T.bool(False), 0, 0, 0)
+                T.tvm_storage_sync("shared")
+                T.copy(T.region(acc[0, 0], 1, 64, 128), T.region(c_s[0, 0], 2, 64, 128))
+                T.tvm_storage_sync("shared")
+                for i in T.parallel(64):
+                    for j in T.parallel(128):
+                        if by_1 * 64 + i < 4096 and bx_1 * 128 + j < 4096:
+                            C[by_1 * 64 + i, bx_1 * 128 + j] = T.Cast("float16", c_s[i, j])

@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 0.1
+  },
+  "rationale": "Six evaluated points span 156.32-157.64us with identical 34.603MB simulated DRAM traffic regardless of block_M, block_N, block_K, stages, or swizzle, so the analytic serpentine-reuse traffic hypothesis is still unconfirmed; swizzle remains non-discriminating (attempts 01-03 identical at same tile/stages). Best remains attempt-04 (block_M=32, block_N=128, block_K=64, stages=1, swizzle=16) at 156.32us with 20480B smem and 4 blocks/SM; attempt-05 (block_M=64, block_N=128, block_K=64, stages=1, swizzle=16) regressed to 157.64us at 32768B smem and 3 blocks/SM, reinforcing that lower smem/higher occupancy helps slightly. I therefore cut footprint weight from 0.25 to 0.1 so low-smem, high-occupancy candidates (small block_M/stages) are favored without over-penalizing; traffic/launches/pipeline stay at 1 since none show discriminating simulator signal. Domains stay broad (only six excluded tuples, 32768-byte cap admits many combos) so the solver can still pick unseen tile/stage/swizzle combinations. Next hypothesis: probe untested low-smem corners near the incumbent — block_M=32 with block_N=64, block_K=32, stages=1-2, and all swizzle values — to see whether higher blocks/SM breaks the ~156us plateau, while continuing to inspect actual simulator traffic/latency for any swizzle locality gain; if none appears, swizzle can be collapsed later. Proxy cost is dimensionless ranking only, never microseconds; Metal checks execute exact source/config/TIR but not the CUDA binary; GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}

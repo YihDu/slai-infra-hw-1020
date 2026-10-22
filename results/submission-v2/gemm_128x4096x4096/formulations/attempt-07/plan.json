@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 0.5
+  },
+  "rationale": "Seven evaluated points plateau at 156.32-157.64us with identical 34.603MB simulator DRAM traffic regardless of tile, stages, or swizzle, so the serpentine-reuse traffic hypothesis remains unconfirmed and traffic stays at weight 1 with no reward; swizzle stays open but is non-discriminating (attempts 01-03 identical at same tile/stages; 05 vs 06 identical across swizzle 16 vs 8). Best remains attempt-04 (block_M=32, block_N=128, block_K=64, stages=1, swizzle=16) at 156.32us with 20480B smem and 4 blocks/SM; attempt-05/06 (block_M=64) regressed to 157.64us at 32768B and 3 blocks/SM, supporting the low-smem/high-occupancy direction. However, footprint weight 0.1 in attempt-06 over-penalized smem and steered the solver away from the incumbent neighborhood into a repeat of block_M=64, so I raise footprint to 0.5 to keep a mild preference for low-smem/high-occupancy candidates without discarding the incumbent's block_M=32 corner. Pipeline stays 1 (stages=1 has produced the two best points), launches stays 1, traffic stays 1 but is not raised given flat simulator traffic. Domains stay broad: only seven tuples excluded and the 32768-byte portability cap still admits many combos (tightest BM=128,BN=128,BK=64,stages=2). Next hypothesis: probe untested low-smem corners near the incumbent with block_M=32/block_N=64/block_K=32/stages=1-2 and block_M=32/block_N=128/block_K=32/stages=1 across swizzle values, checking whether higher blocks/SM breaks the ~156us plateau; if swizzle still shows no simulator traffic/latency effect, collapse it later. Proxy cost is dimensionless ranking only, never microseconds; Metal checks execute exact source/config/TIR but not the CUDA binary; GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}

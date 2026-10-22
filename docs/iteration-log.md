@@ -25,3 +25,23 @@ Gemini read-only 审查尝试因 worker 服务认证 401 失败，未获得审�
    编译/模拟反馈进入下一轮真实模型请求。新增超时清理/缺失 Docker 测试。
 10. 新的五案例两轮运行证据见 results/compiled-baseline；工具链差异、剩余正确性
     缺口和模拟估计汇总见 docs/compiler-integration.md。历史结果不覆盖。
+
+11. Mac 原生 TileLang/Metal 实测五个完整 GEMM：同源码/config 的 input TIR 与 CUDA
+    端逐字节相同；数值参考独立 CPU float64。修复 FP32→FP16 epilogue 与显式同步。
+12. 接入正式 runner、最佳结果检查点、硬截止与清理余量，加入真实错误 shader 负例。
+    第一版六轮搜索完成 30 次模型调用、29 个有效候选，完整记录位于 submission-v1。
+13. 为提升性能尝试分段 epilogue，但发现共享内存越界与数值错误，拒绝纳入正式模板。
+14. 加入与课程 launch_order 一致的 serpentine swizzle；Z3 检查映射边界，有限坐标
+    枚举检查双射，测试覆盖不满 panel 的情况。首次计划用 swizzle=0 建立基线，
+    后续由 DeepSeek 修改域/目标并由 HiGHS 选择。未把测量赢家硬编码为 MIP。
+15. 最终八轮五案例结果位于 submission-v2；原生磁盘 kernel cache 禁用，模拟器原文
+    不变。17 项测试和额外未知 shape 通过。checked 明确为 Metal 源级数值验证，
+    未执行 CUDA 二进制；两者范围在 result.json/报告中明确，不把历史失败改为成功。
+
+## Final submission acceptance
+
+- Final eight-round runs: five public workloads, 40 model calls, 39 evaluated candidates and 117 full-shape numerical tests. Best simulated speedup over the first checked candidate is 1.6016× on 4096³; all case searches finish within 20 minutes.
+- 17 automated tests passed, including real Metal corruption rejection, timeout checkpointing, protocol adapters and swizzle coverage. An unseen 96×192×96 workload passed without code edits.
+- Extracted the release-candidate ZIP into a separate workspace, installed fresh CPU/Metal virtual environments, and verified archive content hashes. The validation CLI regenerates results/summary.json; archive bytes were restored before the full hash comparison.
+- The extracted entry point completed two rounds in 17.924 seconds with EVAL_MODEL_API_KEY and without DEEPSEEK_API_KEY in its environment. All five archived case evidence sets passed validation after extraction. The same Mac and already prepared Docker compiler image were reused; dependency installation was outside the timed run.
+- Final validation remains explicitly Metal numerical execution plus byte-identical input TIR CUDA compilation and original GB10 SASS simulation. CUDA binary execution is not claimed.

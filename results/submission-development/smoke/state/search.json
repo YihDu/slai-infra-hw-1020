@@ -1,0 +1,173 @@
+{
+  "history": [
+    {
+      "attempt": "attempt-00",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 0.1,
+          "pipeline": 0.1,
+          "footprint": 1
+        },
+        "rationale": "Fresh workload gemm_32x4096x4096 has M=32, so block_M must divide 32; allowed [32,64] reduces to block_M=32. block_N in [64,128] and block_K in [32,64] are kept, all divide N=K=4096. threads=[128] as only allowed option. num_stages [1,2,3] kept but the conservative footprint formula and the hard 32768-byte cap constrain feasible tuples; 4*block_M*block_N alone is 8192 for block_N=64 and 16384 for block_N=128, leaving 24576 or 16384 bytes for multi-stage buffering. Weights emphasize traffic and footprint equally at 1.0; launches and pipeline are downweighted to 0.1 because with only 32 output rows, launch count is small and K/block_K/num_stages has limited spread, while traffic and shared-memory pressure are the primary levers. No prior evaluations exist, so no exclusions are applied. The next hypothesis: prefer block_N=128 with block_K=32 and the largest num_stages that fits the 32768-byte cap to reduce traffic via wider N tiles while preserving pipeline depth, then compare against block_K=64 variants that offer fewer K iterations but larger buffers. Metal checks execute the exact source/config/TIR but do not execute the CUDA binary; GB10 values are simulator estimates, not hardware measurements, and numerical tolerance is rtol=0.02, atol=0.002 with FP32 accumulation emitted through the FP32 epilogue."
+      },
+      "selection": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 0.9293831466666667,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 64,
+        "smem_bytes": 8192,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 154.3490409318021,
+      "best_simulated_us": 154.3490409318021
+    },
+    {
+      "attempt": "attempt-01",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1.5,
+          "launches": 0.1,
+          "pipeline": 1.0,
+          "footprint": 0.5
+        },
+        "rationale": "Workload has M=32, so block_M=32 is the only divisor in the allowed set [32,64]; keeping block_M as a singleton domain prevents infeasible solver selections. block_N [64,128] and block_K [32,64] both divide N=K=4096, threads=[128] is the only allowed option, and num_stages [1,2,3] is retained. The conservative footprint 2*block_K*(block_M+block_N)*num_stages + 4*block_M*block_N, combined with the hard 32768-byte portability cap, yields feasibility: for block_N=128, block_K=32 the epilogue term is 16384, allowing stages up to 2 (32768 exact at stages=2) while stages=3 exceeds the cap; for block_N=128, block_K=64 stages=1 fits; for block_N=64, block_K=32 stages 1-3 fit. Observations from attempt-00 (block_M=32,block_N=64,block_K=32,num_stages=1, threads=128): proxy_cost 0.929, numerical passed, compiled, simulated_us 154.35 with actual smem 8192 and 64 registers; this is a narrow tile with minimal traffic reduction, so it motivates exploring wider block_N and deeper num_stages. Weight changes: traffic increased to 1.5 because with only 32 output rows the N-tile width dominates memory traffic (1/block_N term), launches reduced to 0.1 since ceil(32/32)=1 keeps launch count modest, pipeline raised to 1.0 because K/block_K/num_stages varies 64-128 across candidates and can meaningfully influence simulated latency, footprint lowered to 0.5 so feasible larger-tile configs are not over-penalized since all are under 32 KB. Exclusions are not hardcoded here; HiGHS selects among allowed tuples while prior evaluated config is excluded by the harness. Next hypothesis: block_N=128, block_K=32, num_stages=2 should reduce traffic and improve pipeline depth relative to the observed narrow-tile config, provided the 32768-byte cap holds exactly; fall back to stages=1 for block_K=64 or block_N=128 pairings that exceed the cap. Metal checks validate the exact source/config/TIR but not the CUDA binary, and GB10 values are simulator estimates only, not hardware measurements."
+      },
+      "selection": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "proxy_cost": 1.4147080533333332,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 62,
+        "smem_bytes": 24576,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 147.66753212620162,
+      "best_simulated_us": 147.66753212620162
+    }
+  ],
+  "excluded": [
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 128
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 128
+    }
+  ],
+  "best": {
+    "attempt": "attempt-01",
+    "eligible": true,
+    "implementation": "implementation/attempt-01/kernel.py",
+    "configuration": {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 128
+    },
+    "identity": {
+      "source_sha256": "d07e34fc773ce470e6a60c82eca87810a86633ed3e5dd617e1509e59bcc34ffe",
+      "config_sha256": "58a407c23238560cff5c29ccf2c06a7e81faaed2cc2e6728b2a66bece1f67744",
+      "tir_sha256": "bcfd62d5063be5a009ffd97f5a489e52bfb2fce05b20426a66e008c67a5dc1a0",
+      "sass_sha256": "326afe387736474f7d6c2758d5c5ef10c2a31eee6d0adb0398d6a4157ac6d92d",
+      "cubin_sha256": "dbbafc15ce1aadfd5d2d4e168f61daafd2d107f962dd5f239fef3a1e4f979cdd"
+    },
+    "simulated_us": 147.66753212620162
+  },
+  "initial": {
+    "attempt": "attempt-00",
+    "eligible": true,
+    "implementation": "implementation/attempt-00/kernel.py",
+    "configuration": {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 128
+    },
+    "identity": {
+      "source_sha256": "d07e34fc773ce470e6a60c82eca87810a86633ed3e5dd617e1509e59bcc34ffe",
+      "config_sha256": "e8aed91325a4ca83e6c14ea95d6380299907cd87d85259e4816a5323be9a1a19",
+      "tir_sha256": "fa8167d118e03faf291fe9c42b61f74599ecebdab27de00a81ff42e96ff1363d",
+      "sass_sha256": "2b248aa00ae129b44d9d849a18ab3ff41baf98a14409fd55064f326d1fdaa887",
+      "cubin_sha256": "33b2bb42241d21fca2d0db5bc02e672d4dfee9884957ede39221470731734217"
+    },
+    "simulated_us": 154.3490409318021
+  }
+}

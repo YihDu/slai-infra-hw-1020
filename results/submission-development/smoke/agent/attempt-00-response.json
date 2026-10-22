@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":0.1,\"pipeline\":0.1,\"footprint\":1},\"rationale\":\"Fresh workload gemm_32x4096x4096 has M=32, so block_M must divide 32; allowed [32,64] reduces to block_M=32. block_N in [64,128] and block_K in [32,64] are kept, all divide N=K=4096. threads=[128] as only allowed option. num_stages [1,2,3] kept but the conservative footprint formula and the hard 32768-byte cap constrain feasible tuples; 4*block_M*block_N alone is 8192 for block_N=64 and 16384 for block_N=128, leaving 24576 or 16384 bytes for multi-stage buffering. Weights emphasize traffic and footprint equally at 1.0; launches and pipeline are downweighted to 0.1 because with only 32 output rows, launch count is small and K/block_K/num_stages has limited spread, while traffic and shared-memory pressure are the primary levers. No prior evaluations exist, so no exclusions are applied. The next hypothesis: prefer block_N=128 with block_K=32 and the largest num_stages that fits the 32768-byte cap to reduce traffic via wider N tiles while preserving pipeline depth, then compare against block_K=64 variants that offer fewer K iterations but larger buffers. Metal checks execute the exact source/config/TIR but do not execute the CUDA binary; GB10 values are simulator estimates, not hardware measurements, and numerical tolerance is rtol=0.02, atol=0.002 with FP32 accumulation emitted through the FP32 epilogue.\"}",
+  "usage": {
+    "prompt_tokens": 677,
+    "completion_tokens": 419,
+    "total_tokens": 1096,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 677
+  },
+  "response_id": "dfcec5a2-bc58-4b64-ad07-f3923c36ed99"
+}

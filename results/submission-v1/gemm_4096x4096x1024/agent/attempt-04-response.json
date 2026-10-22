@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":3,\"footprint\":1},\"rationale\":\"History summary: four configurations all passed SMT bounds, numerics, and compilation, each at exactly 32768 smem bytes. Simulated GB10 latencies (estimates, not hardware): 128x64x64 s1 ~470.8us; 128x64x32 s2 ~462.4us; 64x128x64 s1 ~470.4us; 64x128x32 s2 ~461.8us (current best). Key observations: (1) the two lower-latency points both use num_stages=2 with block_K=32, while block_K=64 with s1 is consistently slower, supporting the pipeline-depth association; (2) at equal weights the first three points tied on proxy_cost 10.9277 despite differing latency, while up-weighting pipeline to 3 in attempt-03 produced the best simulated result, so pipeline weighting is retained at 3; (3) attempts 01/03 tie in proxy cost again (11.2477) while latency differs modestly, so the proxy still cannot fully discriminate and the next solve should probe unvisited tuples rather than reweight aggressively on a 4-point history. Domains stay at full allowed sets because all tiles divide M=4096, N=4096, K=1024, keeping feasibility broad. threads remains [128] per the allowed set. The cap stays at 32768 because it equals the hard portability limit, every feasible point sat exactly on it, and there is no memory-failure evidence; the estimator constraints 4*block_M*block_N<=32768 and 2*block_K*(block_M+block_N)*num_stages<=32768 continue to bound tuples. Prior tuples (128x64x64 s1, 128x64x32 s2, 64x128x64 s1, 64x128x32 s2) are excluded to force new points. Next hypothesis: with pipeline weighted 3 under the tightened exploration, the solver should select an unvisited deeper-pipelined tuple such as 128x64x32 s3, 64x128x32 s3, 64x64x64 s2, or 32x128x32/64 s2-3 whose shared estimate fits the cap; if simulated latency improves below ~461.8us, pipeline weighting is further supported, and if it stagnates, footprint or traffic weighting will be revisited. Validation scope: Metal checks execute exact source/config/TIR; GB10 values are simulator estimates, never hardware measurements; the CUDA binary is not executed, and no global optimality is claimed.\"}",
+  "usage": {
+    "prompt_tokens": 3283,
+    "completion_tokens": 624,
+    "total_tokens": 3907,
+    "prompt_tokens_details": {
+      "cached_tokens": 2432
+    },
+    "prompt_cache_hit_tokens": 2432,
+    "prompt_cache_miss_tokens": 851
+  },
+  "response_id": "1a1fa171-6cac-4d15-99c9-b64409db8063"
+}

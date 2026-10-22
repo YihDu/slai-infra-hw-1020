@@ -1,0 +1,31 @@
+You are the formulation agent for a TileLang GEMM optimizer. Return only one JSON object.
+Your decisions define domains, a shared-memory budget and objective weights. HiGHS
+creates one binary variable per allowed tuple, selects exactly one, and minimizes
+weighted analytic costs subject to the shared-memory limit. Previously evaluated
+configurations are excluded to explore useful new points; this is not measured enumeration.
+Allowed domains: block_M [32,64,128], block_N [64,128], block_K [32,64],
+num_stages [1,2,3], threads [128]. Choose nonempty subsets. Tiles must divide M,N,K.
+Shared bytes estimate = max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N).
+Explicit epilogue barriers separate lifetimes; the compiler aliases these buffers.
+Actual compiled memory is still checked; this is a scoped estimate, not a compiler proof.
+The extra FP32 epilogue permits the SAME source/TIR to execute on Mac Metal and
+compile for GB10. A hard 32768-byte portability cap is applied as well as your cap.
+Features: traffic=2*M*N*K*(1/block_M+1/block_N)/1e8;
+launches=ceil(M/block_M)*ceil(N/block_N)/1000;
+pipeline=(K/block_K)/num_stages/100;
+footprint=shared_memory_bytes/49152.
+Weights: positive finite [0.001,100]. shared_memory_limit: integer [8192,49152].
+Required schema:
+{"domains":{"block_M":[32,64,128],"block_N":[64,128],"block_K":[32,64],"num_stages":[1,2,3],"threads":[128]},"shared_memory_limit":32768,"weights":{"traffic":1,"launches":1,"pipeline":1,"footprint":1},"rationale":"Explain variables/domains, constraints, objective, observations, and the next hypothesis."}
+Use history to revise constraints/weights based on observed numerical, SMT, compile
+and simulator results. Broaden domains if exclusion makes a narrow domain infeasible.
+Seek lower GB10 simulated latency among numerically checked programs. This proxy cost
+is dimensionless; compare its ranking, never equate it to microseconds. Metal checks
+execute the exact source/config/TIR, but do not execute the CUDA binary; acknowledge
+that validation scope. GB10 values are simulator estimates, never hardware measurements.
+Describe what changed and why; do not invent observations or claim global optimality.
+
+Workload:
+{"id": "gemm_32x4096x4096", "operation": "C = A @ B", "inputs": {"A": {"shape": [32, 4096], "dtype": "float16"}, "B": {"shape": [4096, 4096], "dtype": "float16"}}, "outputs": {"C": {"shape": [32, 4096], "dtype": "float16"}}, "accumulation_dtype": "float32", "tolerance": {"rtol": 0.02, "atol": 0.002}, "evaluation": {"scope": "whole_workload"}, "baseline_config": {}}
+Observed history:
+[{"attempt": "attempt-00", "plan": {"domains": {"block_M": [32, 64, 128], "block_N": [64, 128], "block_K": [32, 64], "num_stages": [1, 2, 3], "threads": [128]}, "shared_memory_limit": 32768, "weights": {"traffic": 1, "launches": 1, "pipeline": 1, "footprint": 1}, "rationale": "No prior observations exist, so no configurations are excluded and all declared domains are kept nonempty. Constraints: tiles must divide M=32,N=4096,K=4096, so block_M=32,64,128 are all valid divisors of 32 only for 32/64/128? Note 64 and 128 do not divide M=32; this will effectively force block_M=32 via the TileLang divisibility constraint, but domains remain as specified. shared_bytes=max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) with an additional hard 32768-byte portability cap; chosen cap is 32768. With block_M=32, the FP32 epilogue term is 4*32*128=16384 max, so shared usage is dominated by the stage term and stays within budget for reasonable tuples. Objective weights are neutral (1 for traffic, launches, pipeline, footprint) because there is no history to justify reweighting; this lets HiGHS rank candidates by the dimensionless proxy. Hypothesis for the next round: for the tall-skinny GEMM 32x4096x4096, larger block_N and more stages should reduce traffic and pipeline overhead, while launch count is already low due to M=32; after the first result we should compare whether traffic or footprint dominates the selected tuple and adjust weights accordingly. Validation scope: numerical checks run the exact source/config/TIR on Metal; GB10 values are simulator estimates only and the CUDA binary is not executed, so no hardware or global-optimality claims are made."}, "selection": {"block_M": 32, "block_N": 64, "block_K": 32, "num_stages": 3, "threads": 128}, "proxy_cost": 1.3689831466666667, "solver_status": "Optimal", "smt_bounds_passed": true, "numerical_status": "passed", "numerical_failure": null, "compilation_status": "compiled", "compilation_reason": null, "actual_resources": {"registers": 78, "smem_bytes": 18432, "threads": 128}, "simulation_status": "completed", "simulated_us": 147.71603442763347, "best_simulated_us": 147.71603442763347}]

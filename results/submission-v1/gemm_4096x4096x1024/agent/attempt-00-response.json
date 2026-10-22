@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":1,\"footprint\":1},\"rationale\":\"No prior evaluations exist, so domains start at the full allowed sets and the shared-memory cap is set to the hard 32768-byte portability limit, which also remains within [8192,49152]. All tiles divide M=4096, N=4096, K=1024, so no divisibility pruning is needed. The estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) with worst-case block_M=128,block_N=128 yields 65536 bytes for the FP32 epilogue term, meaning the 32768 cap will exclude large-tile tuples; the optimizer will thus prefer configurations whose epilogue estimate is at most 32768 (e.g., block_M*block_N <= 8192) or whose combined pipeline buffer fits instead. Equal weights keep traffic, launch count, pipeline depth and footprint balanced for a first exploration. Baseline_config is empty, so no reference weights are adjusted yet. Next hypothesis: solving with these full domains should select a moderately sized tile with num_stages=2-3 and block_K=64 for traffic/pipeline balance while satisfying the portability cap; subsequent history should be used to tighten or broaden domains and reweight if simulated GB10 latency or compile/memory checks favor a specific regime.\"}",
+  "usage": {
+    "prompt_tokens": 717,
+    "completion_tokens": 350,
+    "total_tokens": 1067,
+    "prompt_tokens_details": {
+      "cached_tokens": 384
+    },
+    "prompt_cache_hit_tokens": 384,
+    "prompt_cache_miss_tokens": 333
+  },
+  "response_id": "1ca6c8e9-b535-455d-a14a-5dbaf40963ff"
+}

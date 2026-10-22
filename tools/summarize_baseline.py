@@ -102,5 +102,5 @@ https://github.com/tile-ai/tilelang/blob/main/examples/gemm/example_gemm.py ，�
 下一阶段首先确认课程无 GPU 编译和数值执行方式，再产出真实 sm_121a SASS 和资源数据，
 接通模拟反馈；之后才形成可提交的 checked baseline。详见 docs/development-plan.md。
 '''
-(root/'report.md').write_text(report)
+(root/'docs/initial-cpu-report.md').write_text(report)
 print(json.dumps(dict(cases=len(rows),usage=totals,evidence_validation='passed')))

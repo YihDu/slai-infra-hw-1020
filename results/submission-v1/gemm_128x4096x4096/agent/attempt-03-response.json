@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1.5,\"launches\":0.5,\"pipeline\":2.5,\"footprint\":0.75},\"rationale\":\"Three prior attempts all compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (estimates only; no CUDA binary executed, no hardware measurement). Attempt-00 (128,64,64,1) gave 157.05us smem 32768 proxy 2.377; attempt-01 (64,64,64,2) improved to 156.26us smem 32768 proxy 3.384; attempt-02 (64,64,32,3) regressed to 157.63us smem 24576 proxy 3.732. The analytic proxy is not monotone with simulated latency, so ranking is used cautiously and no global optimality is claimed. Attempt-02 was the first to fit below the cap (24576 bytes) via block_K=32, showing footprint is reducible without lifting the 32768 portability cap, but its deeper stage-3 pipeline with smaller block_K performed worse. Attempt-01, the current best, mixes block_M=64 with block_N=64 at stages=2, so block_N=128 remains untested and could cut traffic given the tall-N shape. Domains kept fully nonempty (block_M divides 128; block_N and block_K divide 4096; threads fixed 128) so HiGHS still owns tuple selection and explores unmeasured points. Weight revision: pipeline eased from 3 to 2.5 since the stage-3 attempt regressed and stage-2 currently leads; traffic held at 1.5 to keep rewarding the untested block_N=128 traffic cut; launches held at 0.5; footprint held at 0.75 to discourage further cap-saturating tiles. Shared-memory limit retained at 32768 (portability cap) because attempts 00/01 already saturate it and the 4*block_M*block_N epilogue term dominates large tiles. Next hypothesis: a (block_M=64, block_N=128, block_K=64 or 32, num_stages=2) tuple may lower simulated_us by cutting traffic relative to attempt-01 while staying under the portability cap; verify compiled smem and Metal-executed source/TIR, and treat simulated_us as a ranking proxy only.\"}",
+  "usage": {
+    "prompt_tokens": 2611,
+    "completion_tokens": 556,
+    "total_tokens": 3167,
+    "prompt_tokens_details": {
+      "cached_tokens": 1792
+    },
+    "prompt_cache_hit_tokens": 1792,
+    "prompt_cache_miss_tokens": 819
+  },
+  "response_id": "c7014736-0dff-43c2-8cff-394e530793d0"
+}

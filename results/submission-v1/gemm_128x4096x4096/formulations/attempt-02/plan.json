@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.5,
+    "launches": 0.5,
+    "pipeline": 3,
+    "footprint": 0.75
+  },
+  "rationale": "Attempts 00 and 01 both compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (estimates only, no CUDA binary executed, no hardware measurement). Attempt-00 (128,64,64,1) gave 157.05 us at smem 32768 and proxy 2.377; attempt-01 (64,64,64,2) improved to 156.26 us at smem 32768 and proxy 3.384, showing the analytic proxy is not monotone with simulated latency here, so the ranking must stay cautious rather than claiming global optimality. Both selections hit the 32768 actual-smem cap, confirming the portability cap binds and that the 4*block_M*block_N epilogue term dominates large tiles. Domains kept fully nonempty and feasible for M=128, N=4096, K=4096 (block_M divides 128; block_N and block_K divide 4096; threads fixed 128), so HiGHS still owns tuple selection and explores unmeasured points. Weight revision: pipeline raised to 3 because stage-1 attempt-00 and stage-2 attempt-01 differ by only ~0.8 us, so deeper pipelining remains the cheapest untested lever; footprint lowered to 0.75 to relax pressure given both prior winners sat exactly at the cap; traffic held at 1.5 since the wide-M/tall-N shape still rewards traffic cuts; launches held at 0.5 since current launch counts are already small relative to traffic/pipeline. Shared-memory limit retained at 32768 (portability cap). Next hypothesis: a (block_M=128, block_N=64, block_K=32, num_stages=3) or (64,128,32,3) tuple may fit under 32768 via the pipeline term while trading footprint, and could lower simulated_us; verify Metal-executed source/TIR and compiled smem, and treat simulated_us as a ranking proxy only."
+}

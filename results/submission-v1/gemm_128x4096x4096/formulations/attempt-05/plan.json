@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 0.5,
+    "pipeline": 2,
+    "footprint": 1.25
+  },
+  "rationale": "Five attempts compiled, passed numerical checks on the exact source/TIR, and completed GB10 simulation (estimates only; no CUDA binary executed, no hardware measurement). Best remains attempt-01 (64,64,64,2) at 156.26us smem 32768 proxy 3.384; others: (128,64,64,1) 157.05us, (64,64,32,3) 157.63us smem 24576, (128,64,32,2) 157.80us, (64,128,64,1) 157.30us. Every block_N=128 probe (attempt-04) and the only stage-3 probe (attempt-02) underperformed the (64,64,64,2) point, so the analytic proxy is clearly not monotone with simulated latency; ranking stays cautious and no global optimality is claimed. Observations: stage-2 mixes lead; block_K=32 at stages 2-3 regressed, suggesting block_K=64 is the productive K-tile; block_N=128 did not help despite the tall-N shape, so traffic is eased from 1.5 to 1.0 to stop over-rewarding wide-N tuples. Pipeline kept at 2 (stage-2 is the current leader) and footprint raised to 1.25 to discourage the cap-saturating 32768-byte tiles that dominate attempts 00/01/03/04, favoring tuples that leave headroom. Launches lowered to 0.5 since launch counts remain small relative to traffic/pipeline for this wide-M tall-N shape. Domains remain fully nonempty and feasible (block_M divides 128; block_N and block_K divide 4096; threads fixed 128), so HiGHS still owns tuple selection and explores unmeasured points; shared-memory limit kept at 32768 (portability cap). Next hypothesis: untested (block_M=32 or 128, block_N=64, block_K=64, num_stages=2) or (32,128,64,2) tuples may beat the (64,64,64,2) leader now that footprint pressure favors sub-cap tiles and traffic/launch pressure is reduced; verify compiled smem and Metal-executed source/TIR, and treat simulated_us as a ranking proxy only, never as hardware latency."
+}

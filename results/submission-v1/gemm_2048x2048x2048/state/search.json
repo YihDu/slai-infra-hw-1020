@@ -1,0 +1,436 @@
+{
+  "history": [
+    {
+      "attempt": "attempt-00",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 1,
+          "pipeline": 1,
+          "footprint": 1
+        },
+        "rationale": "No prior observations exist, so I start from the full allowed domains and keep all tiles and stage counts eligible since 2048 is divisible by every candidate block_M/block_N/block_K. The 32 KiB cap matches the explicit portability ceiling and is well below the 49152 maximum, ensuring the shared-buffer estimate 2*block_K*(block_M+block_N)*num_stages stays within Metal/GB10-friendly bounds for the feasible candidates. Objective weights are uniform to let traffic, launch count, pipeline depth, and footprint compete without prior bias; footprint uses the same 49152-byte normalization. The FP32 epilogue is assumed to enable buffer aliasing via epilogue barriers, but compiled shared memory will still be validated. Next hypothesis: the solver will favor larger tiles (e.g., 128x128 or 128x64) for traffic reduction, with block_K/num_stages combinations that minimize pipeline stalls while respecting the 32 KiB cap; the first evaluated datapoint will be used to reweight traffic vs. pipeline and to potentially narrow num_stages if estimate/simulator mismatch appears."
+      },
+      "selection": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 5.5251985066666665,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 122,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 234.82038003579493,
+      "best_simulated_us": 234.82038003579493
+    },
+    {
+      "attempt": "attempt-01",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1.5,
+          "launches": 0.5,
+          "pipeline": 2,
+          "footprint": 1.5
+        },
+        "rationale": "Only one prior datapoint exists (attempt-00: 128x64x64, stages=1, threads=128; compiled with smem_bytes=32768 exactly at the cap; numerically passed; simulated 234.82 us as the current best). No narrowing is warranted yet since the feasible domain is broad and untested points (e.g., block_M=64, block_N=128, block_K=32 with more stages) remain. Constraints stay at the 32 KiB portability cap because actual smem matched the estimate exactly (32768) at 128x64x64/stages=1, confirming the estimate is tight for stage>=1 combinations that satisfy 2*block_K*(block_M+block_N)*num_stages <= cap; larger tiles therefore require small K and low stages. Domains remain full since 2048 divides all candidates and exclusion is not narrow. Weight changes reflect the observed feasibility pressure: the single feasible chosen point sat exactly at the memory cap, so I raise footprint weight (1 -> 1.5) to steer future selections toward configurations with slack (e.g., block_M=64/128, block_K=32, more stages) and raise pipeline weight (1 -> 2) because stages=1 was selected only because stages>=2 at 128x64x64 likely exceeded the cap, leaving pipeline depth untested; heavier pipeline weight promotes deeper-pipelined configurations once feasible. Traffic weight rises slightly (1 -> 1.5) to retain preference for larger tiles within the cap. Launches weight drops (1 -> 0.5) since launch overhead over 2048x2048 grids is small (~16-32 tiles per dim scaled to /1000 metric) and traffic/pipeline more directly affect rank. This is a proxy score only, not measured latency; the 234.82 us is a GB10 simulator estimate, and Metal checks execute exact source/TIR without executing the CUDA binary, so validation scope is limited. Next hypothesis: the solver should explore block_K=32 with num_stages=2 or 3 and larger blocks (128x128 or 64x128) that satisfy 2*block_K*(block_M+block_N)*num_stages <= 32768 and the 4*block_M*block_N <= 32768 epilogue constraint, which may reduce pipeline stalls and improve simulated latency versus the 128x64x64/stages=1 baseline; the next datapoint will be used to recalibrate weights and possibly tighten the cap if actual smem again saturates it."
+      },
+      "selection": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "proxy_cost": 7.935797759999999,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 124,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 222.04976801567656,
+      "best_simulated_us": 222.04976801567656
+    },
+    {
+      "attempt": "attempt-02",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 2,
+          "launches": 0.3,
+          "pipeline": 2.5,
+          "footprint": 1
+        },
+        "rationale": "Two prior datapoints exist (attempt-00: 128x64x64, stages=1, smem=32768, simulated 234.82; attempt-01: 128x64x32, stages=2, smem=32768, simulated 222.05 = current best). Both numerically passed, compiled, and saturated the 32 KiB cap exactly; the second shows deeper pipelining with smaller block_K improves the GB10 simulator estimate despite no traffic gain (block_M/block_N unchanged). Domains stay full because 2048 is divisible by all candidates and only two points are excluded, so no narrowing is needed. I keep the 32 KiB portability cap since actual smem matched the estimate at both saturated points and the hard portability ceiling is 32768; raising it risks Metal/GB10 portability without evidence of headroom. Changes vs attempt-01: traffic weight 1.5->2 to push toward reducing the still-unexplored tile shapes (e.g., block_N=128, block_M=64) that lower 1/block_M+1/block_N; pipeline weight 2->2.5 in light of attempt-01 beating attempt-00 via stages=2; footprint weight 1.5->1 because both feasible winners sit at the cap and heavy footprint pressure risks steering toward small tiles that increase traffic/pipeline cost; launches 0.5->0.3 since 2048x2048 grid launch overhead is negligible relative to traffic/pipeline terms. Observation caveat: 222.05 us is a GB10 simulator estimate, not hardware; Metal checks execute exact source/TIR but not the CUDA binary. Next hypothesis: selector should choose block_N=128 with block_K=32 and num_stages>=2 (e.g., 64x128x32 or 128x128x32 if 4*block_M*block_N<=32768 permits) to lower traffic while retaining pipeline depth, and possibly explore stages=3; the next datapoint will recalibrate the traffic/pipeline trade-off and test whether non-square tiles improve the simulator ranking."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 9.673330346666665,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 134,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 233.20324842311868,
+      "best_simulated_us": 222.04976801567656
+    },
+    {
+      "attempt": "attempt-03",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 2,
+          "launches": 0.3,
+          "pipeline": 3,
+          "footprint": 1
+        },
+        "rationale": "History: 3 numerically-passed, compiled points. Best is 128x64x32/stages=2 at 222.05 us (proxy 7.94); 128x64x64/stages=1 gave 234.82 us and 64x128x64/stages=1 gave 233.20 us, both saturated at smem=32768. So deeper pipelining with smaller block_K helped, while a non-square 64x128 tile with stages=1 did not beat the best. All three trials hit exactly 32768 bytes, consistent with the estimate formula, so the cap remains binding but the compiler didn't exceed it. Domains stay full (no exclusions yet, 2048 divisible by all candidates), but the solver has been forced to stages<=2 with block_K=32 and cannot reach stages=3 under the current 32 KiB cap combined with large tiles; I keep the cap because it is the hard portability ceiling. Weight changes vs attempt-02: pipeline 2.5->3 to prioritize getting stages=3 feasible (small block_M/block_N with block_K=32), traffic stays 2 to still reward larger tiles within the cap, footprint stays 1 since winners sit at the cap and higher footprint weight would bias away from useful large-tile points, launches stays 0.3 as grid overhead is minor. Caveat: the 222.05 us figure is a GB10 simulator estimate, not hardware, and Metal checks execute the exact source/TIR but not the CUDA binary. Next hypothesis: with heavier pipeline weight the solver should pick a stages=3 combination such as 64x64x32/stages=3 (est 2*32*128*3=24576) or 32x128x32/stages=3 (est 2*32*160*3=30720) to test whether deeper pipelining improves simulated latency; if stages=3 underperforms, rebalance toward traffic and consider that the current best already sits near the cap optimum."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "proxy_cost": 9.833330346666665,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 130,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 222.1818392034746,
+      "best_simulated_us": 222.04976801567656
+    },
+    {
+      "attempt": "attempt-04",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 2,
+          "launches": 0.3,
+          "pipeline": 3,
+          "footprint": 0.8
+        },
+        "rationale": "Four numerically-passed, compiled datapoints; all satisfied SMT bounds and hit exactly smem=32768. Best is 128x64x32/stages=2 at 222.05 us (proxy 7.94); attempt-03 64x128x32/stages=2 gave 222.18 us, nearly tied, while stages=1 variants (128x64x64 and 64x128x64) were ~233-235 us. So block_K=32 with num_stages>=2 clearly ranks better in the GB10 simulator proxy, and larger square-ish tiles plus stages=3 remain unexplored. Domains stay full because 2048 is divisible by all candidates and only four tuples are excluded; no narrowing is warranted. I keep the 32 KiB cap: it is the hard portability ceiling and actual smem matched it exactly at every chosen point, so raising it is not justified. Weight changes vs attempt-03: footprint 1->0.8 to stop penalizing large tiles that sit at the cap (both best points saturate cap yet rank best); pipeline stays 3 to keep pushing stages=3 feasible configurations (e.g., 64x64x32/stages=3 est 24576, 32x128x32/stages=3 est 30720, 128x64x32/stages=3 est 36864 excluded by cap); traffic stays 2 to reward 128x128x32/stages<=2 (est 16384) if the solver can reach it; launches stays 0.3 since 2048x2048 grid overhead is minor. Caveat: 222.05 us is a GB10 simulator estimate, not hardware; Metal checks execute the exact source/TIR but not the CUDA binary. Next hypothesis: with footprint deweighted and pipeline emphasized, the solver should pick either 128x128x32/stages=2 (if traffic+tile gains dominate) or a stages=3 point like 64x64x32 or 32x128x32 to test whether deeper pipelining at smaller tiles improves the simulator ranking beyond the current 222 us best; the next datapoint will discriminate these trade-offs."
+      },
+      "selection": {
+        "block_M": 128,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 10.659997013333333,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 122,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 303.28473658511126,
+      "best_simulated_us": 222.04976801567656
+    },
+    {
+      "attempt": "attempt-05",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32,
+            64,
+            128
+          ],
+          "block_N": [
+            64,
+            128
+          ],
+          "block_K": [
+            32,
+            64
+          ],
+          "num_stages": [
+            1,
+            2,
+            3
+          ],
+          "threads": [
+            128
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1.5,
+          "launches": 0.3,
+          "pipeline": 4,
+          "footprint": 0.5
+        },
+        "rationale": "Five numerically-passed, compiled datapoints, all SMT-bounded and all hitting exactly smem=32768 (estimate matches compiler). Best remains 128x64x32/stages=2 at 222.05 us (proxy 7.94); 64x128x32/stages=2 tied closely at 222.18 us; stages=1 variants (128x64x64 234.82, 64x128x64 233.20, 128x64x32 303.28) ranked worse. Key signal: num_stages>=2 with block_K=32 dominates, and attempt-04's stages=1 drop to 303 us shows the proxy is sensitive to pipeline depth. Domains stay full because 2048 is divisible by all candidates and only five tuples are excluded; no narrowing needed. Cap stays at the hard 32768 portability ceiling since actual smem saturated it exactly at every chosen point. Changes vs attempt-04: pipeline 3->4 to strongly prioritize num_stages=3 configurations (64x64x32/stages=3 est 24576; 32x128x32/stages=3 est 30720; 32x64x32/stages=3 est 18432) that remain untested, given stages has now clearly separated simulated outcomes; footprint 0.8->0.5 since cap-saturating large tiles are the best performers and footprint pressure only risks steering away from them; traffic 2->1.5 to slightly relax tile-size preference so deeper pipelining at modest tiles can win; launches stays 0.3 as 2048x2048 grid overhead is minor. Caveat: 222.05 us is a GB10 simulator estimate, not hardware measurement; Metal checks execute the exact source/TIR and config but do not run the CUDA binary, so validation scope is limited to numerical and compile checks plus proxy ranking. Next hypothesis: solver should select a stages=3 point such as 64x64x32 or 32x128x32 to test whether the additional pipeline depth the current cap permits improves simulated latency beyond the 222.05 us best; if stages=3 underperforms, I will rebalance toward traffic and consider that stages=2 at 128x64x32/64x128x32 may already be near-cap optimum."
+      },
+      "selection": {
+        "block_M": 64,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "proxy_cost": 9.086731093333333,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 132,
+        "smem_bytes": 32768,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 296.8433258271214,
+      "best_simulated_us": 222.04976801567656
+    }
+  ],
+  "excluded": [
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    },
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128
+    },
+    {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 128
+    },
+    {
+      "block_M": 64,
+      "block_N": 128,
+      "block_K": 32,
+      "num_stages": 1,
+      "threads": 128
+    }
+  ],
+  "best": {
+    "attempt": "attempt-01",
+    "eligible": true,
+    "implementation": "implementation/attempt-01/kernel.py",
+    "configuration": {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128
+    },
+    "identity": {
+      "source_sha256": "d07e34fc773ce470e6a60c82eca87810a86633ed3e5dd617e1509e59bcc34ffe",
+      "config_sha256": "dc55e5593d988963778ddb6c7923946e3bb9c6477f41ffc227cad7f05b3aaccd",
+      "tir_sha256": "8fe50d374fe4d7a4e23ff6ec0658994279b0715fc6d2332488368e614605b363",
+      "sass_sha256": "5b52485ba22e3b5ebbaa31b6820e6590339b2f06c97537e19e51ab36b07a95d6",
+      "cubin_sha256": "670c6f4cfe1e65879e65526fc212f618a03c92d0fd9e66bc8478c226fdf27fd3"
+    },
+    "simulated_us": 222.04976801567656
+  },
+  "initial": {
+    "attempt": "attempt-00",
+    "eligible": true,
+    "implementation": "implementation/attempt-00/kernel.py",
+    "configuration": {
+      "block_M": 128,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 1,
+      "threads": 128
+    },
+    "identity": {
+      "source_sha256": "d07e34fc773ce470e6a60c82eca87810a86633ed3e5dd617e1509e59bcc34ffe",
+      "config_sha256": "b6108274ea5f006f07f876e0032110c947fe0f705af7fba4f0e5945a36351737",
+      "tir_sha256": "5e44dd5f84ba7c6f614db89df56e5f67d1c22ed31d396da49c2ec479dbae0740",
+      "sass_sha256": "6103028010800739f268ed6415015535a45f8921d74df1d157158cc42642b81d",
+      "cubin_sha256": "0a28e2babeddb106099a834029e04e524c9604cd1ed7862b26a037b86918865d"
+    },
+    "simulated_us": 234.82038003579493
+  }
+}

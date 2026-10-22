@@ -1,0 +1,77 @@
+{
+  "status": "completed",
+  "source": "gb10_instruction_simulator",
+  "unit": "us",
+  "value": 2575.6137891490143,
+  "source_commit": "a628c9d963cf9c029fa596b872d6e8920ca883e8",
+  "audit": [
+    {
+      "warps": 172,
+      "warps_done": 172,
+      "cycles": 6535455.024438497
+    }
+  ],
+  "scope": "Timing simulation only; not numerical correctness",
+  "opcode_counts": {
+    "LDC": 4,
+    "S2R": 3,
+    "S2UR": 1,
+    "LDCU": 1,
+    "MOV": 1,
+    "CS2R": 32,
+    "UMOV": 1,
+    "ULEA": 1,
+    "SHF": 3,
+    "IMAD": 31,
+    "LEA": 17,
+    "LOP3": 35,
+    "IADD3": 25,
+    "IADD": 9,
+    "LDS": 22,
+    "LDGSTS": 12,
+    "LDGDEPBAR": 3,
+    "BAR": 5,
+    "ISETP": 1,
+    "DEPBAR": 2,
+    "LDSM": 24,
+    "HMMA": 64,
+    "NOP": 52,
+    "BRA": 2,
+    "STS": 32,
+    "F2FP": 32,
+    "STG": 16,
+    "EXIT": 1
+  },
+  "raw": {
+    "source": "gb10_instruction_simulator",
+    "unit": "us",
+    "sass_sha256": "de25da770f95fe54095294878b1be33b568335c39ad06ea9adf9541bf02ea50a",
+    "simulation": {
+      "us": 2575.6137891490143,
+      "tiles": 2048,
+      "blocks_per_sm": 3,
+      "waves": 15,
+      "dram_MB": 540.540928,
+      "parts": [
+        {
+          "counts": {},
+          "blocks": 2048,
+          "per_sm": 3,
+          "miss_frac": 0.168,
+          "dram_GBs": 218.3,
+          "us": 2573.01,
+          "busy": {
+            "tensor": 1.72,
+            "smem": 0.24,
+            "fill": 0.6,
+            "alu": 0.16,
+            "fma": 0.05,
+            "lsu": 0.11,
+            "dram": 0.96,
+            "stg": 0.04
+          }
+        }
+      ]
+    }
+  }
+}

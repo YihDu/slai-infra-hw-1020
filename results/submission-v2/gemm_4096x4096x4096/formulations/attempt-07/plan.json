@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.5,
+    "launches": 1,
+    "pipeline": 2,
+    "footprint": 1
+  },
+  "rationale": "Seven attempts observed, all numerically passed, compiled, and simulated with actual smem exactly 32768 B. Baseline (128,64,64,st=1,sw=0): 2558.09 us / 531.63 MB. Swizzle=16 dominates: best is (64,128,32,st=2,sw=16) 1597.23 us / 269.68 MB; (64,128,64,st=1,sw=16) 1616.24 us / 269.75 MB; (64,128,32,st=1,sw=16) 1912.58 us / 269.68 MB. Swizzle=8 is consistently worse at matched tiles: (64,128,64,st=1,sw=8) 1621.54 us / 320.60 MB; (64,128,32,st=2,sw=8) 1631.28 us / 320.57 MB; (64,128,32,st=1,sw=8) 1947.48 us / 320.57 MB. Conclusions: the serpentine panel hypothesis materializes (sw>0 halves DRAM vs baseline) and saturates at the ~269.7 MB floor with swizzle=16; swizzle=8 plateau (~320.6 MB) is clearly inferior, so larger swizzle is preferred. Once traffic saturates, pipeline is the discriminative signal (st=2 beats st=1 at matched tile: 1597 vs 1913 us; st=1 also penalized with sw=8). Keep weights traffic=1.5, pipeline=2, launches=1, footprint=1. Keep the 32768-byte portability cap: all compiled runs used exactly 32768 B, so it binds the promising large-tile region and lowering it would cut that region while raising it exceeds the portability ceiling. Keep tile/stage/swizzle domains since all tiles divide 4096 and seven exclusions have not made any subset infeasible; swizzle=[0,4,8,16] retained per feedback rules. Prior seven tuples are excluded, so HiGHS must select a new point; untried regions still include block_M=128 with swizzle in {8,16} and stages in {2,3}, and block_N=64 with swizzle=16. Next hypothesis: block_M=128 with swizzle=16 and stages in {2,3} may reduce simulated latency via larger serpentine panels plus pipelining; if DRAM stays ~270 MB and latency does not improve, consider reducing traffic weight (saturated) and increasing pipeline/footprint weight, or narrowing swizzle to {8,16}. Proxy cost is dimensionless ranking only, never microseconds. Validation scope: Metal checks execute the exact source/config/TIR but CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}

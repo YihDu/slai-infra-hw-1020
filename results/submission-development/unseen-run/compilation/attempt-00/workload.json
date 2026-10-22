@@ -1,0 +1,38 @@
+{
+  "id": "unseen_96x192x96",
+  "operation": "C = A @ B",
+  "inputs": {
+    "A": {
+      "shape": [
+        96,
+        96
+      ],
+      "dtype": "float16"
+    },
+    "B": {
+      "shape": [
+        96,
+        192
+      ],
+      "dtype": "float16"
+    }
+  },
+  "outputs": {
+    "C": {
+      "shape": [
+        96,
+        192
+      ],
+      "dtype": "float16"
+    }
+  },
+  "accumulation_dtype": "float32",
+  "tolerance": {
+    "rtol": 0.02,
+    "atol": 0.002
+  },
+  "evaluation": {
+    "scope": "whole_workload"
+  },
+  "baseline_config": {}
+}

@@ -1,0 +1,31 @@
+{
+  "domains": {
+    "block_M": [
+      32
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.5,
+    "launches": 0.1,
+    "pipeline": 1.0,
+    "footprint": 0.5
+  },
+  "rationale": "Workload has M=32, so block_M=32 is the only divisor in the allowed set [32,64]; keeping block_M as a singleton domain prevents infeasible solver selections. block_N [64,128] and block_K [32,64] both divide N=K=4096, threads=[128] is the only allowed option, and num_stages [1,2,3] is retained. The conservative footprint 2*block_K*(block_M+block_N)*num_stages + 4*block_M*block_N, combined with the hard 32768-byte portability cap, yields feasibility: for block_N=128, block_K=32 the epilogue term is 16384, allowing stages up to 2 (32768 exact at stages=2) while stages=3 exceeds the cap; for block_N=128, block_K=64 stages=1 fits; for block_N=64, block_K=32 stages 1-3 fit. Observations from attempt-00 (block_M=32,block_N=64,block_K=32,num_stages=1, threads=128): proxy_cost 0.929, numerical passed, compiled, simulated_us 154.35 with actual smem 8192 and 64 registers; this is a narrow tile with minimal traffic reduction, so it motivates exploring wider block_N and deeper num_stages. Weight changes: traffic increased to 1.5 because with only 32 output rows the N-tile width dominates memory traffic (1/block_N term), launches reduced to 0.1 since ceil(32/32)=1 keeps launch count modest, pipeline raised to 1.0 because K/block_K/num_stages varies 64-128 across candidates and can meaningfully influence simulated latency, footprint lowered to 0.5 so feasible larger-tile configs are not over-penalized since all are under 32 KB. Exclusions are not hardcoded here; HiGHS selects among allowed tuples while prior evaluated config is excluded by the harness. Next hypothesis: block_N=128, block_K=32, num_stages=2 should reduce traffic and improve pipeline depth relative to the observed narrow-tile config, provided the 32768-byte cap holds exactly; fall back to stages=1 for block_K=64 or block_N=128 pairings that exceed the cap. Metal checks validate the exact source/config/TIR but not the CUDA binary, and GB10 values are simulator estimates only, not hardware measurements."
+}

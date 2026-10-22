@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 2,
+    "footprint": 1
+  },
+  "rationale": "Three evaluated points show essentially flat simulated latency (157.05us for 128x64x64/stages=1/swizzle=0 vs 157.59us for both 32x128x32/swizzle=16 and swizzle=8 at stages=3). DRAM traffic is identical at 34.603MB across all three despite very different block_M, stages and swizzle, so the analytic serpentine reuse/traffic hypothesis has not materialized in simulator output; traffic weight stays at 1 rather than being raised. Attempt-01 and attempt-02 differ only in swizzle but produce identical latency and traffic, further confirming swizzle is non-discriminating here. I keep swizzle open [0,4,8,16] for one more exploratory round but do not reward it. Pipeline weight stays at 2 because the best observed point used stages=1, so deeper pipelining is not yet validated as beneficial; raising it further without signal would bias away from the incumbent winner. Domains remain broad (block_M [32,64,128], block_N [64,128], block_K [32,64], stages [1,2,3]) since only three tuples are excluded and many feasible combos fit under the 32768-byte cap (tightest: BM=128,BN=128,BK=64,stages=2 at the cap). Cap stays at 32768 for the hard portability requirement. Next hypothesis: test larger block_K with moderate stages and swizzle=0 at block_M=128 variants, and check whether any config breaks the 157us plateau; if latency stays flat, the workload is likely bound by the tall-skinny M=128 shape and only block_M/tile-count effects remain. Proxy cost is a dimensionless ranking only, never microseconds; Metal checks execute the exact source/config/TIR but not the CUDA binary, and GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}

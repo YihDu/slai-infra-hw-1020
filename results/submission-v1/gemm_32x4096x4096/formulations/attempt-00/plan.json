@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "No prior observations exist, so no configurations are excluded and all declared domains are kept nonempty. Constraints: tiles must divide M=32,N=4096,K=4096, so block_M=32,64,128 are all valid divisors of 32 only for 32/64/128? Note 64 and 128 do not divide M=32; this will effectively force block_M=32 via the TileLang divisibility constraint, but domains remain as specified. shared_bytes=max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) with an additional hard 32768-byte portability cap; chosen cap is 32768. With block_M=32, the FP32 epilogue term is 4*32*128=16384 max, so shared usage is dominated by the stage term and stays within budget for reasonable tuples. Objective weights are neutral (1 for traffic, launches, pipeline, footprint) because there is no history to justify reweighting; this lets HiGHS rank candidates by the dimensionless proxy. Hypothesis for the next round: for the tall-skinny GEMM 32x4096x4096, larger block_N and more stages should reduce traffic and pipeline overhead, while launch count is already low due to M=32; after the first result we should compare whether traffic or footprint dominates the selected tuple and adjust weights accordingly. Validation scope: numerical checks run the exact source/config/TIR on Metal; GB10 values are simulator estimates only and the CUDA binary is not executed, so no hardware or global-optimality claims are made."
+}

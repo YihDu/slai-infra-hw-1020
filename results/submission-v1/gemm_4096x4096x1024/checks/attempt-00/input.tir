@@ -1,0 +1,34 @@
+# from tvm.script import tirx as T
+
+@T.prim_func
+def matmul(A: T.handle, B: T.handle, C_handle: T.handle):
+    T.func_attr({"tilelang_out_idx": [-1]})
+    A_1 = T.match_buffer(A, (4096, 1024), "float16", strides=(1024, 1))
+    B_1 = T.match_buffer(B, (1024, 4096), "float16", strides=(4096, 1))
+    C = T.match_buffer(C_handle, (4096, 4096), "float16", strides=(4096, 1))
+    # with T.sblock("root"):
+    for bx in T.thread_binding(64, thread="blockIdx.x"):
+        for by in T.thread_binding(32, thread="blockIdx.y"):
+            tx: T.int32 = T.launch_thread_idx(0)
+            ty: T.int32 = T.launch_thread_idx(1)
+            tz: T.int32 = T.launch_thread_idx(2)
+            with T.sblock("tilelang_root"):
+                T.reads()
+                T.writes()
+                T.sblock_attr({"tl.launch_threads": [128, 1, 1]})
+                a_s = T.sblock_alloc_buffer((128, 64), "float16", scope="shared.dyn")
+                b_s = T.sblock_alloc_buffer((64, 64), "float16", scope="shared.dyn")
+                acc = T.sblock_alloc_buffer((128, 64), scope="local.fragment")
+                c_s = T.sblock_alloc_buffer((128, 64), scope="shared.dyn")
+                T.fill(T.region(acc[0, 0], 2, 128, 64), 0)
+                for p in T.serial(16, annotations={"num_stages": 1}):
+                    T.copy(T.region(A_1[by * 128, p * 64], 1, 128, 64), T.region(a_s[0, 0], 2, 128, 64), disable_tma=T.bool(True))
+                    T.copy(T.region(B_1[p * 64, bx * 64], 1, 64, 64), T.region(b_s[0, 0], 2, 64, 64), disable_tma=T.bool(True))
+                    T.gemm(T.region(a_s[0, 0], 1, 128, 64), T.region(b_s[0, 0], 1, 64, 64), T.region(acc[0, 0], 3, 128, 64), T.bool(False), T.bool(False), 128, 64, 64, 0, T.bool(False), 0, 0, 0)
+                T.tvm_storage_sync("shared")
+                T.copy(T.region(acc[0, 0], 1, 128, 64), T.region(c_s[0, 0], 2, 128, 64))
+                T.tvm_storage_sync("shared")
+                for i in T.parallel(128):
+                    for j in T.parallel(64):
+                        if by * 128 + i < 4096 and bx * 64 + j < 4096:
+                            C[by * 128 + i, bx * 64 + j] = T.Cast("float16", c_s[i, j])

@@ -1,0 +1,64 @@
+{
+  "attempt": "attempt-07",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ],
+      "swizzle": [
+        0,
+        4,
+        8,
+        16
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 0.3,
+      "launches": 0.3,
+      "pipeline": 1.5,
+      "footprint": 1
+    },
+    "rationale": "Seven observed points show a latency plateau: attempt-00 (N64/K32/stages3/swz0) 147.716us/18KB/5 blocks-per-SM, and attempts 01-06 (N64/K64/stages2 with swz 16/8/4/0, plus N64/K32/stages3 swz16/8) all 147.6675-147.7160us with identical 33.816576MB simulated DRAM. Swizzle 0/4/8/16 and block_K 32/64 do not change DRAM or latency, so the serpentine panel-reuse hypothesis is not materializing on this M=32 shape, as expected since reuse=min(swizzle or 1, ceil(M/block_M)) is bounded at 1. block_M is pinned to 32 (only exact divisor of M=32; 64/128 cannot tile M). Traffic and launches stay downweighted to 0.3 each because they are observed-invariant here. Pipeline weight 1.5 retains preference for deeper overlap (the only lever with any observed effect, stages=3 giving the tied-best and smallest-footprint 18KB/5-blocks-per-SM point). Footprint weight 1 biases toward high-occupancy small-smem configs. shared_memory_limit stays at the 32768-byte hard portability cap; estimate max(2*block_K*(block_M+block_N)*num_stages, 4*block_M*block_N) plus exact divisibility of N=4096 and K=4096 bound feasibility. The untested region is block_N=128 (halves N-tile count, larger B tile footprint, may change block count/occupancy) combined with block_K/stages variants; prior exclusion of earlier tuples keeps prior swizzle/stage points from being re-selected. Next hypothesis: block_N=128 configurations may break the latency plateau by reducing launch/block count; if simulator remains ~147.7us with unchanged DRAM, treat the shape as latency-flat and finalize the smallest-footprint stages-3 point. Scope: simulated_us and simulated_dram_mb are GB10 simulator estimates, not hardware measurements; Metal numerically checks the exact source/TIR/config but does not execute the CUDA binary. Local revision from seven observed points, not a global optimality claim."
+  },
+  "selection": {
+    "block_M": 32,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 3,
+    "threads": 128,
+    "swizzle": 4
+  },
+  "proxy_cost": 1.1851949439999998,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 78,
+    "smem_bytes": 18432,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 147.71603442763347,
+  "simulated_dram_mb": 33.816576,
+  "simulated_blocks_per_sm": 5,
+  "best_simulated_us": 147.66753212620162
+}

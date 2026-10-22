@@ -1,0 +1,65 @@
+{
+  "attempt": "attempt-01",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        1,
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ],
+      "swizzle": [
+        0,
+        4,
+        8,
+        16
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1,
+      "launches": 1,
+      "pipeline": 1,
+      "footprint": 1
+    },
+    "rationale": "Initial baseline used swizzle=[0], block_M=32 (only divisor of M=32), block_N=64, block_K=32, 3 stages, 18432 B smem, 78 regs, 147.7 us simulated, 33.8 MB DRAM, 5 blocks/SM. Since M=32, reuse=min(swizzle or 1, ceil(32/32))=1 for any swizzle value, so the panel-reuse hypothesis cannot reduce traffic on this skinny-M workload; nevertheless we broaden swizzle to [0,4,8,16] per protocol and to test whether serpentine ordering affects the simulator at all. block_M fixed at 32 (divisibility). block_N [64,128] and block_K [32,64] retained; stages [1,2,3] retained. All choices still fit the 32768-byte cap (worst case block_N=128, block_K=64 requires stages<=2 due to 2*64*(32+128)*stages; solver enforces this). Weights left equal because traffic is already dominated by the block_N term (reuse=1) and footprint has headroom; next hypothesis: test whether larger block_N/block_K with lower stages, and non-zero swizzle, lower simulated latency and DRAM through better coalescing, without exceeding the portability cap. Metal results validate numerics for the exact source/config/TIR but do not execute CUDA binaries; GB10 values are simulator estimates only."
+  },
+  "selection": {
+    "block_M": 32,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 3,
+    "threads": 128,
+    "swizzle": 16
+  },
+  "proxy_cost": 1.3689831466666667,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 78,
+    "smem_bytes": 18432,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 147.71603442763347,
+  "simulated_dram_mb": 33.816576,
+  "simulated_blocks_per_sm": 5,
+  "best_simulated_us": 147.71603442763347
+}

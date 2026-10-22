@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 0.5,
+    "pipeline": 3.0,
+    "footprint": 1.0
+  },
+  "rationale": "Four attempts observed; all numerically passed, compiled, and simulator-completed, with actual smem pinned at exactly 32768 in every case, confirming the 32768-byte portability cap is binding and the estimate cannot discriminate tuples once saturated. Best simulated latency remains attempt-01 (128,64,32,2) at 2544.21 us; attempt-00 (128,64,64,1) at 2558.09 us; attempt-03 (64,128,32,2) at 2575.61 us; attempt-02 (64,128,64,1) at 2592.58 us. The only factor correlated with improvement is block_M=128 with block_K=32 and num_stages=2, i.e., deeper staging with smaller K-tile; both block_M=64 variants and both stages=1 variants were slower. Revision rationale: raise pipeline weight to 3.0 to strongly favor num_stages>=2 with block_K=32 (the observed winning direction), drop traffic to 1.0 because block_M=128/block_N=64 already dominates reuse and traffic did not track observed ranking, drop footprint to 1.0 since it is saturated and a weak discriminator, and keep launches at 0.5 to mildly favor block_M=128. Domains unchanged and full: no exclusion caused infeasibility and all tiles divide 4096; shared_memory_limit remains the hard 32768-byte portability cap. Previously evaluated tuples are excluded via the solver history mechanism to force a new point, so the next hypothesis targets untested deeper-staging tuples such as block_M=128 with num_stages=3 and block_K=32, or block_M=128/block_N=128 with num_stages=2/3, to see whether further pipeline depth under the cap lowers GB10 simulated latency. Validation scope: Metal executes the exact source/config/TIR but the CUDA binary is not executed; GB10 values are simulator estimates, not hardware measurements, and the dimensionless proxy is a ranking aid only, not a claim of global optimality."
+}

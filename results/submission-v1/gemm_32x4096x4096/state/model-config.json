@@ -1,0 +1,9 @@
+{
+  "protocol": "openai_chat_completions",
+  "base_url": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "max_tokens_field": "max_tokens",
+  "trust_env": true,
+  "thinking": "disabled"
+}

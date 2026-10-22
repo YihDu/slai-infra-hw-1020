@@ -1,0 +1,26 @@
+test_generated_program_and_corrupted_program_are_distinguished (test_actual_numeric.ActualNumericTests.test_generated_program_and_corrupted_program_are_distinguished) ... ok
+test_driver_does_not_promote_shadow_to_checked (test_baseline.BaselineTests.test_driver_does_not_promote_shadow_to_checked) ... ok
+test_infeasible_mip_has_no_assignment (test_baseline.BaselineTests.test_infeasible_mip_has_no_assignment) ... ok
+test_real_mip_exports_and_feasible_assignment (test_baseline.BaselineTests.test_real_mip_exports_and_feasible_assignment) ... ok
+test_reject_invalid_model_decision (test_baseline.BaselineTests.test_reject_invalid_model_decision) ... ok
+test_shadow_full_tail_and_cancellation (test_baseline.BaselineTests.test_shadow_full_tail_and_cancellation) ... ok
+test_smt_detects_unguarded_tail (test_baseline.BaselineTests.test_smt_detects_unguarded_tail) ... ok
+test_missing_docker_is_unavailable (test_compiler.CompilerTests.test_missing_docker_is_unavailable) ... ok
+test_timeout_removes_container_and_preserves_inputs (test_compiler.CompilerTests.test_timeout_removes_container_and_preserves_inputs) ... ok
+test_all_declared_protocols_use_config_and_decode_text (test_model.ModelTests.test_all_declared_protocols_use_config_and_decode_text) ... ok
+test_unsupported_protocol_and_missing_credentials_fail_clearly (test_model.ModelTests.test_unsupported_protocol_and_missing_credentials_fail_clearly) ... ok
+test_checkpoint_survives_later_timeout_and_binds_identity (test_runner.RunnerTests.test_checkpoint_survives_later_timeout_and_binds_identity) ... ok
+test_ranking_requires_validation_and_preserves_best (test_runner.RunnerTests.test_ranking_requires_validation_and_preserves_best) ... ok
+test_real_deadline_interrupts_model_wait (test_runner.RunnerTests.test_real_deadline_interrupts_model_wait) ... ok
+test_usage_marks_missing_and_reads_anthropic_cache (test_runner.RunnerTests.test_usage_marks_missing_and_reads_anthropic_cache) ... ok
+test_exact_order_matches_unmodified_course_model_including_partial_panels (test_swizzle.SwizzleTests.test_exact_order_matches_unmodified_course_model_including_partial_panels) ... ok
+test_partial_panel_has_smt_bounds_and_complete_bijection_check (test_swizzle.SwizzleTests.test_partial_panel_has_smt_bounds_and_complete_bijection_check) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 6.020s
+
+OK
+{"status": "no_valid_result", "workload_id": "small", "elapsed_ms": 205, "usage": {"model_calls": 1, "input_tokens": 1, "output_tokens": 1, "cached_tokens": null, "reasoning_tokens": null, "evaluations": 0, "cpu_diagnostics": 1, "compilations": 0, "simulations": 0}}
+{"status": "no_valid_result", "workload_id": "small", "elapsed_ms": 9, "usage": {"model_calls": 1, "input_tokens": null, "output_tokens": null, "cached_tokens": null, "reasoning_tokens": null, "evaluations": 0, "cpu_diagnostics": 0, "compilations": 0, "simulations": 0}}
+{"status": "checked", "workload_id": "small", "elapsed_ms": 38, "usage": {"model_calls": 2, "input_tokens": 2, "output_tokens": 4, "cached_tokens": null, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 2, "compilations": 2, "simulations": 2, "numerical_checks": 2, "solver_calls": 2}}
+{"status": "no_valid_result", "workload_id": "gemm_32x4096x4096", "elapsed_ms": 910, "usage": {"model_calls": 1, "input_tokens": null, "output_tokens": null, "cached_tokens": null, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 0, "compilations": 0, "simulations": 0, "numerical_checks": 0, "solver_calls": 0}}

@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Attempt-00 established a numerical-passing, compiling baseline at block_M=128, block_N=64, block_K=64, num_stages=1, swizzle=0 with simulated_us=470.78 and actual smem 32768 bytes (right at the cap). That baseline could not use swizzle for locality, and its large tile plus stage-1 pipeline is likely conservative on both traffic and pipeline depth. This revision broadens swizzle to [0,4,8,16] to test the serpentine panel reuse hypothesis against same-tile swizzle=0, while keeping block_M/block_N/block_K/num_stages domains unchanged so HiGHS can trade off traffic, launches, pipeline, and footprint under the unchanged 32768-byte cap. Weights remain uniform because there is only one observation and no evidence yet to favor or penalize any single feature; the hypothesis is that swizzle>0 reduces analytic traffic via reuse without increasing shared memory, and that smaller stages/tiles may unlock more stages under the cap. We still treat the panel reuse term as analytical, not measured: next round we will inspect actual simulator traffic/latency and, if locality gains do not materialize, down-weight swizzle-driven traffic or narrow swizzle. Validation scope unchanged: Metal checks execute exact source/config/TIR, CUDA binaries are not run on GB10, and GB10 values are simulator estimates rather than hardware measurements; no global optimality is claimed."
+}

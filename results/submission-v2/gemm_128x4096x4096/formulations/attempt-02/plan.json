@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 2,
+    "footprint": 1
+  },
+  "rationale": "Two evaluated points: attempt-00 (128x64x64,stages=1,swizzle=0) at 157.05us and attempt-01 (32x128x32,stages=3,swizzle=16) at 157.59us. Both report identical 34.603MB simulated DRAM traffic despite very different swizzle, block_M and stages, so the analytic reuse/traffic hypothesis did not materialize in simulator traffic; latency is essentially flat and attempt-01 is marginally worse. I therefore keep swizzle open [0,4,8,16] but do not weight traffic up, since it showed no discriminating signal. I raise pipeline weight from 1 to 2 to favor deeper pipelining (higher num_stages relative to K/block_K) given both points sit near the same latency and the stage-1 attempt-00 held the best time, suggesting pipeline depth may matter more for GB10 simulator ranking than reuse. Domains stay broad across block_M [32,64,128], block_N [64,128], block_K [32,64], stages [1,2,3] because only two tuples are excluded and the 32768-byte cap still admits many feasible combos (tightest: BM=128,BN=128,BK=64,stages=2). Cap remains 32768 to respect the hard portability limit. Next hypothesis: test whether higher-stage configs with larger block_K at fixed block_M near 128 improve simulated latency, and whether any swizzle value produces different simulator traffic than 34.6MB; if no swizzle effect appears again, deprioritize swizzle in later rounds. Proxy cost is a dimensionless ranking only, never microseconds; Metal checks execute the exact source/config/TIR but not the CUDA binary, and GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}
