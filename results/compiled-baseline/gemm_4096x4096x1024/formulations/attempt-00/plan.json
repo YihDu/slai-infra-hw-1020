@@ -1,0 +1,32 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 49152,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 0.5,
+    "pipeline": 0.5,
+    "footprint": 0.3
+  },
+  "rationale": "M=4096, N=4096, K=1024 are all powers of two, so every allowed block_M (64,128), block_N (64,128), and block_K (32,64) evenly divides the corresponding dimension; all tuples are supported. threads fixed at 128 per allowed set. Shared memory estimate 2*block_K*(block_M+block_N)*num_stages peaks at 2*64*(128+128)*3=98304 > 49152, so the limit actively prunes large-tile/high-stage combinations (e.g., 128x128 with stages 3 at block_K=64, and some block_K=64 stage-2 cases near the cap), producing a genuine MIP trade-off rather than enumeration. Weights emphasize traffic (dominant analytic cost for this rectangular GEMM) with moderate launch and pipeline penalties and lighter footprint pressure; all within [0.001,100]. No GPU results are claimed: CPU-shadow correctness and latency do not establish CUDA correctness or GB10 performance, and no SASS timings are inferred for missing artifacts. Feedback is null, so no revision applied; the formulation would be adjusted only if justified empirical or constraint feedback arrives."
+}

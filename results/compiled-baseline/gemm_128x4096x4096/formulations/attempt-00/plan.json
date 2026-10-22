@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 49152,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 0.5,
+    "pipeline": 0.5,
+    "footprint": 0.5
+  },
+  "rationale": "Workload M=128,N=4096,K=4096; all chosen block sizes divide dimensions, so the full Cartesian product is feasible. Traffic dominates since M is small relative to N,K: larger block_M (up to 128) reduces A-side traffic, while block_N and block_K trade plane reuse against pipelining. Shared-memory cap 49152 allows e.g. block_M=128,block_N=128,block_K=32,stages=3 (49152B) but constrains deep-pipeline variants. Analytic weights emphasize traffic (1.0) over launches, pipeline, and footprint (0.5 each) to favor reuse without ignoring occupancy/resource pressure. Feedback is null; no GPU measurements are claimed. CPU-shadow correctness and latency would not establish CUDA correctness or GB10 performance, and no SASS exists to justify timings."
+}

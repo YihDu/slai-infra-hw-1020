@@ -1,0 +1,235 @@
+{
+  "scope": "Compiled SASS timing estimates; exact GPU numerical correctness unverified",
+  "cases": [
+    {
+      "workload": "gemm_128x4096x4096",
+      "seconds": 13.693,
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 2915,
+        "output_tokens": 674,
+        "cached_tokens": 896,
+        "reasoning_tokens": null,
+        "evaluations": 2,
+        "cpu_diagnostics": 2,
+        "compilations": 2,
+        "simulations": 2
+      },
+      "cpu_shadow_passed": true,
+      "attempts": [
+        {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 236.9573159026959,
+          "numerical_correctness": "not_run"
+        },
+        {
+          "attempt": "attempt-01",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 236.9573159026959,
+          "numerical_correctness": "not_run"
+        }
+      ]
+    },
+    {
+      "workload": "gemm_2048x2048x2048",
+      "seconds": 15.918,
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 2937,
+        "output_tokens": 570,
+        "cached_tokens": 896,
+        "reasoning_tokens": null,
+        "evaluations": 2,
+        "cpu_diagnostics": 2,
+        "compilations": 2,
+        "simulations": 2
+      },
+      "cpu_shadow_passed": true,
+      "attempts": [
+        {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 271.0659800516379,
+          "numerical_correctness": "not_run"
+        },
+        {
+          "attempt": "attempt-01",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 271.0659800516379,
+          "numerical_correctness": "not_run"
+        }
+      ]
+    },
+    {
+      "workload": "gemm_32x4096x4096",
+      "seconds": 12.233,
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 2937,
+        "output_tokens": 673,
+        "cached_tokens": 896,
+        "reasoning_tokens": null,
+        "evaluations": 2,
+        "cpu_diagnostics": 2,
+        "compilations": 2,
+        "simulations": 2
+      },
+      "cpu_shadow_passed": true,
+      "attempts": [
+        {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 32,
+            "block_N": 64,
+            "block_K": 32,
+            "num_stages": 2,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 147.845798207161,
+          "numerical_correctness": "not_run"
+        },
+        {
+          "attempt": "attempt-01",
+          "configuration": {
+            "block_M": 32,
+            "block_N": 64,
+            "block_K": 32,
+            "num_stages": 2,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 147.845798207161,
+          "numerical_correctness": "not_run"
+        }
+      ]
+    },
+    {
+      "workload": "gemm_4096x4096x1024",
+      "seconds": 28.67,
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 3003,
+        "output_tokens": 706,
+        "cached_tokens": 896,
+        "reasoning_tokens": null,
+        "evaluations": 2,
+        "cpu_diagnostics": 2,
+        "compilations": 2,
+        "simulations": 2
+      },
+      "cpu_shadow_passed": true,
+      "attempts": [
+        {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 32,
+            "num_stages": 1,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 575.6952569231746,
+          "numerical_correctness": "not_run"
+        },
+        {
+          "attempt": "attempt-01",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 432.6470077433539,
+          "numerical_correctness": "not_run"
+        }
+      ]
+    },
+    {
+      "workload": "gemm_4096x4096x4096",
+      "seconds": 101.819,
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 2970,
+        "output_tokens": 748,
+        "cached_tokens": 896,
+        "reasoning_tokens": null,
+        "evaluations": 2,
+        "cpu_diagnostics": 2,
+        "compilations": 2,
+        "simulations": 2
+      },
+      "cpu_shadow_passed": true,
+      "attempts": [
+        {
+          "attempt": "attempt-00",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 64,
+            "num_stages": 1,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 1989.0869950954013,
+          "numerical_correctness": "not_run"
+        },
+        {
+          "attempt": "attempt-01",
+          "configuration": {
+            "block_M": 128,
+            "block_N": 128,
+            "block_K": 32,
+            "num_stages": 2,
+            "threads": 128
+          },
+          "compilation": "compiled",
+          "simulation": "completed",
+          "simulated_us": 1974.7486834734743,
+          "numerical_correctness": "not_run"
+        }
+      ]
+    }
+  ]
+}

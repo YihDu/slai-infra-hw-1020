@@ -16,3 +16,12 @@
 
 Gemini read-only 审查尝试因 worker 服务认证 401 失败，未获得审查结论；
 开发和复核由主 agent 完成。该调用不属于任何 workload 的计时运行和结果用量。
+
+7. 复核上游 compile_only/lower 与 GB10 Spark runner 后，在 Mac 安装独立 ARM64 Linux
+   Colima VM，配置 CPU PyTorch + TileLang 0.1.15 + CUDA 13.0 工具链，无 GPU 编译 sm_121a。
+8. 初次 lower 因缺少 Target context 失败，保留 compilation.json；添加显式 Target
+   context 后真实生成 cubin/SASS。为匹配 cp.async 禁用 warp specialization/TMA copy。
+9. 接入未修改的课程模拟器，额外审计 warp 完成状态；模拟时延单独保存，不当作数值检查。
+   编译/模拟反馈进入下一轮真实模型请求。新增超时清理/缺失 Docker 测试。
+10. 新的五案例两轮运行证据见 results/compiled-baseline；工具链差异、剩余正确性
+    缺口和模拟估计汇总见 docs/compiler-integration.md。历史结果不覆盖。

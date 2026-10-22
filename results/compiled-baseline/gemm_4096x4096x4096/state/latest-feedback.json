@@ -1,0 +1,175 @@
+{
+  "previous_plan": {
+    "domains": {
+      "block_M": [
+        64,
+        128
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ]
+    },
+    "shared_memory_limit": 49152,
+    "weights": {
+      "traffic": 1.0,
+      "launches": 0.5,
+      "pipeline": 0.75,
+      "footprint": 1.25
+    },
+    "rationale": "Workload is a single 4096x4096x4096 fp16 GEMM with fp32 accumulation; M,N,K divisible by all candidate blocks, so all tuples are supported. Prior plan used num_stages=1 with block_K=64 and 128x128 tile, yielding 1 wave-front of 11 waves at 2 blocks/SM with 32 KB dynamic smem, 188 registers, ~1.99 ms simulator estimate. That configuration is a valid compiled artifact (sm_121a cubin, CPU-shadow compile only), but the pipeline feature was starved and shared memory was underutilized; observed register pressure (188) plus 2 blocks/SM suggests headroom. Revising to num_stages in {2,3} to force multi-stage software pipelining, which the MIP will compare against the 49152-byte budget. Dropping block_M=32 removes tiles that compile but yield low arithmetic intensity and poor HMMA occupancy. Increasing footprint weight to 1.25 penalizes tuples that exhaust the 48 KB limit and force register spills, since the compiled kernel already showed 188 registers; keeping traffic=1.0 dominant because K is large; launches weight stays low (single workload, 1024 tiles = ~1 unit). shared_memory_limit=49152 allows e.g. 128x128x64x2=49152 (exactly at limit) and 64x64x64x3=24576. Feedback note: compile and resource metrics and the GB10 instruction-simulator estimate are model/tool outputs, not measured GB10 timings; CPU-shadow correctness is not TileLang CUDA numerical correctness; no checked GPU results are claimed; missing SASS-derived timings are not inferred."
+  },
+  "selection": {
+    "block_M": 128,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128
+  },
+  "solver_status": "Optimal",
+  "cost": 23.300169813333333,
+  "cpu_shadow_passed": true,
+  "compilation": {
+    "status": "compiled",
+    "target": "sm_121a",
+    "source_sha256": "6af75693e7970375c77537044a118d58d51f1a2a0999ae8954fb242b2b43402c",
+    "config_sha256": "16cc70f87a4c5e3e88f24e0add417f688c3591ba1f7add344bc88444f5566542",
+    "gpu_execution": false,
+    "stage": "complete",
+    "versions": {
+      "tilelang": "0.1.15",
+      "torch": "2.11.0+cpu",
+      "nvidia-cuda-nvcc": "13.0.88",
+      "nvidia-cuda-nvdisasm": "13.4.92"
+    },
+    "device_attributes": [
+      {
+        "target": "{\"kind\":\"cuda\",\"tag\":\"\",\"keys\":[\"cuda\",\"gpu\"],\"max_num_threads\":1024,\"thread_warp_size\":32,\"arch\":\"sm_121a\"}",
+        "tirx.noalias": "True",
+        "tl.non_restrict_params": "()",
+        "tl.readonly_param_indices": "(0, 1)",
+        "tirx.is_global_func": "T.bool(True)",
+        "calling_conv": "2",
+        "tirx.kernel_launch_params": "(\"blockIdx.x\", \"blockIdx.y\", \"threadIdx.x\", \"threadIdx.y\", \"threadIdx.z\", \"tirx.use_dyn_shared_memory\")",
+        "global_symbol": "matmul_kernel",
+        "thread_extent": "{\"blockIdx.x\": 32, \"blockIdx.y\": 32, \"threadIdx.x\": 128, \"threadIdx.y\": 1, \"threadIdx.z\": 1}",
+        "dyn_shared_memory_buf": "32768"
+      }
+    ],
+    "command": [
+      "nvcc",
+      "-std=c++20",
+      "-arch=sm_121a",
+      "-cubin",
+      "/out/kernel.cu",
+      "-o",
+      "/out/kernel.cubin",
+      "-Xptxas",
+      "-v",
+      "-O3",
+      "--expt-relaxed-constexpr",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/../src",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/cutlass/include",
+      "-I/usr/local/lib/python3.12/site-packages/nvidia/cu13/include"
+    ],
+    "kernel": "matmul_kernel",
+    "registers": 194,
+    "threads": 128,
+    "static_smem_bytes": 0,
+    "dynamic_smem_bytes": 32768,
+    "smem_bytes": 32768,
+    "cubin_sha256": "19a2ce62613c955947d10dbbf7e9c0f4ddc5b3c78b1b1cea7538f6d614148bcb",
+    "sass_sha256": "8793ae3cc162b7c97f6671e4fcb98ef422983a8318d4851137b40c83ee6bc361",
+    "elapsed_ms": 4065,
+    "container_image": "slai-gb10-compiler:0.1.15",
+    "container_image_id": "sha256:bf3f7ba6bd1027687bb11c7b3c41231907b96acc08d6140dffe8694c3062f987"
+  },
+  "simulation": {
+    "status": "completed",
+    "source": "gb10_instruction_simulator",
+    "unit": "us",
+    "value": 1974.7486834734743,
+    "source_commit": "a628c9d963cf9c029fa596b872d6e8920ca883e8",
+    "audit": [
+      {
+        "warps": 88,
+        "warps_done": 88,
+        "cycles": 5009257.656022625
+      }
+    ],
+    "scope": "Timing simulation only; not numerical correctness",
+    "opcode_counts": {
+      "LDC": 4,
+      "S2R": 3,
+      "S2UR": 1,
+      "LDCU": 1,
+      "CS2R": 64,
+      "UMOV": 1,
+      "ULEA": 1,
+      "SHF": 3,
+      "IMAD": 28,
+      "LEA": 17,
+      "LOP3": 33,
+      "IADD3": 24,
+      "IADD": 13,
+      "LDS": 6,
+      "LDGSTS": 16,
+      "MOV": 1,
+      "LDGDEPBAR": 3,
+      "BAR": 3,
+      "ISETP": 1,
+      "DEPBAR": 2,
+      "LDSM": 32,
+      "HMMA": 128,
+      "NOP": 92,
+      "BRA": 2,
+      "F2FP": 64,
+      "STG": 64,
+      "EXIT": 1
+    },
+    "raw": {
+      "source": "gb10_instruction_simulator",
+      "unit": "us",
+      "sass_sha256": "8793ae3cc162b7c97f6671e4fcb98ef422983a8318d4851137b40c83ee6bc361",
+      "simulation": {
+        "us": 1974.7486834734743,
+        "tiles": 1024,
+        "blocks_per_sm": 2,
+        "waves": 11,
+        "dram_MB": 402.653184,
+        "parts": [
+          {
+            "counts": {},
+            "blocks": 1024,
+            "per_sm": 2,
+            "miss_frac": 0.188,
+            "dram_GBs": 212.8,
+            "us": 1972.15,
+            "busy": {
+              "tensor": 2.3,
+              "smem": 0.22,
+              "fill": 0.52,
+              "alu": 0.1,
+              "fma": 0.03,
+              "lsu": 0.11,
+              "dram": 0.96,
+              "stg": 0.05
+            }
+          }
+        ]
+      }
+    }
+  },
+  "instruction": "Revise domains/weights using the observed compile/resource/simulation feedback. Simulator values are model estimates. CPU shadow is not TileLang numerical correctness."
+}

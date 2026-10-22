@@ -1,6 +1,8 @@
-# 开发 baseline 报告
+# 初始 CPU baseline 历史报告
 
-## 当前结论
+本文仅记录接入编译器之前的运行，保留其原始结论。最新进展见 [编译接入记录](docs/compiler-integration.md)。
+
+## 当时结论
 
 五个公开 GEMM 的两轮模型建模、HiGHS 求解与 CPU shadow 数值诊断已运行。
 所有结果为 `no_valid_result`：尚无经过编译、数值执行和 GB10 模拟的 TileLang 结果。

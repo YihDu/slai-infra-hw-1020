@@ -25,7 +25,7 @@ class BaselineTests(unittest.TestCase):
                           evaluation=dict(scope='whole_workload'),baseline_config={})
             (root/'workload.json').write_text(json.dumps(workload))
             response=dict(text=json.dumps(PLAN),usage=dict(prompt_tokens=1,completion_tokens=1))
-            argv=['baseline','--workload',str(root/'workload.json'),'--output',str(root/'out'),'--rounds','1']
+            argv=['baseline','--workload',str(root/'workload.json'),'--output',str(root/'out'),'--rounds','1','--compiler','none']
             with patch('sys.argv',argv),patch('optimizer.baseline.generate',return_value=response):
                 self.assertEqual(main(),0)
             result=json.loads((root/'out/result.json').read_text())

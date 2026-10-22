@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":49152,\"weights\":{\"traffic\":1.0,\"launches\":0.5,\"pipeline\":0.3,\"footprint\":0.2},\"rationale\":\"For 2048^3 GEMM, all listed block sizes divide M,N,K, so the full nonempty domain is feasible. shared_memory_limit=49152 is the conservative max allowed here; with block_M/block_N up to 128 and block_K up to 64, the largest stage footprint is 2*64*(128+128)=32768 bytes per stage, so all tuples tie within 49152 except no pruning is needed. Objective weights emphasize traffic (dominant for tall square GEMM), moderate launches (2048/64 vs 2048/128 matters), lower pipeline and footprint to discourage excessive stages and smem. The MIP selects one tuple minimizing weighted normalized analytic features subject to the smem constraint. Any CPU-shadow correctness or latency does not establish CUDA correctness or GB10 performance; no SASS yields no timing inference, and no GPU-checked results are claimed.\"}",
+  "usage": {
+    "prompt_tokens": 586,
+    "completion_tokens": 269,
+    "total_tokens": 855,
+    "prompt_tokens_details": {
+      "cached_tokens": 384
+    },
+    "prompt_cache_hit_tokens": 384,
+    "prompt_cache_miss_tokens": 202
+  },
+  "response_id": "5873d9f0-c861-4f40-9fae-4692b9d244e6"
+}

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":49152,\"weights\":{\"traffic\":1.0,\"launches\":0.5,\"pipeline\":0.4,\"footprint\":0.3},\"rationale\":\"Keep the full nonempty domain since all values divide M=N=K=2048, so every tuple is feasible and genuine MIP selection remains meaningful. Retain shared_memory_limit=49152 (conservative dev cap); required schema fixes threads=[128]. Feedback shows selected 128x128x64,1-stage compiled at sm_121a with 188 regs, 32768 dynamic smem, 2 blocks/SM, and simulator ~271us over 3 waves with dominant tensor activity and modest DRAM. That supports traffic-heavy weighting; slightly raise pipeline and footprint weights to discourage high-stage/low-K variants that raise smem pressure and modeled occupancy loss beyond the observed 2-blocks/SM regime, while keeping launches moderate. No domain pruning is justified since MIP over the small candidate set is cheap and feasibility holds. Caveat: simulator/compile resource values and CPU-shadow passing do NOT establish CUDA correctness or GB10 performance; no SASS-derived timing claims are made beyond the provided model estimate, and no GPU-checked results are claimed.\"}",
+  "usage": {
+    "prompt_tokens": 2351,
+    "completion_tokens": 301,
+    "total_tokens": 2652,
+    "prompt_tokens_details": {
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 1839
+  },
+  "response_id": "1cc51fc6-24bf-4db8-a9fc-2cde35ea04a2"
+}

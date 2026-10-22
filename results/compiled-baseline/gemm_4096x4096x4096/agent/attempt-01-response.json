@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[2,3],\"threads\":[128]},\"shared_memory_limit\":49152,\"weights\":{\"traffic\":1.0,\"launches\":0.5,\"pipeline\":0.75,\"footprint\":1.25},\"rationale\":\"Workload is a single 4096x4096x4096 fp16 GEMM with fp32 accumulation; M,N,K divisible by all candidate blocks, so all tuples are supported. Prior plan used num_stages=1 with block_K=64 and 128x128 tile, yielding 1 wave-front of 11 waves at 2 blocks/SM with 32 KB dynamic smem, 188 registers, ~1.99 ms simulator estimate. That configuration is a valid compiled artifact (sm_121a cubin, CPU-shadow compile only), but the pipeline feature was starved and shared memory was underutilized; observed register pressure (188) plus 2 blocks/SM suggests headroom. Revising to num_stages in {2,3} to force multi-stage software pipelining, which the MIP will compare against the 49152-byte budget. Dropping block_M=32 removes tiles that compile but yield low arithmetic intensity and poor HMMA occupancy. Increasing footprint weight to 1.25 penalizes tuples that exhaust the 48 KB limit and force register spills, since the compiled kernel already showed 188 registers; keeping traffic=1.0 dominant because K is large; launches weight stays low (single workload, 1024 tiles = ~1 unit). shared_memory_limit=49152 allows e.g. 128x128x64x2=49152 (exactly at limit) and 64x64x64x3=24576. Feedback note: compile and resource metrics and the GB10 instruction-simulator estimate are model/tool outputs, not measured GB10 timings; CPU-shadow correctness is not TileLang CUDA numerical correctness; no checked GPU results are claimed; missing SASS-derived timings are not inferred.\"}",
+  "usage": {
+    "prompt_tokens": 2384,
+    "completion_tokens": 444,
+    "total_tokens": 2828,
+    "prompt_tokens_details": {
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 1872
+  },
+  "response_id": "f1f32ed2-208a-47b5-99f2-7edf4aa455c8"
+}

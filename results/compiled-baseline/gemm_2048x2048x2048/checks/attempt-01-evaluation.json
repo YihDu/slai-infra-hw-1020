@@ -1,0 +1,148 @@
+{
+  "attempt": "attempt-01",
+  "kernel_sha256": "6af75693e7970375c77537044a118d58d51f1a2a0999ae8954fb242b2b43402c",
+  "config_sha256": "42b4311abfd3a06d0030bb0ff92a925cf687abf60df0d12f72592360b5e9a65b",
+  "configuration": {
+    "block_M": 128,
+    "block_N": 128,
+    "block_K": 64,
+    "num_stages": 1,
+    "threads": 128
+  },
+  "compilation": {
+    "status": "compiled",
+    "target": "sm_121a",
+    "source_sha256": "6af75693e7970375c77537044a118d58d51f1a2a0999ae8954fb242b2b43402c",
+    "config_sha256": "42b4311abfd3a06d0030bb0ff92a925cf687abf60df0d12f72592360b5e9a65b",
+    "gpu_execution": false,
+    "stage": "complete",
+    "versions": {
+      "tilelang": "0.1.15",
+      "torch": "2.11.0+cpu",
+      "nvidia-cuda-nvcc": "13.0.88",
+      "nvidia-cuda-nvdisasm": "13.4.92"
+    },
+    "device_attributes": [
+      {
+        "target": "{\"kind\":\"cuda\",\"tag\":\"\",\"keys\":[\"cuda\",\"gpu\"],\"max_num_threads\":1024,\"thread_warp_size\":32,\"arch\":\"sm_121a\"}",
+        "tirx.noalias": "True",
+        "tl.non_restrict_params": "()",
+        "tl.readonly_param_indices": "(0, 1)",
+        "tirx.is_global_func": "T.bool(True)",
+        "calling_conv": "2",
+        "tirx.kernel_launch_params": "(\"blockIdx.x\", \"blockIdx.y\", \"threadIdx.x\", \"threadIdx.y\", \"threadIdx.z\", \"tirx.use_dyn_shared_memory\")",
+        "global_symbol": "matmul_kernel",
+        "thread_extent": "{\"blockIdx.x\": 16, \"blockIdx.y\": 16, \"threadIdx.x\": 128, \"threadIdx.y\": 1, \"threadIdx.z\": 1}",
+        "dyn_shared_memory_buf": "32768"
+      }
+    ],
+    "command": [
+      "nvcc",
+      "-std=c++20",
+      "-arch=sm_121a",
+      "-cubin",
+      "/out/kernel.cu",
+      "-o",
+      "/out/kernel.cubin",
+      "-Xptxas",
+      "-v",
+      "-O3",
+      "--expt-relaxed-constexpr",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/../src",
+      "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/cutlass/include",
+      "-I/usr/local/lib/python3.12/site-packages/nvidia/cu13/include"
+    ],
+    "kernel": "matmul_kernel",
+    "registers": 188,
+    "threads": 128,
+    "static_smem_bytes": 0,
+    "dynamic_smem_bytes": 32768,
+    "smem_bytes": 32768,
+    "cubin_sha256": "fa008c7eea183e18d8eda7a57bdde45d6f497ccfceda7677edf206866ebbbc04",
+    "sass_sha256": "d46828b5d284d31202902a8bcee98d320dffc7b88002a9c45083e67ce9590e0d",
+    "elapsed_ms": 2595,
+    "container_image": "slai-gb10-compiler:0.1.15",
+    "container_image_id": "sha256:bf3f7ba6bd1027687bb11c7b3c41231907b96acc08d6140dffe8694c3062f987"
+  },
+  "correctness": {
+    "status": "not_run",
+    "reason": "CPU shadow does not execute TileLang"
+  },
+  "simulation": {
+    "status": "completed",
+    "source": "gb10_instruction_simulator",
+    "unit": "us",
+    "value": 271.0659800516379,
+    "source_commit": "a628c9d963cf9c029fa596b872d6e8920ca883e8",
+    "audit": [
+      {
+        "warps": 24,
+        "warps_done": 24,
+        "cycles": 681903.5893311602
+      }
+    ],
+    "scope": "Timing simulation only; not numerical correctness",
+    "opcode_counts": {
+      "LDC": 4,
+      "S2R": 3,
+      "S2UR": 1,
+      "LDCU": 1,
+      "CS2R": 64,
+      "UMOV": 2,
+      "ULEA": 1,
+      "UIADD3": 2,
+      "SHF": 3,
+      "IMAD": 22,
+      "LEA": 14,
+      "LOP3": 33,
+      "IADD3": 6,
+      "IADD": 32,
+      "LDS": 6,
+      "LDGSTS": 32,
+      "LDGDEPBAR": 4,
+      "UISETP": 1,
+      "DEPBAR": 2,
+      "BAR": 3,
+      "LDSM": 64,
+      "HMMA": 256,
+      "NOP": 185,
+      "BRA": 2,
+      "F2FP": 64,
+      "STG": 64,
+      "EXIT": 1
+    },
+    "raw": {
+      "source": "gb10_instruction_simulator",
+      "unit": "us",
+      "sass_sha256": "d46828b5d284d31202902a8bcee98d320dffc7b88002a9c45083e67ce9590e0d",
+      "simulation": {
+        "us": 271.0659800516379,
+        "tiles": 256,
+        "blocks_per_sm": 2,
+        "waves": 3,
+        "dram_MB": 16.777216,
+        "parts": [
+          {
+            "counts": {},
+            "blocks": 256,
+            "per_sm": 2,
+            "miss_frac": 0.062,
+            "dram_GBs": 144.2,
+            "us": 268.47,
+            "busy": {
+              "tensor": 2.31,
+              "smem": 0.22,
+              "fill": 0.48,
+              "alu": 0.01,
+              "fma": 0.0,
+              "lsu": 0.07,
+              "dram": 0.43,
+              "stg": 0.09
+            }
+          }
+        ]
+      }
+    }
+  },
+  "cpu_shadow_passed": true
+}

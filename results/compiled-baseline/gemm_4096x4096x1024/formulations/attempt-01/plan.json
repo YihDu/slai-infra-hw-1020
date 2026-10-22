@@ -1,0 +1,32 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 49152,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 0.4,
+    "pipeline": 0.6,
+    "footprint": 0.2
+  },
+  "rationale": "M=4096,N=4096,K=1024 are powers of two, so all allowed block_M (64,128), block_N (64,128), and block_K (32,64) divide the dimensions and every tuple is supported. threads fixed at 128. Peak smem = 2*64*(128+128)*3 = 98304 > 49152, so the cap actively prunes large-tile/high-stage combos, making this a genuine MIP trade-off. Revision triggered by feedback: solver chose 128x128x32 stages=1 (boundary due to footprint cap), showing the prior footprint weight (0.3) over-penalized larger stages while leaving traffic dominant at weight 1 with no counterbalance to encourage pipelining; the simulator reported pipeline busy only 1.98% tensor and short effective pipeline, so I raise pipeline weight to 0.6 and lower footprint to 0.2 so the MIP can prefer deeper stage counts at high-traffic tiles, and moderately reduce launches to 0.4. Weights remain within [0.001,100]; shared_memory_limit 49152 kept. No CUDA correctness or GB10 performance is claimed: CPU-shadow correctness and CPU latency do not establish CUDA correctness or GB10 performance, and no SASS-based timings are inferred; simulator outputs are model estimates only."
+}

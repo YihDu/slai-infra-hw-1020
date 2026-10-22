@@ -1,8 +1,8 @@
-# Agentic AI Infrastructure Optimizer — CPU development baseline
+# Agentic AI Infrastructure Optimizer
 
-已运行五个公开案例的两轮 DeepSeek → HiGHS → TileLang 源码生成 → CPU shadow 诊断 → 反馈流程。
-所有 CPU 诊断通过，但没有实际编译/执行 TileLang 或 GB10 SASS 模拟；结果均为
-`no_valid_result`，不能作为已经通过课程检查的 kernel。
+已接入 DeepSeek → HiGHS → TileLang → CUDA sm_121a 编译 → GB10 时序模拟 → Agent 反馈。
+Mac 通过独立 Linux ARM64 虚拟机完成编译，不需要 NVIDIA GPU。数值检查目前仍为
+CPU shadow，因此结果保持 `no_valid_result`；GPU 内核的数值正确性尚未验证。
 
 开发顺序见 [开发计划](docs/development-plan.md)，实测结果和限制见 [报告](report.md)。
 
@@ -18,15 +18,16 @@
 输出目录必须为空，防止覆盖证据。默认两轮，最长 1200 秒；可用 `--rounds 1`
 和 `--budget-seconds 60` 控制开发运行。`run.sh` 不下载依赖，也不访问模型服务之外的网络。
 它只加载仓库中的模型驱动、提示词与代码，不加载个人 Agent 设置。
-真实模型服务需要联网和运行时凭据；课程无 GPU 编译/验证接口接入前不能生成 checked 结果。
+真实模型服务需要联网和运行时凭据。默认使用已构建的 Docker 编译镜像；
+`--compiler none` 只运行旧 CPU 诊断流程。运行中不构建或拉取镜像。
 
 ```sh
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python tools/summarize_baseline.py
 ```
 
-公开案例记录位于 `results/gemm_*/`。每次运行保留模型请求/可见响应、token 用量、
-LP/MPS、HiGHS 状态与 gap、配置和源码哈希、Z3 范围证明、CPU 误差、编译/模拟缺失原因。
+新的编译模拟记录位于 `results/compiled-baseline/`，初始 CPU 记录位于 `results/gemm_*/`。每次运行保留模型请求/可见响应、token 用量、
+LP/MPS、HiGHS 状态与 gap、配置和源码哈希、Z3 范围证明、CPU 误差、编译/模拟状态和失败原因。
 `state/source/` 保存与当次 manifest 哈希一致的代码快照。第一次空模型响应失败也保留。
 
 ## 已准备
@@ -49,19 +50,28 @@ sh setup/cpu.sh
 安装阶段需要网络。离线安装可提前将对应平台的所有依赖 wheel 放入 `wheelhouse/`。
 `.venv/`、缓存与 wheelhouse 不纳入提交。
 
-## CPU 与 GPU 分工
+## Mac 上的无 GPU 编译环境
 
-Agent API、HiGHS、Z3 和 GB10 时序模拟可在 CPU 上运行。模拟器不执行 GEMM，
-不能证明输出正确。课程包未提供数值模拟器、reference.py 或 baseline.py。
-按课程方“不需要 GPU”的说明，当前采用 CPU 配置，不要求购买或租用服务器。
-课程提供的无 GPU 编译和数值验证路径仍待确认；时序模拟不能替代正确性检查。
+本机已创建独立 Colima 实例 `slai-compiler`：4 CPU、6 GiB 内存、40 GiB 虚拟磁盘。
+默认 Docker context 未改动。重新开机后启动该实例即可：
 
-GB10 SASS 可在没有 GPU 的 Linux 环境中用适当工具链交叉编译；需要支持
-`sm_121a` 的 CUDA 工具链（CUDA 13.0 文档包含该目标）、nvdisasm 和兼容 TileLang。
-不能将较旧 GPU 当作可以执行 sm_121a 程序的设备。
+```sh
+colima start slai-compiler
+# 首次安装环境时才需要构建；本机已经完成
+sh setup/compiler-build.sh
+```
 
-暂不在 Mac 上安装 CUDA/TileLang。课程编译工具链公布后再选择兼容平台和版本。
-TileLang 使用定制 TVM，避免盲目安装另一套 TVM。
+编译镜像固定 TileLang 0.1.15、CPU PyTorch 2.11.0、CUDA nvcc 13.0.88，目标 sm_121a；
+Python 依赖版本见 `setup/compiler-python.lock`。容器运行时禁止联网、不挂载 GPU，
+保存 CUDA 源码、真实 cubin、编码 SASS、寄存器/共享内存用量与镜像 ID。
+镜像构建默认使用本机代理映射 `192.168.5.2:25662`，可用 `SLAI_BUILD_PROXY` 覆盖。
+`SLAI_DOCKER_CONTEXT` 和 `SLAI_COMPILER_IMAGE` 可覆盖 context 和镜像名。
+普通 Linux Docker 可将 `SLAI_DOCKER_CONTEXT` 设为 `default`。
+
+模拟器原文件不改动；外层校验来源哈希及所有 warp 完成状态，排除未完成/超时/资源无效结果。
+它只估计耗时、不计算输出。CPU shadow 通过不能证明 GPU 实现正确。
+详细工具链、实测结果和下一步见 [编译接入记录](docs/compiler-integration.md)。
+不用时可执行 `colima stop slai-compiler` 释放 VM 内存。
 
 ## 模型配置
 
@@ -69,7 +79,7 @@ TileLang 使用定制 TVM，避免盲目安装另一套 TVM。
 API 已通过一次真实连通性测试，证据见 `setup/deepseek-connectivity.json`。
 已验证 Python HTTP 客户端端到端调用并返回 OK（2026-10-22）；通用配置模板仍保留。
 `optimizer/model.py` 支持三种协议的纯文本请求，模型需能输出代码和结构化决策；
-已实现有限域建模与诊断反馈循环，编译/模拟反馈尚待接入。不读取个人 Agent 配置，不将密钥写入项目。
+已实现有限域建模与编译、模拟反馈循环。不读取个人 Agent 配置，不将密钥写入项目。
 
 ```sh
 .venv/bin/python tools/check_model_config.py configs/model.example.json
@@ -98,4 +108,4 @@ https://developers.openai.com/api/reference/resources/responses/methods/create
 下载来源：
 http://10.204.87.113:8001/agentic-optimizer/downloads/gb10-simulator-inputs-v2.zip
 
-课程编译/验证接口和真实性能优化闭环仍待完成；本目录尚不满足最终作业全部要求。
+精确 GPU 内核数值验证和最终提交验收仍待完成；本目录尚不满足最终作业全部要求。

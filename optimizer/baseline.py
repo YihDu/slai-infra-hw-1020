@@ -14,6 +14,7 @@ from pathlib import Path
 from optimizer.formulation import solve, validate, index_proof
 from optimizer.model import ModelConfig, generate
 from optimizer.trace import Trace
+from optimizer.compiler import compile_candidate, simulate_candidate
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -51,6 +52,7 @@ def main():
     parser.add_argument('--output',required=True,type=Path)
     parser.add_argument('--rounds',type=int,default=2)
     parser.add_argument('--budget-seconds',type=int,default=1200)
+    parser.add_argument('--compiler',choices=['docker','none'],default='docker')
     args=parser.parse_args()
     if not 1<=args.rounds<=5 or not 1<=args.budget_seconds<=1200:parser.error('rounds 1..5; budget 1..1200 seconds')
     out=args.output.resolve()
@@ -66,7 +68,8 @@ def main():
     def checkpoint():
         result['elapsed_ms']=round((time.monotonic()-start)*1000)
         dump(out/'checks.json',dict(scope='CPU shadow only',attempts=checks))
-        dump(out/'evaluation.json',dict(attempts=attempts,performance_source='none',unit=None,value=None))
+        dump(out/'evaluation.json',dict(attempts=attempts,performance_source='see individual attempts',unit='us',value=None,
+                                       reason='No numerically checked winner selected'))
         result['evidence']=dict(correctness='checks.json',evaluation='evaluation.json')
         dump(out/'result.json',result)
     def remaining():
@@ -83,7 +86,7 @@ def main():
                                                api_key_env=model.api_key_env,max_tokens_field=model.max_tokens_field,trust_env=model.trust_env,thinking=model.thinking))
         prompt=(ROOT/'prompts/formulate.txt').read_text()
         (out/'state/formulate.txt').write_text(prompt)
-        manifest={str(p.relative_to(ROOT)):digest(p) for p in [*sorted((ROOT/'optimizer').glob('*.py')),ROOT/'templates/gemm_tilelang.py',ROOT/'prompts/formulate.txt']}
+        manifest={str(p.relative_to(ROOT)):digest(p) for p in [*sorted((ROOT/'optimizer').glob('*.py')),ROOT/'templates/gemm_tilelang.py',ROOT/'prompts/formulate.txt',ROOT/'tools/compiler_worker.py',ROOT/'tools/simulate_audited.py',ROOT/'setup/compiler.Dockerfile',ROOT/'setup/compiler-python.lock']}
         for relative in manifest:
             snapshot=out/'state/source'/relative
             snapshot.parent.mkdir(parents=True,exist_ok=True)
@@ -159,17 +162,27 @@ def main():
             checks.append(dict(attempt=tag,**cpu))
             availability=dict(tilelang=importlib.util.find_spec('tilelang') is not None,nvcc=shutil.which('nvcc'),nvdisasm=shutil.which('nvdisasm'))
             evaluation=dict(attempt=tag,kernel_sha256=kernel_hash,config_sha256=config_hash,configuration=config,
-                            compilation=dict(status='unavailable',tools=availability,reason='sm_121a compile/export adapter not integrated'),
+                            compilation=dict(status='disabled',tools=availability,reason='--compiler none'),
                             correctness=dict(status='not_run',reason='CPU shadow does not execute TileLang'),
                             simulation=dict(status='not_run',reason='No compiled encoded SASS or actual resource metadata',source='gb10_instruction_simulator',value=None,unit='us'),
                             cpu_shadow_passed=cpu['passed'])
+            if args.compiler=='docker':
+                compiled_dir=out/'compilation'/tag
+                usage['compilations']+=1
+                evaluation['compilation']=compile_candidate(out/'state/workload.json',impl/'config.json',impl/'kernel.py',compiled_dir,timeout=min(180,remaining()))
+                trace.record('compilation_completed',attempt=tag,artifacts=[f'compilation/{tag}/compilation.json'],status=evaluation['compilation']['status'])
+                if evaluation['compilation']['status']=='compiled':
+                    usage['simulations']+=1
+                    usage['evaluations']+=1
+                    evaluation['simulation']=simulate_candidate(compiled_dir,timeout=min(120,remaining()))
+                    trace.record('simulation_completed',attempt=tag,artifacts=[f'compilation/{tag}/simulation.json'],status=evaluation['simulation']['status'])
             attempts.append(evaluation);dump(out/'checks'/f'{tag}-evaluation.json',evaluation)
             trace.record('diagnostics_completed',attempt=tag,artifacts=[f'checks/{tag}-cpu.json',f'checks/{tag}-evaluation.json'],cpu_shadow_passed=cpu['passed'])
             feedback=dict(previous_plan=plan,selection=config,solver_status=solver['status'],cost=solver['incumbent'],
                           cpu_shadow_passed=cpu['passed'],compilation=evaluation['compilation'],simulation=evaluation['simulation'],
-                          instruction='Revise domains/weights only when justified. CPU timing is not GB10 timing; compilation is still blocked.')
+                          instruction='Revise domains/weights using the observed compile/resource/simulation feedback. Simulator values are model estimates. CPU shadow is not TileLang numerical correctness.')
             dump(out/'state/latest-feedback.json',feedback)
-            result['reason']='CPU development baseline completed; exact TileLang compilation/numerical execution and GB10 simulation remain unavailable'
+            result['reason']='Development run completed; exact TileLang numerical execution remains unverified. See separate compilation and simulation statuses.'
             checkpoint()
     except TimeoutError:
         result['reason']='Wall-clock budget reached without a checked TileLang implementation'

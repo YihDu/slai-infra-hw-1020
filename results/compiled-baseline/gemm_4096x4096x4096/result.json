@@ -1,0 +1,23 @@
+{
+  "schema_version": "agentic-result-v1",
+  "workload_id": "gemm_4096x4096x4096",
+  "status": "no_valid_result",
+  "implementation": null,
+  "evidence": {
+    "correctness": "checks.json",
+    "evaluation": "evaluation.json"
+  },
+  "elapsed_ms": 101819,
+  "usage": {
+    "model_calls": 2,
+    "input_tokens": 2970,
+    "output_tokens": 748,
+    "cached_tokens": 896,
+    "reasoning_tokens": null,
+    "evaluations": 2,
+    "cpu_diagnostics": 2,
+    "compilations": 2,
+    "simulations": 2
+  },
+  "reason": "Development run completed; exact TileLang numerical execution remains unverified. See separate compilation and simulation statuses."
+}

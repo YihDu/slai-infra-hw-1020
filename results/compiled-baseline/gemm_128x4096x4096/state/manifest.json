@@ -1,0 +1,22 @@
+{
+  "resources": {
+    "optimizer/__init__.py": "a1014ad3b588c41662086a9307a10f91989e236ad4a03230c47997724e3eea3e",
+    "optimizer/baseline.py": "e90f85e850262d88c83b7a33c539c2ec08474c92c5bc47dd78d6e94b38c7f21b",
+    "optimizer/compiler.py": "d9cfb1a18dcb4bb4f2f9a27475a5924bad4cf75c23b4795b5c96fb34acc87911",
+    "optimizer/cpu_shadow.py": "8eea6dbab9bc161bd20d8d497764bc005248b554234374937efed339e057e785",
+    "optimizer/formulation.py": "2129bc832d302f0811a0d4137c965d4c05b95a9ebf0ba74786c9d2465d66a43a",
+    "optimizer/model.py": "f5c11d09b079616be7a99b8c923b5ab6b0bd151b9321291ea9f842b3430ce91f",
+    "optimizer/numeric.py": "635979054f49ac0c246bc1bc7132fb494b1542b0e23511d0d51f67270b9c65c8",
+    "optimizer/trace.py": "4bd5a52a5a75441b783bc079b1ded941e4cc148cd82a983a599f201ef2e8e102",
+    "templates/gemm_tilelang.py": "6af75693e7970375c77537044a118d58d51f1a2a0999ae8954fb242b2b43402c",
+    "prompts/formulate.txt": "502492c8e79156a768cc189cdeb63ebc74a35f3bc49a52888b64055f4aa5e478",
+    "tools/compiler_worker.py": "7dd23dd3484fe30ed33f1200bce52bd67effb0af71b6c60d06987191fa77db8a",
+    "tools/simulate_audited.py": "e3991cc13686884c9b474240f07b209a84273a30ac7a3f946f655bc4d1f0cead",
+    "setup/compiler.Dockerfile": "eac24854ad03a9b1d428f79c2ae53502d35f4a2d62384c97b0462bf8e79877c9",
+    "setup/compiler-python.lock": "d5c10e24abe046b24aad0a657308a1bbab26cc541bf9fc8f6f0d2e1e627db929"
+  },
+  "python": "3.13.13 | packaged by conda-forge | (main, Apr  8 2026, 02:29:07) [Clang 19.1.7 ]",
+  "prebuilt": "CPU shadow, kernel family, MIP builder, bounds checker",
+  "runtime_changes": "Agent domains/resource constraints/objective; selected configuration; generated implementation artifacts",
+  "graph_optimization": "Single GEMM: graph fusion not applicable; no TVM graph transformation claimed"
+}

@@ -1,0 +1,33 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 49152,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 0.5,
+    "pipeline": 0.75,
+    "footprint": 0.75
+  },
+  "rationale": "Workload is a single 4096x4096x4096 fp16 GEMM with fp32 accumulation; M,N,K all divisible by every candidate block size, so the nonempty domain subsets are fully supported. Domain includes 32 for block_M to broaden the MIP search across more tile granularity while keeping block_N/block_K at standard values; threads fixed at 128 per allowed set. shared_memory_limit=49152 (max allowed) permits legitimate multi-stage tiles (e.g., 128x128x64x2-stages = 49152) while the MIP constraint still filters infeasible tuples. Objective weights keep traffic dominant to reflect the very large K and memory-bound risk, moderately penalize pipeline depth and footprint (shared-memory pressure), and lightly weigh launches since a single workload launch count is small relative to traffic. Feedback is null, so no revision is applied. Note: CPU-shadow correctness and latency do not establish CUDA correctness or GB10 performance; no missing-SASS timings are inferred and no checked GPU results are claimed."
+}

@@ -1,0 +1,38 @@
+{
+  "id": "gemm_32x4096x4096",
+  "operation": "C = A @ B",
+  "inputs": {
+    "A": {
+      "shape": [
+        32,
+        4096
+      ],
+      "dtype": "float16"
+    },
+    "B": {
+      "shape": [
+        4096,
+        4096
+      ],
+      "dtype": "float16"
+    }
+  },
+  "outputs": {
+    "C": {
+      "shape": [
+        32,
+        4096
+      ],
+      "dtype": "float16"
+    }
+  },
+  "accumulation_dtype": "float32",
+  "tolerance": {
+    "rtol": 0.02,
+    "atol": 0.002
+  },
+  "evaluation": {
+    "scope": "whole_workload"
+  },
+  "baseline_config": {}
+}
