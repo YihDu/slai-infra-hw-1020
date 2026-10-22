@@ -1,0 +1,47 @@
+{
+  "repository": "https://github.com/memxlife/AI-Infra-Co-Design",
+  "commit": "a628c9d963cf9c029fa596b872d6e8920ca883e8",
+  "files": {
+    "agentic/gb10/model.py": {
+      "upstream_path": "agentic/gb10/model.py",
+      "sha256": "95f68147ac4b4500a92d3313297693962e19c8b362bccfdee15db51ebfb8ddb5",
+      "change": "none"
+    },
+    "agentic/gb10/sim/sass.py": {
+      "upstream_path": "agentic/gb10/sim/sass.py",
+      "sha256": "45d00766f4d1a1e20c6af4fc740bb30a6564d2eeff068aa777ee15e989e9f1f4",
+      "change": "none"
+    },
+    "agentic/gb10/sim/sm.py": {
+      "upstream_path": "agentic/gb10/sim/sm.py",
+      "sha256": "7bf1c07fd0521105671b51969da60da198c03b40ab71cc1c576a2562d7f6d02e",
+      "change": "none"
+    },
+    "agentic/gb10/sim/kernel.py": {
+      "upstream_path": "agentic/gb10/sim/kernel.py",
+      "sha256": "04d40d182dded0406d9ed3b7f124213df465b37b9b1b84a66ca91e5a7410fdd8",
+      "change": "none"
+    },
+    "agentic/gb10/sim/ws.py": {
+      "upstream_path": "agentic/gb10/sim/ws.py",
+      "sha256": "53d0cb68bb815efb9a6de93c8f5138a1b76d2d12ab5dc4262ca9024359a798d1",
+      "change": "none"
+    },
+    "calibration/spark-6951/gb10.json": {
+      "upstream_path": "calibration/spark-6951/gb10.json",
+      "sha256": "4a01371a86b3d8385ef48a185b97905f29a4476959d19496516a3482f1892a19",
+      "change": "none"
+    },
+    "agentic/gb10/sim/whole_tma.py": {
+      "upstream_path": "agentic/gb10/sim/ws_validate.py",
+      "upstream_sha256": "adb9464f09e80820b2c2062f53f2612020f0a2a83faff42589f9fdcdcf46e48b",
+      "sha256": "1bb2bd1d7b16a46583c60bc074d07251d8bee8ba2f18b5c02b3dac42d5ee9fdd",
+      "change": "Removed benchmark comparison __main__; replaced module docstring. Simulation functions unchanged."
+    }
+  },
+  "workloads": {
+    "upstream_path": "runs/gb10/shapes/items.json",
+    "shape_count": 5,
+    "change": "Unique input shapes only; course tensor I/O fields; no candidates or results. Tolerances are development defaults."
+  }
+}

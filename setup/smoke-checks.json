@@ -1,0 +1,7 @@
+{
+  "openai_responses": "request construction passed; no network call",
+  "openai_chat_completions": "request construction passed; no network call",
+  "anthropic_messages": "request construction passed; no network call",
+  "trace": "JSONL and output path containment passed",
+  "scope": "Environment checks only; no numerical kernel check or simulator performance result"
+}

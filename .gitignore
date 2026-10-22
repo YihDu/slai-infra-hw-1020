@@ -1,0 +1,13 @@
+.venv/
+.cache/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+.local/
+*.pem
+*.key
+setup/environment.json
+results/
+wheelhouse/

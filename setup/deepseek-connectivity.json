@@ -1,0 +1,19 @@
+{
+  "model": "deepseek-flash",
+  "text": "OK",
+  "usage": {
+    "prompt_tokens": 34,
+    "completion_tokens": 14,
+    "total_tokens": 48,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 12
+    }
+  },
+  "transport": "optimizer.model.generate / httpx",
+  "scope": "API connectivity only",
+  "verified_at": "2026-10-22",
+  "response_id": "1a16d7d4-4521-4cbe-b85a-16d1d1cd976c"
+}

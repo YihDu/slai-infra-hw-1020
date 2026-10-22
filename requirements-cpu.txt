@@ -1,0 +1,5 @@
+# Initial CPU environment pins; validated by tools/doctor.py after installation.
+highspy==1.11.0
+z3-solver==4.15.3.0
+numpy==2.2.6
+httpx==0.28.1
