@@ -1,0 +1,31 @@
+{
+  "status": "Optimal",
+  "incumbent": 0.26112288,
+  "bound": 0.26112288,
+  "gap": 0.0,
+  "selected_index": 0,
+  "candidates": [
+    {
+      "config": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "smem_bytes_estimate": 12288,
+      "features": {
+        "traffic": 0.00012288,
+        "launches": 0.001,
+        "pipeline": 0.01,
+        "footprint": 0.25
+      },
+      "cost": 0.26112288
+    }
+  ],
+  "cost_unit": "dimensionless analytic proxy; not latency",
+  "highs_version": "1.11.0",
+  "effective_shared_memory_limit": 32768,
+  "excluded_previously_evaluated": []
+}

@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.5,
+    "launches": 0.75,
+    "pipeline": 2,
+    "footprint": 1
+  },
+  "rationale": "Seven evaluated points, all numerically passed, compiled, and saturating 32768 smem with 3 blocks/SM and identical 16.78 MB simulated DRAM. Best remains 203.69 us at 64x128x32/s2 with swizzle 8 or 4; swizzle 0 at the same tile/stage gave 222.18 us, and swizzle 4 and 8 were identical, so serpentine locality affects simulator latency only inconsistently and never changes DRAM traffic — the analytic panel-reuse hypothesis is not supported as a traffic benefit. The 128-block_M row and block_K=64 with num_stages=3 remain unsampled. Keep block_N narrowed to [128] (all best points), block_M [64,128], block_K [32,64], stages [2,3] to concentrate on deeper pipelines since all s1 points are dominated. Swizzle kept open [0,4,8,16] as a probe but its weight effect stays low via traffic=0.5. Pipeline raised influence held at 2 to steer toward untested stage=3/block_K=64; launches 0.75 favors fewer/larger tiles; footprint 1 is non-differentiating because every point hits the cap. Hard 32768 portability cap retained. Metal checks execute exact source/config/TIR; CUDA binary is not executed, and GB10 latencies are simulator estimates, not hardware measurements. Exploratory only; next hypothesis is that num_stages=3, possibly with block_K=64 or the unsampled block_M=128 row, beats 203.69 us."
+}

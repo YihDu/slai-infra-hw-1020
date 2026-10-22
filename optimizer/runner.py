@@ -51,7 +51,7 @@ def main():
     start=time.monotonic()
     cleanup_reserve=min(15,args.budget_seconds*.1)
     deadline=start+args.budget_seconds-cleanup_reserve;trace=Trace(out)
-    usage=dict(model_calls=0,input_tokens=0,output_tokens=0,cached_tokens=0,reasoning_tokens=0,cache_creation_tokens=0,
+    usage=dict(model_calls=0,http_requests=0,input_tokens=0,output_tokens=0,cached_tokens=0,reasoning_tokens=0,cache_creation_tokens=0,
                evaluations=0,compilations=0,simulations=0,numerical_checks=0,solver_calls=0)
     attempts=[];history=[];excluded=[];best=None;initial=None;exit_code=0
     result=dict(schema_version='agentic-result-v1',workload_id=None,status='no_valid_result',implementation=None,
@@ -114,10 +114,12 @@ def main():
             request=prompt+'\nWorkload:\n'+json.dumps(workload)+'\nObserved history:\n'+json.dumps(history)
             request_path=agent/(tag+'-request.txt');request_path.write_text(request)
             usage['model_calls']+=1
+            usage['http_requests']+=1
             trace.record('model_started',attempt=tag,artifacts=[str(request_path.relative_to(out))])
             response_path=agent/(tag+'-response.json')
             try:
                 response=generate(model,request,timeout=min(100,remaining()),max_output_tokens=4096)
+                usage['http_requests']+=response.get('request_count',1)-1
                 dump(response_path,response);add_usage(usage,response.get('usage') or {})
                 text=response['text'].strip()
                 if text.startswith('```'):text='\n'.join(text.splitlines()[1:-1])
@@ -126,11 +128,17 @@ def main():
                 add_usage(usage,{})
                 raise
             except Exception as exc:
-                if not response_path.exists():add_usage(usage,{})
+                error_artifacts=[]
+                if not response_path.exists():
+                    usage['http_requests']+=getattr(exc,'request_count',1)-1
+                    add_usage(usage,getattr(exc,'usage',None) or {})
+                    if hasattr(exc,'record'):
+                        error_path=agent/(tag+'-error.json');dump(error_path,exc.record())
+                        error_artifacts.append(str(error_path.relative_to(out)))
                 observation=dict(attempt=tag,stage='model_or_schema',error_type=type(exc).__name__,
-                                 reason=str(exc)[:300] if response_path.exists() else 'Model request failed before a response was saved')
+                                 reason=str(exc)[:300] if response_path.exists() or hasattr(exc,'record') else 'Model request failed before a response was saved')
                 history.append(observation);attempts.append(observation)
-                trace.record('model_failed',**observation,artifacts=[str(request_path.relative_to(out))]+([str(response_path.relative_to(out))] if response_path.exists() else []))
+                trace.record('model_failed',**observation,artifacts=[str(request_path.relative_to(out))]+([str(response_path.relative_to(out))] if response_path.exists() else [])+error_artifacts)
                 checkpoint();continue
             directory=out/'formulations'/tag;directory.mkdir(parents=True)
             dump(directory/'plan.json',plan);usage['solver_calls']+=1
@@ -182,7 +190,9 @@ def main():
                         best=choose_best(best,candidate)
                         trace.record('simulation_completed',attempt=tag,status=simulation['status'],artifacts=[f'compilation/{tag}/simulation.json'])
             observation=dict(attempt=tag,plan=plan,selection=config,proxy_cost=solver['incumbent'],solver_status=solver['status'],
-                             smt_bounds_passed=smt_ok,numerical_status=evaluation['correctness']['status'],
+                             smt_bounds_passed=smt_ok,
+                             smt_failures=[{k:v for k,v in item.items() if k!='smt2'} for item in proof['results'] if item['status']!='unsat'],
+                             smt_mapping_check=proof['finite_mapping_check'],numerical_status=evaluation['correctness']['status'],
                              numerical_failure=evaluation['correctness'].get('reason'),
                              compilation_status=evaluation['compilation']['status'],compilation_reason=evaluation['compilation'].get('reason'),
                              actual_resources={k:evaluation['compilation'].get(k) for k in ['registers','smem_bytes','threads']},

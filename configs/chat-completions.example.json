@@ -1,0 +1,6 @@
+{
+  "protocol": "openai_chat_completions",
+  "base_url": "https://model-endpoint.example/v1",
+  "model": "evaluation-model",
+  "api_key_env": "EVAL_MODEL_API_KEY"
+}

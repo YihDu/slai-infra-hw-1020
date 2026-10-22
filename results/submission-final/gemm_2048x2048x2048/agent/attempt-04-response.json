@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[128],\"block_K\":[32,64],\"num_stages\":[2,3],\"threads\":[128],\"swizzle\":[0,4,8,16]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":0.5,\"launches\":0.75,\"pipeline\":2,\"footprint\":1},\"rationale\":\"Four evaluated points, all passed numerics, compiled, and used exactly 32768 smem with 3 blocks/SM and identical 16.78 MB simulated DRAM. Latencies: 128x64x64/s1/sw0=234.82; 64x128x64/s1/sw16=235.12; 64x128x32/s2/sw16=221.79 (best); 64x128x64/s1/sw8=214.47 (new best). Two key observations: (1) swizzle and DRAM traffic never differentiated, so the analytic panel-reuse feature is not materializing in simulator traffic — traffic weight is lowered further to 0.5 and swizzle kept open only for continued probing; (2) improvements came despite higher proxy costs from stage/scheduling changes rather than traffic, and stages=1 with block_N=128 still yielded the best latency, so the pipeline proxy is not tracking latency monotonically. I raise pipeline weight to 2 to steer toward the still-unexplored num_stages=3 regime (all samples so far are s1 or s2), keep launches modest at 0.75 to favor fewer/larger tiles (128-block_M not yet sampled), and hold footprint at 1 since every point saturates the 32768 cap so it cannot differentiate. block_N is narrowed to [128] because both 64- and 128-N samples exist and 128-N holds the best latency; block_M [64,128] keeps the unsampled 128 path available while dropping the 32 width; block_K stays [32,64] and num_stages [2,3] to concentrate exploration on deeper-pipeline variants that already excluded s1 best points but leave s2/s3 open. Hard 32768 cap retained. Metal checks execute exact source/config/TIR; CUDA binary execution is not validated, and GB10 latency values are simulator estimates, not hardware measurements. This is exploratory and not a claim of global optimality.\"}",
+  "usage": {
+    "prompt_tokens": 3541,
+    "completion_tokens": 506,
+    "total_tokens": 4047,
+    "prompt_tokens_details": {
+      "cached_tokens": 2560
+    },
+    "prompt_cache_hit_tokens": 2560,
+    "prompt_cache_miss_tokens": 981
+  },
+  "response_id": "00c5dbfd-be2d-4dd7-b7a1-a643342aa500"
+}

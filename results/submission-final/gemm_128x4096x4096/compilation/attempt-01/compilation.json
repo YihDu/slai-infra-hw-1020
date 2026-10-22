@@ -1,0 +1,55 @@
+{
+  "status": "compiled",
+  "target": "sm_121a",
+  "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+  "config_sha256": "a76298ef87919dad68c4c096fa84b1d58ed59a08276a1960a8532eca12677202",
+  "gpu_execution": false,
+  "stage": "complete",
+  "versions": {
+    "tilelang": "0.1.15",
+    "torch": "2.11.0+cpu",
+    "nvidia-cuda-nvcc": "13.0.88",
+    "nvidia-cuda-nvdisasm": "13.4.92"
+  },
+  "device_attributes": [
+    {
+      "target": "{\"kind\":\"cuda\",\"tag\":\"\",\"keys\":[\"cuda\",\"gpu\"],\"max_num_threads\":1024,\"thread_warp_size\":32,\"arch\":\"sm_121a\"}",
+      "tirx.noalias": "True",
+      "tl.non_restrict_params": "()",
+      "tl.readonly_param_indices": "(0, 1)",
+      "tirx.is_global_func": "T.bool(True)",
+      "calling_conv": "2",
+      "tirx.kernel_launch_params": "(\"blockIdx.x\", \"blockIdx.y\", \"threadIdx.x\", \"threadIdx.y\", \"threadIdx.z\", \"tirx.use_dyn_shared_memory\")",
+      "global_symbol": "matmul_kernel",
+      "thread_extent": "{\"blockIdx.x\": 32, \"blockIdx.y\": 4, \"threadIdx.x\": 256, \"threadIdx.y\": 1, \"threadIdx.z\": 1}",
+      "dyn_shared_memory_buf": "30720"
+    }
+  ],
+  "command": [
+    "nvcc",
+    "-std=c++20",
+    "-arch=sm_121a",
+    "-cubin",
+    "/out/kernel.cu",
+    "-o",
+    "/out/kernel.cubin",
+    "-Xptxas",
+    "-v",
+    "-O3",
+    "--expt-relaxed-constexpr",
+    "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/../src",
+    "-I/usr/local/lib/python3.12/site-packages/tilelang/3rdparty/cutlass/include",
+    "-I/usr/local/lib/python3.12/site-packages/nvidia/cu13/include"
+  ],
+  "kernel": "matmul_kernel",
+  "registers": 80,
+  "threads": 256,
+  "static_smem_bytes": 0,
+  "dynamic_smem_bytes": 30720,
+  "smem_bytes": 30720,
+  "cubin_sha256": "4364858ce4a8cf1f79eeb2c06c56144166a138258ed8746bc5fc893164b2af46",
+  "sass_sha256": "22ce5f4192e7ca79d98f7dc30430bc86936f7fdb22e3ce9f427759860be3dcfe",
+  "elapsed_ms": 7764,
+  "container_image": "slai-gb10-compiler:0.1.15",
+  "container_image_id": "sha256:bf3f7ba6bd1027687bb11c7b3c41231907b96acc08d6140dffe8694c3062f987"
+}

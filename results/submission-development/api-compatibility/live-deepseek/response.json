@@ -1,0 +1,23 @@
+{
+  "protocol": "openai_chat_completions",
+  "model": "deepseek-flash",
+  "text": "OK",
+  "usage": {
+    "prompt_tokens": 8,
+    "completion_tokens": 1,
+    "total_tokens": 9,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 8
+  },
+  "response_id": "eb20dd1a-3641-45c5-8ffb-f43409acae5f",
+  "request_count": 1,
+  "http_attempts": [
+    {
+      "status_code": 200,
+      "token_limit_field": "max_tokens"
+    }
+  ]
+}

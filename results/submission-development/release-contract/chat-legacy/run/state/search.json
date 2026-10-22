@@ -1,0 +1,120 @@
+{
+  "history": [
+    {
+      "attempt": "attempt-00",
+      "plan": {
+        "domains": {
+          "block_M": [
+            32
+          ],
+          "block_N": [
+            64
+          ],
+          "block_K": [
+            32
+          ],
+          "num_stages": [
+            2
+          ],
+          "threads": [
+            128
+          ],
+          "swizzle": [
+            0
+          ]
+        },
+        "shared_memory_limit": 32768,
+        "weights": {
+          "traffic": 1,
+          "launches": 1,
+          "pipeline": 1,
+          "footprint": 1
+        },
+        "rationale": "Protocol contract fixture, not Agent optimization evidence"
+      },
+      "selection": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 32,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "proxy_cost": 0.26112288,
+      "solver_status": "Optimal",
+      "smt_bounds_passed": true,
+      "smt_failures": [],
+      "smt_mapping_check": {
+        "bijective": true,
+        "grid_tiles": 1,
+        "method": "Complete finite enumeration of coordinates, not performance evaluation"
+      },
+      "numerical_status": "passed",
+      "numerical_failure": null,
+      "compilation_status": "compiled",
+      "compilation_reason": null,
+      "actual_resources": {
+        "registers": 47,
+        "smem_bytes": 12288,
+        "threads": 128
+      },
+      "simulation_status": "completed",
+      "simulated_us": 3.145078740157481,
+      "simulated_dram_mb": 0.0,
+      "simulated_blocks_per_sm": 7,
+      "best_simulated_us": 3.145078740157481
+    }
+  ],
+  "excluded": [
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 0
+    }
+  ],
+  "best": {
+    "attempt": "attempt-00",
+    "eligible": true,
+    "implementation": "implementation/attempt-00/kernel.py",
+    "configuration": {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 0
+    },
+    "identity": {
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config_sha256": "d8745e8d682d4c037666ebfce517fe038486a26507dbdf3740d18c063e412dbc",
+      "tir_sha256": "3ca86cedd00dc21cbf1a829161120c26417c920278469b898d92e5ce5a62fe20",
+      "sass_sha256": "1b7a1e228d8ddfa9cfb5b8a37211716a0dd9c303cfb3f09dd09e592572989907",
+      "cubin_sha256": "53f08ec11adc8ced092e4d35498317ac38070ae045af6d9c41575b200d0f068c"
+    },
+    "simulated_us": 3.145078740157481
+  },
+  "initial": {
+    "attempt": "attempt-00",
+    "eligible": true,
+    "implementation": "implementation/attempt-00/kernel.py",
+    "configuration": {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 0
+    },
+    "identity": {
+      "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+      "config_sha256": "d8745e8d682d4c037666ebfce517fe038486a26507dbdf3740d18c063e412dbc",
+      "tir_sha256": "3ca86cedd00dc21cbf1a829161120c26417c920278469b898d92e5ce5a62fe20",
+      "sass_sha256": "1b7a1e228d8ddfa9cfb5b8a37211716a0dd9c303cfb3f09dd09e592572989907",
+      "cubin_sha256": "53f08ec11adc8ced092e4d35498317ac38070ae045af6d9c41575b200d0f068c"
+    },
+    "simulated_us": 3.145078740157481
+  }
+}

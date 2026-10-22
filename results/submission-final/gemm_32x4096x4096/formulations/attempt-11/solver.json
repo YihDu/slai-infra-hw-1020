@@ -1,0 +1,122 @@
+{
+  "status": "Optimal",
+  "incumbent": 1.1803249066666668,
+  "bound": 1.1803249066666668,
+  "gap": 0.0,
+  "selected_index": 0,
+  "candidates": [
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128,
+        "swizzle": 0
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 0.8388608,
+        "launches": 0.128,
+        "pipeline": 0.32,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 1.1803249066666668
+    },
+    {
+      "config": {
+        "block_M": 16,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 256,
+        "swizzle": 0
+      },
+      "smem_bytes_estimate": 20480,
+      "features": {
+        "traffic": 0.8388608,
+        "launches": 0.128,
+        "pipeline": 0.32,
+        "footprint": 0.4166666666666667
+      },
+      "cost": 1.1803249066666668
+    }
+  ],
+  "cost_unit": "dimensionless analytic proxy; not latency",
+  "highs_version": "1.11.0",
+  "effective_shared_memory_limit": 32768,
+  "excluded_previously_evaluated": [
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 3,
+      "threads": 256,
+      "swizzle": 0
+    },
+    {
+      "block_M": 16,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 8
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 32,
+      "num_stages": 3,
+      "threads": 256,
+      "swizzle": 64
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 64
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 128,
+      "swizzle": 64
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 32
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 16
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 0
+    },
+    {
+      "block_M": 32,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 8
+    }
+  ]
+}

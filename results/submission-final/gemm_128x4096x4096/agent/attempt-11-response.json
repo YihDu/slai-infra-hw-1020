@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64],\"block_N\":[64,128],\"block_K\":[64],\"num_stages\":[2,3],\"threads\":[128,256],\"swizzle\":[4,8]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1.0,\"launches\":1.1,\"pipeline\":1.2,\"footprint\":0.5},\"rationale\":\"Ten attempts observed; all feasible ones compiled, passed SMT and numerics (attempt-04 infeasible from over-narrow domains). Best is attempt-03/09 tie at 156.258us: block_M=64,block_N=64,block_K=64,stages=2,threads=128, swizzle 4 (03) and swizzle 0 (09, 156.2588us) essentially identical, so swizzle 0 vs 4 is within noise and panels >=8 gave no gain (05/06/07 tied 156.49us across swizzle 4/8/64 with M=128 limiting reuse to <=2 tile rows; proxy reuse overpredicts here). attempt-08 (stage=1,threads=128) slower 157.64us with 132 regs, so 128 threads needs stage>=2. attempt-10 (block_K=32,stages=2,threads=256) was 157.83us, so block_K=32 at this tile is not better. Revision: freeze the winning block_M=64, block_K=64 regime and focus remaining exploration narrowly — block_N in {64,128} (64 is winner; 128 tied at stage=1), stages in {2,3} (2 won; 3 untested at winner tile with 128 threads), threads 128/256 to disambiguate the tie, swizzle restricted to [4,8] to honor the instruction to keep swizzle exploration while acknowledging 0/4 equivalence. block_K=128 and stage=4 remain excluded because they repeatedly drive MIP infeasibility at the 32768 portability cap and have never won; the observed plateau (156.2-156.5us) suggests local floor. Weights: traffic 1.0, launches 1.1, pipeline 1.2 to favor stage comparison at the winning tile, footprint 0.5 since smem is pinned at the cap and not the binding limiter. Next hypothesis: stage=3 with threads=128 at block_M=64,block_N=64 may either break or confirm the 156.26us plateau; if it does not improve, accept block_K=64/stage=2/threads=128 as the local floor. Validation scope: Metal executed exact source/config/TIR numerics; CUDA binary not executed; GB10 latencies are simulator estimates, not hardware measurements; no global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 9982,
+    "completion_tokens": 613,
+    "total_tokens": 10595,
+    "prompt_tokens_details": {
+      "cached_tokens": 8960
+    },
+    "prompt_cache_hit_tokens": 8960,
+    "prompt_cache_miss_tokens": 1022
+  },
+  "response_id": "6273448f-4c9e-459e-b5e5-390bce705c27"
+}

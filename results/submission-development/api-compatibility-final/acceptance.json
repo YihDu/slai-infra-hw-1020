@@ -1,0 +1,40 @@
+{
+  "fixture_only": true,
+  "not_performance_evidence": true,
+  "server": "local HTTP protocol fixture; not an actual TA/provider endpoint",
+  "credential_source": "TA_TEST_API_KEY only; DEEPSEEK_API_KEY absent",
+  "cases": [
+    {
+      "route": "responses",
+      "protocol": "openai_responses",
+      "status": "passed",
+      "numeric_test_cases": 3,
+      "http_requests": 1
+    },
+    {
+      "route": "chat",
+      "protocol": "openai_chat_completions",
+      "status": "passed",
+      "numeric_test_cases": 3,
+      "http_requests": 1
+    },
+    {
+      "route": "messages",
+      "protocol": "anthropic_messages",
+      "status": "passed",
+      "numeric_test_cases": 3,
+      "http_requests": 1
+    },
+    {
+      "route": "chat-legacy",
+      "protocol": "openai_chat_completions",
+      "status": "passed",
+      "numeric_test_cases": 3,
+      "http_requests": 2
+    }
+  ],
+  "all_passed": true,
+  "numerical_backend": "Metal",
+  "cuda_binary_executed": false,
+  "http_requests": 10
+}

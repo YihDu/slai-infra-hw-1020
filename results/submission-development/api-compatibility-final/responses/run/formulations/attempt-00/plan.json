@@ -1,0 +1,30 @@
+{
+  "domains": {
+    "block_M": [
+      32
+    ],
+    "block_N": [
+      64
+    ],
+    "block_K": [
+      32
+    ],
+    "num_stages": [
+      2
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Protocol contract fixture, not Agent optimization evidence"
+}

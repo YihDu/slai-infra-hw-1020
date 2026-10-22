@@ -1,0 +1,9 @@
+{
+  "protocol": "openai_chat_completions",
+  "base_url": "http://127.0.0.1:62943/chat/v1",
+  "model": "ta-model-chat",
+  "api_key_env": "TA_TEST_API_KEY",
+  "max_tokens_field": "auto",
+  "trust_env": false,
+  "thinking": null
+}

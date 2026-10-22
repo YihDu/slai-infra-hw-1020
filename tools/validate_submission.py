@@ -89,7 +89,7 @@ def verify_run(directory):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--results',type=Path,default=(ROOT/'results/submission-v2' if (ROOT/'results/submission-v2').exists() else ROOT/'results'));a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--results',type=Path,default=(ROOT/'results/submission-final' if (ROOT/'results/submission-final').exists() else ROOT/'results'));a=p.parse_args()
     expected=sorted(read(w)['id'] for w in (ROOT/'third_party/gb10/workloads').glob('*.json'))
     rows=[verify_run(a.results/name) for name in expected]
     source=read(ROOT/'third_party/gb10/SOURCE.json')

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[32,64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128],\"swizzle\":[0,4,8,16]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":1,\"launches\":1,\"pipeline\":2,\"footprint\":0.5},\"rationale\":\"Four numerical-passing, compiling observations: attempt-00 (128x64x64, st=1, sw=0) 470.78us; attempt-01 (64x128x64, st=1, sw=16) 402.23us; attempt-02 (64x128x32, st=2, sw=16) 399.54us best; attempt-03 (64x128x32, st=1, sw=16) 408.93us. Simulated DRAM is flat at 16.78 MB across all runs, so the analytical serpentine-reuse traffic term is NOT materializing as measured traffic; swizzle effect on latency is unconfirmed and confounded with tile/stage changes. The clearest observed lever is block_K=32 with stages=2 (attempt-02 vs attempt-03), consistent with deeper pipelining at smaller block_K. Attempt-03 regressing despite same tile as best suggests stage count matters more than swizzle. Keep swizzle [0,4,8,16] to disambiguate swizzle>0 vs swizzle=0 at matched tile/stage, and keep tile/stage domains full so HiGHS can trade tile size for extra stages under the 32KB cap (multi-stage at 64x128x32 fits; try block_M=32 to unlock stages=3). Weights: pipeline=2 (best lever observed), footprint=0.5 (actual smem pinned at hard 32KB cap in all runs so the constraint already enforces it), traffic=1 (measured DRAM flat, analytic term unreliable), launches=1 (avoid overfitting four points). Shared cap stays 32768, matching the portability cap. Next hypothesis: match tile/stage at 64x128x32/stages=2 and compare swizzle=0 vs 4 vs 8 vs 16; also probe block_M=32 with stages=3 for deeper pipelining. Validation scope: Metal checks execute exact source/config/TIR, CUDA binaries are not run on GB10; GB10 values are simulator estimates not hardware measurements; no global optimality claimed.\"}",
+  "usage": {
+    "prompt_tokens": 3729,
+    "completion_tokens": 546,
+    "total_tokens": 4275,
+    "prompt_tokens_details": {
+      "cached_tokens": 2816
+    },
+    "prompt_cache_hit_tokens": 2816,
+    "prompt_cache_miss_tokens": 913
+  },
+  "response_id": "8f086b1a-36b8-455b-a644-28422dbfbf59"
+}

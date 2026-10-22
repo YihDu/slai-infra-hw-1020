@@ -1,0 +1,1 @@
+{"status": "checked", "workload_id": "api_contract_responses", "elapsed_ms": 5988, "usage": {"model_calls": 1, "http_requests": 1, "input_tokens": 11, "output_tokens": 7, "cached_tokens": null, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 1, "compilations": 1, "simulations": 1, "numerical_checks": 1, "solver_calls": 1}}

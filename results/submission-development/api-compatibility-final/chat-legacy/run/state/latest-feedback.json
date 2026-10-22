@@ -1,0 +1,58 @@
+{
+  "attempt": "attempt-00",
+  "plan": {
+    "domains": {
+      "block_M": [
+        32
+      ],
+      "block_N": [
+        64
+      ],
+      "block_K": [
+        32
+      ],
+      "num_stages": [
+        2
+      ],
+      "threads": [
+        128
+      ],
+      "swizzle": [
+        0
+      ]
+    },
+    "shared_memory_limit": 32768,
+    "weights": {
+      "traffic": 1,
+      "launches": 1,
+      "pipeline": 1,
+      "footprint": 1
+    },
+    "rationale": "Protocol contract fixture, not Agent optimization evidence"
+  },
+  "selection": {
+    "block_M": 32,
+    "block_N": 64,
+    "block_K": 32,
+    "num_stages": 2,
+    "threads": 128,
+    "swizzle": 0
+  },
+  "proxy_cost": 0.26112288,
+  "solver_status": "Optimal",
+  "smt_bounds_passed": true,
+  "numerical_status": "passed",
+  "numerical_failure": null,
+  "compilation_status": "compiled",
+  "compilation_reason": null,
+  "actual_resources": {
+    "registers": 47,
+    "smem_bytes": 12288,
+    "threads": 128
+  },
+  "simulation_status": "completed",
+  "simulated_us": 3.145078740157481,
+  "simulated_dram_mb": 0.0,
+  "simulated_blocks_per_sm": 7,
+  "best_simulated_us": 3.145078740157481
+}

@@ -1,0 +1,38 @@
+{
+  "id": "api_contract_responses",
+  "operation": "C = A @ B",
+  "inputs": {
+    "A": {
+      "shape": [
+        32,
+        64
+      ],
+      "dtype": "float16"
+    },
+    "B": {
+      "shape": [
+        64,
+        64
+      ],
+      "dtype": "float16"
+    }
+  },
+  "outputs": {
+    "C": {
+      "shape": [
+        32,
+        64
+      ],
+      "dtype": "float16"
+    }
+  },
+  "accumulation_dtype": "float32",
+  "tolerance": {
+    "rtol": 0.02,
+    "atol": 0.002
+  },
+  "evaluation": {
+    "scope": "whole_workload"
+  },
+  "baseline_config": {}
+}

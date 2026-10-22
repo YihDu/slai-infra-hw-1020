@@ -1,8 +1,10 @@
 # Agentic GB10 optimizer — submission report
 
-This is the frozen v2 report accompanying the existing ZIP. Subsequent development
-exploration is recorded separately in `results/exploration-v3/comparison.json` and
-`docs/iteration-log.md`; those experiments have not replaced this submission candidate.
+The final delivery retains the best complete observed run per workload (two v3 runs,
+three v2 runs), with original snapshots and traces. `results/selection.json` identifies
+provenance. Latest API/SMT feedback changes are separately tested; historical performance
+is not attributed to a new five-case rerun. Earlier experiments, including regressions,
+remain under `results/history/` in the ZIP.
 
 ## Result and validation boundary
 
@@ -26,27 +28,30 @@ under the same source family, simulator and test protocol; it is not a cuBLAS co
 
 | Workload | Initial μs | Best μs | Simulated ratio | Usable candidates | Search seconds |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| gemm_128x4096x4096 | 157.048 | 156.322 | 1.005× | 8 | 77.80 |
+| gemm_128x4096x4096 | 157.292 | 155.921 | 1.009× | 11 | 252.23 |
 | gemm_2048x2048x2048 | 234.820 | 203.694 | 1.153× | 7 | 81.84 |
-| gemm_32x4096x4096 | 147.716 | 147.668 | 1.000× | 8 | 70.73 |
+| gemm_32x4096x4096 | 195.806 | 147.524 | 1.327× | 9 | 193.09 |
 | gemm_4096x4096x1024 | 470.776 | 399.545 | 1.178× | 8 | 140.02 |
 | gemm_4096x4096x4096 | 2558.094 | 1597.230 | 1.602× | 8 | 391.61 |
 
-Numerical checks: 117 full-shape cases across the candidates.
+Numerical checks: 129 full-shape cases across the candidates.
 Each candidate is tested with independent normal inputs at seeds 42 and 7 and a structured
 zero-row/signed-column pattern at seed 42. FP16 inputs and output, FP32 TileLang accumulation;
 reference is a separate CPU PyTorch float64 full matmul rounded to FP16. Every output element
 is checked against the workload tolerance, with NaN initialization to detect unwritten values.
 The test suite also deliberately corrupts a generated shader and verifies numerical rejection.
 
-Additional acceptance: 17 automated tests passed. An unseen 96×192×96 GEMM completed
-through the same interface without source edits. The release-candidate ZIP was extracted
-into a separate directory, its file hashes verified, and fresh CPU and Metal Python
-environments installed. A two-round run completed there in 17.92 seconds using the
-configured EVAL_MODEL_API_KEY variable with DEEPSEEK_API_KEY absent. All five archived
-public runs also passed artifact/identity verification after extraction. This check reused
-the same Mac and prepared compiler image; it is not a fresh-machine test. Evidence is in
-setup/acceptance.json and results/history/submission-development/cleanroom in the ZIP.
+Final acceptance: 27 automated tests pass, including actual Metal execution, deliberate
+numerical corruption, three protocol adapters, retry accounting and concrete SMT witnesses.
+Four local protocol fixtures (Responses, Chat, Anthropic and legacy Chat) drive the full
+entry point with only a TA-style key variable, compiler and simulator. Fixture runs are
+contract evidence, not performance evidence or access to a real TA endpoint. A separate
+real DeepSeek API call passed using a renamed key variable. See setup/acceptance.json.
+
+Historical v2 acceptance also includes an unseen 96×192×96 GEMM and fresh Python
+CPU/Metal environments after archive extraction. That two-round run took 17.92 seconds
+on the same Mac with the prepared compiler image. This historical environment installation
+check is not relabeled as a fresh-machine test of the final archive.
 
 ## Agent/MIP formulation and implementation
 
@@ -63,15 +68,16 @@ geometry, buffer sizes, GEMM and pipeline. Previously evaluated points are exclu
 loop evaluates distinct selected candidates rather than exhaustively measuring and encoding
 a known winner. Optimality is only within the explicit finite proxy formulation.
 
-Catalog: block_M={32,64,128}, block_N={64,128}, block_K={32,64}, stages={1,2,3},
-threads={128}, serpentine row-panel swizzle={0,4,8,16}. The first model plan uses
+Current catalog: block_M={16,32,64,128}, block_N={32,64,128,256}, block_K={32,64,128}, stages={1,2,3,4},
+threads={64,128,256}, serpentine row-panel swizzle={0,4,8,16,32,64}.
+Historical v2 runs use the narrower catalog captured in their source snapshots. The first model plan uses
 row-major swizzle=0 as a conventional comparison baseline; later plans explore all
 allowed swizzles. Only tiles dividing the case dimensions are included. A 32768-byte portability
 cap permits the same source to execute on Metal. The memory estimate is
 max(2*block_K*(block_M+block_N)*stages, 4*block_M*block_N), reflecting separated buffer lifetimes
 and observed compiler aliasing; actual compiled resources and actual Metal execution are
 checked separately. This excludes 128×128 FP32 epilogues and does not claim to cover every
-fast GB10 kernel. Thread counts, split-K and TMA are not searched in this version.
+fast GB10 kernel. Thread counts are searched; split-K and TMA are not.
 
 The objective combines normalized traffic (with an analytical panel-locality reuse term),
 launch-count, inverse pipeline-depth and memory
@@ -100,9 +106,9 @@ To compare like with like, the **first plan's fixed weights** are reapplied to a
 feature vectors; costs from differently weighted rounds are not directly compared as latency.
 The resulting preferred points versus observed winners are:
 
-- gemm_128x4096x4096: first-plan proxy prefers attempt-01 among measured candidates (157.588 μs); observed best is attempt-04 (156.322 μs).
+- gemm_128x4096x4096: first-plan proxy prefers attempt-01 among measured candidates (186.637 μs); observed best is attempt-11 (155.921 μs).
 - gemm_2048x2048x2048: first-plan proxy prefers attempt-01 among measured candidates (235.125 μs); observed best is attempt-04 (203.694 μs).
-- gemm_32x4096x4096: first-plan proxy prefers attempt-00 among measured candidates (147.716 μs); observed best is attempt-01 (147.668 μs).
+- gemm_32x4096x4096: first-plan proxy prefers attempt-01 among measured candidates (176.447 μs); observed best is attempt-11 (147.524 μs).
 - gemm_4096x4096x1024: first-plan proxy prefers attempt-01 among measured candidates (402.232 μs); observed best is attempt-02 (399.545 μs).
 - gemm_4096x4096x4096: first-plan proxy prefers attempt-01 among measured candidates (1616.240 μs); observed best is attempt-02 (1597.230 μs).
 
@@ -111,7 +117,7 @@ hardware-calibrated error bound. Limited samples and small simulated improvement
 real-hardware speedups. The model's bandwidth/cache assumptions and mapping approximations remain
 limitations, particularly for fine differences between candidates.
 
-Incomplete/rejected public-run observations: `[{"workload": "gemm_2048x2048x2048", "attempt": "attempt-07", "stage": "MIP", "status": "Infeasible", "numerical_status": null, "simulation_status": null}]`.
+Incomplete/rejected public-run observations: `[{"workload": "gemm_128x4096x4096", "attempt": "attempt-04", "stage": "MIP", "status": "Infeasible", "numerical_status": null, "simulation_status": null}, {"workload": "gemm_2048x2048x2048", "attempt": "attempt-07", "stage": "MIP", "status": "Infeasible", "numerical_status": null, "simulation_status": null}, {"workload": "gemm_32x4096x4096", "attempt": "attempt-05", "stage": null, "status": null, "numerical_status": "not_run", "simulation_status": "not_run"}, {"workload": "gemm_32x4096x4096", "attempt": "attempt-08", "stage": "MIP", "status": "Infeasible", "numerical_status": null, "simulation_status": null}, {"workload": "gemm_32x4096x4096", "attempt": "attempt-09", "stage": "MIP", "status": "Infeasible", "numerical_status": null, "simulation_status": null}]`.
 Raw failed/rejected plans and traces are retained. Development history additionally preserves
 empty-model-output failures, missing Target-context compilation, Metal FP16 epilogue type errors,
 numerical NaNs before explicit epilogue barriers, and an unsuccessful sliced-fragment
@@ -128,7 +134,8 @@ Z3 checks fixed, divisible tile indices for out-of-bounds access, recording SMT2
 shape/config and source hash. Swizzled tile bounds are also checked with Z3; complete
 finite coordinate enumeration establishes bijective tile coverage. Unit tests compare
 the mapping against the unchanged course launch_order, including partial panels.
-Nondivisible counterexamples are tested. This is neither a
+Nondivisible counterexamples are tested. The final runtime saves SAT variable assignments
+and violated bounds (or the reason for UNKNOWN), and includes these in subsequent Agent feedback. This is neither a
 floating-point proof nor a pipeline/whole-family proof; numerical tests remain independent.
 The official simulator and parameters retain their original SOURCE.json hashes. A wrapper
 checks that every simulated warp completed, without changing timing parameters or the algorithm.
@@ -136,7 +143,7 @@ Unsupported/resource-invalid/incomplete/timeout results cannot enter performance
 
 ## Usage, prebuilt components and reproducibility
 
-Aggregate public-run usage: `{"model_calls": 40, "input_tokens": 133909, "output_tokens": 20038, "cached_tokens": 103168, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 39, "compilations": 39, "simulations": 39, "numerical_checks": 39, "solver_calls": 40}`. Counts include failed model attempts; unavailable
+Aggregate public-run usage: `{"model_calls": 48, "input_tokens": 205092, "output_tokens": 25279, "cached_tokens": 166912, "reasoning_tokens": null, "cache_creation_tokens": null, "evaluations": 43, "compilations": 43, "simulations": 43, "numerical_checks": 43, "solver_calls": 48}`. Counts include failed model attempts; unavailable
 provider metrics are null. These are API/tool records, not a billing estimate. Per-case elapsed
 wall time includes model calls, solving, checking, compilation and simulation, within 1200 seconds.
 

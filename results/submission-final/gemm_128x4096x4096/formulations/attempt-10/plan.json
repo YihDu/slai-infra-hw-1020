@@ -1,0 +1,38 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.1,
+    "launches": 1.1,
+    "pipeline": 1.2,
+    "footprint": 0.5
+  },
+  "rationale": "Ten attempts observed (00-09): all feasible ones compiled, passed SMT and numerics; attempt-04 was infeasible from over-narrow domains. Best remains attempt-03 = 156.26us (block_M=64,block_N=64,block_K=64,stages=2,threads=128,swizzle=4, smem=32768, 3 blocks/SM); attempt-09 reproduced this tile/stage/thread at swizzle=0 for 156.259us (within noise; 8-byte estimate margin over the 32768 cap). attempts-05/06/07 tied at 156.49us for block_M=64,block_N=128,block_K=64,stages=1,threads=256 across swizzle 4/8/64, so larger panels give no measurable gain (M=128 with block_M=64 gives at most 2 tile rows; proxy reuse mispredicts here). attempt-08 (threads=128, stage=1) was slower at 157.64us with 132 registers, so 128 threads needs stage>=2. attempts-01/02 rejected small-tile/short-K (block_M=32,block_K=32) at 186.64us. Latencies are tightly clustered 156-157us in the block_K=64 regime, a plateau. Revision: reintroduce block_K=32 alongside 64 to have feasibility slack for larger tiles/stages under the 32768 cap and to probe whether a shorter K-step with deeper stages helps the 64-block_M regime; keep block_N 64 (winner) plus 128/256 for launch tests and block_M 64/128. Trim num_stages to [1,2,3] (stage=4 at block_K=64 tends to exceed cap or match lower stages) and swizzle to [0,4] since 8/16/32/64 were equivalent. Keep threads 128/256 (256 tied at stage=1, 128 won at stage=2; 64 never selected and untested). Weights: traffic/launches 1.1, pipeline 1.2 to keep stage exploration competitive, footprint 0.5 since smem is pinned at the portability cap and not the binding limiter. Shared limit stays 32768 (hard portability cap). Next hypothesis: block_M=64,block_N=64/128,block_K=64,stages=2/3,threads=128 vs 256 may break the plateau, and block_K=32 with stages=3 at wider N is a genuine structural alternative not yet tried. Validation scope: Metal executed exact source/config/TIR numerics; CUDA binary not executed; GB10 latencies are simulator estimates, not hardware measurements; no global optimality claimed."
+}

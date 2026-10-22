@@ -1,0 +1,36 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.5,
+    "launches": 0.75,
+    "pipeline": 2,
+    "footprint": 1
+  },
+  "rationale": "Five evaluated points, all numerically passed, compiled, and saturating 32768 smem with 3 blocks/SM and identical 16.78 MB simulated DRAM. Latencies improved monotonically overall: 128x64x64/s1/sw0=234.82; 64x128x64/s1/sw16=235.12; 64x128x32/s2/sw16=221.79; 64x128x64/s1/sw8=214.47; 64x128x32/s2/sw8=203.69 (new best). Swizzle and simulated DRAM have never differentiated, so the analytic panel-reuse hypothesis is not materializing in traffic; traffic weight stays low at 0.5 and swizzle is kept open only to continue probing. Best points use block_N=128, so block_N remains narrowed to [128]; block_M stays [64,128] to keep the unsampled 128-M row alive; block_K [32,64] and stages [2,3] concentrate on deeper-pipeline variants since s1 points are all dominated. Pipeline weight held at 2 to keep steering toward the still-unsampled num_stages=3 regime (block_K=64 with s3 is untested), launches at 0.75 to favor larger/fewer tiles, footprint at 1 since every point saturates the cap and cannot differentiate. Hard 32768 portability cap retained. Metal checks execute exact source/config/TIR; CUDA binary execution is not validated, and GB10 latency values are simulator estimates, not hardware measurements. Exploratory only; not a claim of global optimality."
+}

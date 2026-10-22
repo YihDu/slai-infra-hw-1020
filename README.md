@@ -1,11 +1,11 @@
 # Agent + HiGHS + TileLang optimizer for GB10
 
-Development continues after the frozen v2 submission candidate. The existing ZIP,
-`report.md`, and `setup/acceptance.json` describe v2; no course upload has been made.
-The expanded 12-round exploration is saved separately in `results/exploration-v3/`.
-Its `comparison.json` compares against the **previous best**, not just a new initial
-candidate. `best-known.json` indexes the retained best complete runs and final acceptance.
-Per-run source snapshots preserve the version actually evaluated.
+Final delivery includes the current API adapter and SMT feedback, plus the best complete
+historical run for each public workload. `results/selection.json` in the ZIP identifies
+those runs; each preserves its original runtime source snapshots. They are not claimed
+as fresh performance measurements of the latest runtime. In this workspace the selected
+runs are staged in `results/submission-final/`. The report distinguishes final checks
+from earlier clean-environment and optimization experiments.
 
 This workspace runs a real DeepSeek/API formulation agent, HiGHS MIP selection,
 TileLang numerical checks, GB10 cross-compilation and the supplied timing simulator.
@@ -65,12 +65,76 @@ settings, conversation history, MCP servers or global skills. Credentials are ne
 packaged. This is a custom Python/httpx harness, chosen to control reproducible state,
 strict model configuration, tool calls and the workload deadline directly.
 
-Supported protocols: `openai_responses`, `openai_chat_completions`,
-`anthropic_messages`. Honor `base_url`, `model`, `api_key_env`; the model must return
-structured JSON with domains, resource constraints, weights and a rationale.
-All three adapters have fixture tests; real public-case runs use DeepSeek.
-Optional `max_tokens_field`, `trust_env` and `thinking` extensions are documented by
-`configs/deepseek.json`. Model responses and provider usage are saved without headers.
+The TA supplies a JSON file with four required fields; no source edits are needed:
+
+```json
+{
+  "protocol": "openai_responses",
+  "base_url": "https://model-endpoint.example/v1",
+  "model": "evaluation-model",
+  "api_key_env": "EVAL_MODEL_API_KEY"
+}
+```
+
+| protocol | Request route | Authentication |
+| --- | --- | --- |
+| `openai_responses` | `/responses` | `Authorization: Bearer …` |
+| `openai_chat_completions` | `/chat/completions` | `Authorization: Bearer …` |
+| `anthropic_messages` | `/messages` | `x-api-key` + `anthropic-version: 2023-06-01` |
+
+Minimal examples are in `configs/{responses,chat-completions,anthropic-messages}.example.json`.
+The credential is read **only** from the named variable at runtime. The configured
+endpoint and model override the development DeepSeek settings for that invocation.
+Only text/JSON generation is required; native tool calling and streaming are unnecessary.
+
+The standalone compatibility script and the optimizer share `optimizer/model.py`:
+
+```sh
+# Offline configuration validation (does not contact the model):
+.venv/bin/python tools/check_model_config.py /evaluation/model.json
+# One actual API call, returning normalized text/usage as JSON:
+.venv/bin/python tools/model_api.py --model-config /evaluation/model.json \
+  --prompt 'Reply with OK.'
+# Complete non-interactive optimization using exactly the same adapter:
+./run.sh --workload /cases/example/workload.json \
+  --model-config /evaluation/model.json --output /results/example
+```
+
+Set the variable named by `api_key_env` before these commands. Never put its value
+in the JSON or the ZIP. `model_api.py` also accepts `--prompt-file`,
+`--max-output-tokens` and `--timeout`; failure returns a nonzero exit code and a safe
+JSON error without headers or upstream error bodies.
+
+URL behavior: an API root such as `https://host` gets `/v1` plus the protocol route;
+`https://host/custom/v1` preserves that exact prefix. A full route URL is accepted
+without appending it twice. A full route conflicting with the protocol is rejected.
+A provider using a nonstandard unversioned route can supply its full route URL.
+
+Chat token limits default to `max_completion_tokens`. If a 400/422 error explicitly
+rejects that parameter, the adapter retries once with `max_tokens`, within the request
+budget. Explicit `max_tokens_field` disables this negotiation. Auth, quota, server and
+context-length errors are not retried by this adapter. `model_calls` counts logical
+generation calls; `http_requests` and per-response `http_attempts` separately count all
+HTTP attempts, including parameter rejection. Missing token metrics are `null`.
+Optional `trust_env: true` permits explicitly chosen environment proxies; the default
+is false. The optional Chat-only `thinking` extension is used by our DeepSeek config.
+No fallback provider or developer credential is selected if the TA endpoint fails.
+
+Verification uses four **local protocol fixtures**, including a legacy Chat service,
+with the default DeepSeek key absent. Each fixture drives the real entry point,
+Metal reference checks, CUDA compiler and GB10 simulator; this is contract testing,
+not performance or live-provider evidence. A separate real DeepSeek call verifies the
+standalone script with a renamed key variable. We have not accessed the TA's private
+service or claimed live OpenAI/Anthropic validation.
+
+```sh
+.venv/bin/python -m unittest discover -s tests
+.venv/bin/python tools/test_api_contract.py --output /path/to/new-contract-output
+```
+
+Protocol references: [Responses](https://developers.openai.com/api/reference/resources/responses/methods/create),
+[Chat Completions](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create),
+[Anthropic Messages](https://platform.claude.com/docs/en/api/messages/create).
 
 Output must be new or empty. Twelve rounds are attempted by default, bounded by 1200
 seconds. `--rounds N` and `--budget-seconds S` are available for experiments.
@@ -112,7 +176,7 @@ TVM is used for TileLang lowering, not a claimed graph-level speedup.
 ## Evidence, verification and packaging
 
 The final ZIP places public-case runs under `results/<workload-id>/`. In the development
-repository the latest batch is under `results/submission-v2/`; older CPU and compiled
+repository the latest batch is under `results/submission-final/`; older CPU and compiled
 runs remain separate, and are not retroactively relabeled. Each run saves:
 
 - `result.json`, `checks.json`, `evaluation.json`: selected identity, validation scope,
@@ -123,8 +187,8 @@ runs remain separate, and are not retroactively relabeled. Each run saves:
 
 ```sh
 .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python tools/validate_submission.py --results results/submission-v2
-.venv/bin/python tools/build_submission.py --results results/submission-v2
+.venv/bin/python tools/validate_submission.py --results results/submission-final
+.venv/bin/python tools/build_submission.py --results results/submission-final
 ```
 
 In the extracted ZIP, use `--results results` (or omit it) for these tools.
@@ -141,3 +205,18 @@ unfinished warp execution. Failed/unsupported/timed-out simulations do not enter
 The ZIP excludes credentials, virtual environments, caches and Git internals. It has
 no enclosing directory or symbolic links. Save the portal receipt after uploading.
 Use `colima stop slai-compiler` when finished to release the VM's memory.
+
+## Course upload procedure
+
+The required command and model configuration come from the [assignment](http://10.204.87.113:8001/agentic-optimizer/homework.md).
+Prepare dependencies before the timed run; during it only the selected model service
+and its authentication may use the network. The whole workload has 1200 seconds.
+
+Upload one ZIP to <http://10.204.87.113:8005/>, entering your name and student ID.
+The archive must have `run.sh`, `README.md`, and `report.md` directly at its root and
+saved public runs under `results/<workload-id>/`. Limits are 256 MiB compressed,
+1 GiB expanded and 10000 entries; exclude secrets, environments, caches, symlinks
+and encryption. Save the private receipt/receipt JSON and verify its SHA-256 matches
+the uploaded ZIP. The portal stores submissions and does not run code or score them;
+TA API testing is a separate later step. Deadline: 2026-10-23 23:59 Beijing time.
+No course upload has been performed by this workspace's development workflow.

@@ -8,10 +8,27 @@ from unittest.mock import patch
 
 from optimizer.baseline import digest, dump
 from optimizer.runner import main, choose_best, add_usage
+from optimizer.model import ModelAPIError
 from test_baseline import PLAN
 
 
 class RunnerTests(unittest.TestCase):
+    def test_failed_api_attempts_and_available_usage_are_saved(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            workload=json.loads((Path(__file__).resolve().parents[1]/'third_party/gb10/workloads/gemm_32x4096x4096.json').read_text())
+            dump(root/'workload.json',workload)
+            error=ModelAPIError('Model endpoint returned HTTP 400',[dict(status_code=400),dict(status_code=400)],dict(input_tokens=3,output_tokens=0))
+            argv=['runner','--workload',str(root/'workload.json'),'--output',str(root/'out'),'--rounds','1']
+            with patch.dict('os.environ',{'DEEPSEEK_API_KEY':'test-placeholder'}),patch('sys.argv',argv),patch('optimizer.runner.generate',side_effect=error):
+                self.assertEqual(main(),0)
+            result=json.loads((root/'out/result.json').read_text())
+            self.assertEqual(result['usage']['model_calls'],1)
+            self.assertEqual(result['usage']['http_requests'],2)
+            self.assertEqual(result['usage']['input_tokens'],3)
+            saved=json.loads((root/'out/agent/attempt-00-error.json').read_text())
+            self.assertEqual(saved['request_count'],2)
+
     def test_schema_failure_reason_reaches_next_model_request(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)

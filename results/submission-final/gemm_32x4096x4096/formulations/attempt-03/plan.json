@@ -1,0 +1,42 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      64,
+      128
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1.5,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "History: attempt-00 (M=32,N=64,K=32,st=3,thr=256,sw=0) = 195.8us; attempt-01 (M=16,N=64,K=64,st=2,thr=256,sw=8) = 176.4us best; attempt-02 repeated the exact attempt-00 tuple (M=32,N=64,K=32,st=3,thr=256,sw=64) and reproduced 195.8us, confirming swizzle=64 is inert at M/block_M=1 (reuse capped at 1). Since M=32, block_M in {16,32} only (64/128 overshoot). Drop block_K=32: it lost twice, and the best result used K=64 with N=64. Keep block_N {64,128,256} to test wider N once from a winning thread domain, and block_K {64,128} to probe whether a deeper K tile offsets the N=256 smem cost. Stages {2,3,4}; stage=4 still untested and is now prioritized per instructions. Threads {128,256}: 64 never won and register/warp layout is unpriced, so exclude it and test 128 as the changed thread domain. Launch weight 1.5 retained because N/block_N drives block count and M gives only 1-2 tile rows; traffic weight 1 retained though observed DRAM is identical across attempts (33.8 MB), which argues the reuse proxy is not yet delivering locality gains -- if the next winner keeps DRAM flat, down-weight traffic further. Footprint/pipeline at 1 to penalize stage=4 + K=128 + N=256 tuples under the 32768 cap plus hard portability cap. Next hypothesis: from the attempt-01 winning shape family, test threads=128 with block_K=128/stage>=3 (or N=128) to see if lower thread count and deeper K reduce simulator latency more than wider N=256. GB10 values are simulator estimates, not hardware measurements; Metal validates exact source/TIR numerically but the CUDA binary is not executed, so compile/memory status here is scoped, not a hardware proof. No global optimality claimed."
+}

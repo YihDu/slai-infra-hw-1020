@@ -1,35 +1,102 @@
 {
-  "unit_tests": 17,
+  "release": "final-2026-10-22",
+  "unit_tests": 27,
   "unit_status": "passed",
-  "unit_log_sha256": "8979f29db678b0fab2be849c271674a24c4de48cffd8ca4e77418ea27394f8e7",
+  "unit_log_sha256": "7977f7ee33bbe7e8c0395209ce97184b6cb51bdd0309d5400920e81b6b532da2",
   "public_cases": 5,
-  "checked_target": "metal",
-  "cuda_binary_executed": false,
-  "numerical_cases": 117,
+  "numerical_cases": 129,
+  "public_run_provenance": "results/selection.json; historical runs with original snapshots",
   "full_run_usage": {
-    "model_calls": 40,
-    "input_tokens": 133909,
-    "output_tokens": 20038,
-    "cached_tokens": 103168,
+    "model_calls": 48,
+    "input_tokens": 205092,
+    "output_tokens": 25279,
+    "cached_tokens": 166912,
     "reasoning_tokens": null,
     "cache_creation_tokens": null,
-    "evaluations": 39,
-    "compilations": 39,
-    "simulations": 39,
-    "numerical_checks": 39,
-    "solver_calls": 40
+    "evaluations": 43,
+    "compilations": 43,
+    "simulations": 43,
+    "numerical_checks": 43,
+    "solver_calls": 48
   },
-  "unseen_case_result": "results/submission-development/unseen-run/result.json",
-  "cleanroom_status": "passed",
-  "cleanroom_result": "results/submission-development/cleanroom/run/result.json",
-  "cleanroom_rc_sha256": "e34b2af935db801e1c8fc2366513f24874646cebdd931628a322fd385623fa17",
-  "cleanroom_manifest_verified": true,
-  "cleanroom_fresh_environments": [
-    ".venv",
-    ".venv-metal"
-  ],
-  "cleanroom_reused": "Same Mac and prepared Docker compiler image; dependencies installed before timed run",
-  "cleanroom_model_api_key_env": "EVAL_MODEL_API_KEY",
-  "cleanroom_original_key_env_absent": true,
-  "cleanroom_elapsed_seconds": 17.924
+  "checked_target": "metal",
+  "cuda_binary_executed": false,
+  "protocol_contract": {
+    "fixture_only": true,
+    "not_performance_evidence": true,
+    "server": "local HTTP protocol fixture; not an actual TA/provider endpoint",
+    "credential_source": "TA_TEST_API_KEY only; DEEPSEEK_API_KEY absent",
+    "cases": [
+      {
+        "route": "responses",
+        "protocol": "openai_responses",
+        "status": "passed",
+        "numeric_test_cases": 3,
+        "http_requests": 1
+      },
+      {
+        "route": "chat",
+        "protocol": "openai_chat_completions",
+        "status": "passed",
+        "numeric_test_cases": 3,
+        "http_requests": 1
+      },
+      {
+        "route": "messages",
+        "protocol": "anthropic_messages",
+        "status": "passed",
+        "numeric_test_cases": 3,
+        "http_requests": 1
+      },
+      {
+        "route": "chat-legacy",
+        "protocol": "openai_chat_completions",
+        "status": "passed",
+        "numeric_test_cases": 3,
+        "http_requests": 2
+      }
+    ],
+    "all_passed": true,
+    "numerical_backend": "Metal",
+    "cuda_binary_executed": false,
+    "http_requests": 10
+  },
+  "protocol_evidence": "results/history/submission-development/release-contract",
+  "live_provider_scope": "DeepSeek standalone call passed; actual TA/Responses/Anthropic services untested",
+  "historical_v2_acceptance": {
+    "unit_tests": 17,
+    "unit_status": "passed",
+    "unit_log_sha256": "8979f29db678b0fab2be849c271674a24c4de48cffd8ca4e77418ea27394f8e7",
+    "public_cases": 5,
+    "checked_target": "metal",
+    "cuda_binary_executed": false,
+    "numerical_cases": 117,
+    "full_run_usage": {
+      "model_calls": 40,
+      "input_tokens": 133909,
+      "output_tokens": 20038,
+      "cached_tokens": 103168,
+      "reasoning_tokens": null,
+      "cache_creation_tokens": null,
+      "evaluations": 39,
+      "compilations": 39,
+      "simulations": 39,
+      "numerical_checks": 39,
+      "solver_calls": 40
+    },
+    "unseen_case_result": "results/submission-development/unseen-run/result.json",
+    "cleanroom_status": "passed",
+    "cleanroom_result": "results/submission-development/cleanroom/run/result.json",
+    "cleanroom_rc_sha256": "e34b2af935db801e1c8fc2366513f24874646cebdd931628a322fd385623fa17",
+    "cleanroom_manifest_verified": true,
+    "cleanroom_fresh_environments": [
+      ".venv",
+      ".venv-metal"
+    ],
+    "cleanroom_reused": "Same Mac and prepared Docker compiler image; dependencies installed before timed run",
+    "cleanroom_model_api_key_env": "EVAL_MODEL_API_KEY",
+    "cleanroom_original_key_env_absent": true,
+    "cleanroom_elapsed_seconds": 17.924
+  },
+  "course_upload": false
 }

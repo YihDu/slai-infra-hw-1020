@@ -64,3 +64,12 @@ Gemini read-only 审查尝试因 worker 服务认证 401 失败，未获得审�
 - The final serial suite passed all 21 tests in 10.336 seconds. The earlier concurrent Metal test timeout is retained separately; it did not recur serially. The current runtime files match the staged run's saved source manifest.
 - Across the five v3 searches and two refined validation runs: 66 real model calls, 58 numerical checks/compilations/simulations, 301506 input tokens and 34092 output tokens (249728 cached input tokens reported). Failed/simulation-timeout attempts remain included; these are provider records, not billing estimates. The 16 manual development probes are separate and not counted as Agent-generated candidates.
 - `results/exploration-v3/comparison.json` retains the direct v3-versus-v2 comparison, including the regression. `best-known.json` selects complete verified run records without overwriting originals. The existing submission ZIP retains its original SHA-256; no new course upload or ZIP replacement was performed.
+
+## Final delivery — 2026-10-22
+
+- Retained two complete v3 runs and three v2 runs via results/submission-final/selection.json; no rewriting of historical performance or source snapshots.
+- Final API adapter supports four-field TA configs for Responses, Chat Completions and Anthropic Messages, with bounded token-parameter fallback and HTTP attempt accounting.
+- Added concrete SAT witnesses / UNKNOWN reasons to saved SMT checks and Agent feedback; nondivisible witness regression passes.
+- Final 27-test suite passes; four local API fixtures each pass full Metal check, CUDA compilation and unchanged GB10 simulation (12 numerical cases). These fixtures are not model-performance evidence.
+- Updated report and acceptance to distinguish historical cleanroom installation, historical performance, and current contract verification.
+- Mac Metal numerical backend remains required; no CUDA binary execution or actual TA endpoint validation claimed.

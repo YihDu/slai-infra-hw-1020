@@ -1,0 +1,10 @@
+{"route": "responses", "protocol": "openai_responses", "path": "/responses/v1/responses", "model": "ta-model-responses", "auth_verified": true, "token_field": "max_output_tokens", "status_code": 200}
+{"route": "responses", "protocol": "openai_responses", "path": "/responses/v1/responses", "model": "ta-model-responses", "auth_verified": true, "token_field": "max_output_tokens", "status_code": 200}
+{"route": "chat", "protocol": "openai_chat_completions", "path": "/chat/v1/chat/completions", "model": "ta-model-chat", "auth_verified": true, "token_field": "max_completion_tokens", "status_code": 200}
+{"route": "chat", "protocol": "openai_chat_completions", "path": "/chat/v1/chat/completions", "model": "ta-model-chat", "auth_verified": true, "token_field": "max_completion_tokens", "status_code": 200}
+{"route": "messages", "protocol": "anthropic_messages", "path": "/messages/v1/messages", "model": "ta-model-messages", "auth_verified": true, "token_field": "max_tokens", "status_code": 200}
+{"route": "messages", "protocol": "anthropic_messages", "path": "/messages/v1/messages", "model": "ta-model-messages", "auth_verified": true, "token_field": "max_tokens", "status_code": 200}
+{"route": "chat-legacy", "protocol": "openai_chat_completions", "path": "/chat-legacy/v1/chat/completions", "model": "ta-model-chat-legacy", "auth_verified": true, "token_field": "max_completion_tokens", "status_code": 400}
+{"route": "chat-legacy", "protocol": "openai_chat_completions", "path": "/chat-legacy/v1/chat/completions", "model": "ta-model-chat-legacy", "auth_verified": true, "token_field": "max_tokens", "status_code": 200}
+{"route": "chat-legacy", "protocol": "openai_chat_completions", "path": "/chat-legacy/v1/chat/completions", "model": "ta-model-chat-legacy", "auth_verified": true, "token_field": "max_completion_tokens", "status_code": 400}
+{"route": "chat-legacy", "protocol": "openai_chat_completions", "path": "/chat-legacy/v1/chat/completions", "model": "ta-model-chat-legacy", "auth_verified": true, "token_field": "max_tokens", "status_code": 200}

@@ -1,0 +1,47 @@
+{
+  "schema_version": "agentic-result-v1",
+  "workload_id": "gemm_128x4096x4096",
+  "status": "checked",
+  "implementation": {
+    "path": "implementation/attempt-11/kernel.py",
+    "factory": "build",
+    "config": {
+      "block_M": 64,
+      "block_N": 64,
+      "block_K": 64,
+      "num_stages": 2,
+      "threads": 256,
+      "swizzle": 8
+    }
+  },
+  "evidence": {
+    "correctness": "checks.json",
+    "evaluation": "evaluation.json"
+  },
+  "usage": {
+    "model_calls": 12,
+    "input_tokens": 64003,
+    "output_tokens": 7004,
+    "cached_tokens": 54016,
+    "reasoning_tokens": null,
+    "cache_creation_tokens": null,
+    "evaluations": 11,
+    "compilations": 11,
+    "simulations": 11,
+    "numerical_checks": 11,
+    "solver_calls": 12
+  },
+  "elapsed_ms": 252234,
+  "checked_target": "metal",
+  "cuda_binary_executed": false,
+  "validation_scope": "Same TileLang source/configuration/IR tested on Metal; GB10 SASS timing simulated, CUDA binary not executed",
+  "identity": {
+    "source_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "config_sha256": "d29ffa81e69c8469a676a7da55048e741db131cbd8078b0a48d5f60e950fa988",
+    "tir_sha256": "9f6c44b51a1cce34c0943dfc469ae4d1d2d79ea49aa4903b4165e24e1b3892d4",
+    "sass_sha256": "7cd7618c4da0d83edf5ccfd9e33752df6235abbd84e59ffaa4e2e3cfecd29e41",
+    "cubin_sha256": "7cf6487fdc6d1511420879668600495e2ff9f99ac28af941caaa350f00013215"
+  },
+  "selected_attempt": "attempt-11",
+  "initial_checked_attempt": "attempt-00"
+}

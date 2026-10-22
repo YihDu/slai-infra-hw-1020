@@ -1,0 +1,17 @@
+{
+  "protocol": "anthropic_messages",
+  "model": "ta-model-messages",
+  "text": "{\"domains\": {\"block_M\": [32], \"block_N\": [64], \"block_K\": [32], \"num_stages\": [2], \"threads\": [128], \"swizzle\": [0]}, \"shared_memory_limit\": 32768, \"weights\": {\"traffic\": 1, \"launches\": 1, \"pipeline\": 1, \"footprint\": 1}, \"rationale\": \"Protocol contract fixture, not Agent optimization evidence\"}",
+  "usage": {
+    "input_tokens": 11,
+    "output_tokens": 7
+  },
+  "response_id": "fixture-messages",
+  "request_count": 1,
+  "http_attempts": [
+    {
+      "status_code": 200,
+      "token_limit_field": "max_tokens"
+    }
+  ]
+}

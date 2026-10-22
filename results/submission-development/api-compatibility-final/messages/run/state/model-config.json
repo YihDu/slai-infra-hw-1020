@@ -1,0 +1,9 @@
+{
+  "protocol": "anthropic_messages",
+  "base_url": "http://127.0.0.1:50821/messages/v1",
+  "model": "ta-model-messages",
+  "api_key_env": "TA_TEST_API_KEY",
+  "max_tokens_field": "auto",
+  "trust_env": false,
+  "thinking": null
+}

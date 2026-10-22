@@ -1,0 +1,45 @@
+{
+  "policy": "Retain each complete best observed public run, without modifying original evidence. These historical runs are not reruns of the latest API/feedback adapter.",
+  "cases": [
+    {
+      "workload": "gemm_128x4096x4096",
+      "previous_best_us": 156.32238763280637,
+      "best_known_us": 155.92133828093964,
+      "speedup_over_previous": 1.002572126152125,
+      "result": "results/exploration-v3/gemm_128x4096x4096/result.json",
+      "selected_attempt": "attempt-11"
+    },
+    {
+      "workload": "gemm_2048x2048x2048",
+      "previous_best_us": 203.6936494479265,
+      "best_known_us": 203.6936494479265,
+      "speedup_over_previous": 1.0,
+      "result": "results/submission-v2/gemm_2048x2048x2048/result.json",
+      "selected_attempt": "attempt-04"
+    },
+    {
+      "workload": "gemm_32x4096x4096",
+      "previous_best_us": 147.66753212620162,
+      "best_known_us": 147.52388799198215,
+      "speedup_over_previous": 1.0009737008438069,
+      "result": "results/exploration-v3/gemm_32x4096x4096/result.json",
+      "selected_attempt": "attempt-11"
+    },
+    {
+      "workload": "gemm_4096x4096x1024",
+      "previous_best_us": 399.54490791347746,
+      "best_known_us": 399.54490791347746,
+      "speedup_over_previous": 1.0,
+      "result": "results/submission-v2/gemm_4096x4096x1024/result.json",
+      "selected_attempt": "attempt-02"
+    },
+    {
+      "workload": "gemm_4096x4096x4096",
+      "previous_best_us": 1597.229841263918,
+      "best_known_us": 1597.229841263918,
+      "speedup_over_previous": 1.0,
+      "result": "results/submission-v2/gemm_4096x4096x4096/result.json",
+      "selected_attempt": "attempt-02"
+    }
+  ]
+}

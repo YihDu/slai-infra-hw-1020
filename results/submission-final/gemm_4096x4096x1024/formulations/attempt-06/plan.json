@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.75,
+    "launches": 1,
+    "pipeline": 2.5,
+    "footprint": 0.5
+  },
+  "rationale": "Six numerical-passing, compiling observations, all pinned at 32768 actual smem (the hard portability cap). Best remains attempt-02/05 (64x128x32, stages=2, swizzle=16 and swizzle=8) at 399.54 us, confirming swizzle 8 vs 16 is indistinguishable at matched tile/stage. Simulated DRAM is flat at 16.78 MB across every run, so the analytical serpentine panel-reuse traffic term has not materialized as measured traffic; prior probes (attempt-01 vs 04) already showed swizzle=0 and swizzle=8 identical at 402.23 us for 64x128x64 stages=1. Since swizzle=0 vs 16 has not been directly compared at the best config (64x128x32, stages=2), keep swizzle=[0,4,8,16] this round to disambiguate that exact match; if swizzle still shows no effect, narrow to [0] next revision. Keep full tile/stage domains so HiGHS can trade smaller block_M or block_N for stages=3 under the 32KB cap (e.g., 32x64x32 or 64x64x32 at stages=3). Weights carried over from attempt-05: traffic=0.75 (analytic term unreliable, measured DRAM flat), pipeline=2.5 (deeper staging at small block_K is the clearest observed lever, attempt-02/05 vs attempt-03), footprint=0.5 (hard cap already enforces it), launches=1 (avoid overfitting six points). Next hypotheses: (a) matched 64x128x32/stages=2 with swizzle=0 to test locality, and (b) block_M=32 or block_N=64 with block_K=32 and stages=3 to test whether deeper pipelining lowers simulated latency further. Validation scope unchanged: Metal checks execute the exact source/config/TIR, but CUDA binaries are not executed on GB10; GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}

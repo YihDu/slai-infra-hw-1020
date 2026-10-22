@@ -1,0 +1,35 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      64,
+      128
+    ],
+    "num_stages": [
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 0.3,
+    "launches": 1.5,
+    "pipeline": 1.2,
+    "footprint": 1
+  },
+  "rationale": "Attempt-08 was MIP-infeasible because forcing block_N in {128,256} with stages {3,4} and block_K {64,128} leaves no tuple under the hard 32768-byte portability cap and shared_memory_limit 32768 (e.g. N=128,K=64,stage=3 already needs 2*64*(32+128)*3=61440 bytes > cap). So I re-open block_N to include 64 and narrow num_stages to [4] to fit a deep-pipeline probe within budget: N=64,K=64,block_M=32,stage=4 estimates max(2*64*96*4=49152, 4*32*64=8192)=49152 > 32768, which still exceeds the cap, so a truly feasible stage=4 tuple requires block_M=16 and N=64 with K=64: 2*64*(16+64)*4=40960 > 32768 too; only K=64,N=64,block_M=16,stage=4 stays over budget as well. Given the estimator, stage=4 may be infeasible for all tuples under the hard cap, so attempting it confirms the budget boundary rather than yielding a winner. Best remains 147.67us at M=32,N=64,K=64,st=2 (attempts 03/04). DRAM stays flat at 33.8 MB across all swizzle/stage variants, so traffic stays de-weighted to 0.3; swizzle fixed at [0] since nonzero panels reproduced identical latency and sw=32 was SMT-infeasible. K=32 lost twice and is dropped; block_K {64,128} retained; block_N {64,128,256} retained so the solver can still pick the incumbent N=64 or test wider N once feasible. Threads {128,256} both tied at the winner. Next hypothesis: verify whether stage=4 is representable under the 32768 cap; if attempt-09 is again infeasible or reproduces the 147.7us incumbent, the next round should restore num_stages {2,3} and test block_K=128 with block_N=128 at stage=2/3, which is where an unexplored feasible deeper-K/thread tradeoff remains. Scope: Metal validates exact source/TIR numerically but CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}

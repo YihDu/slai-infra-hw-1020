@@ -1,0 +1,30 @@
+{
+  "resources": {
+    "optimizer/__init__.py": "a1014ad3b588c41662086a9307a10f91989e236ad4a03230c47997724e3eea3e",
+    "optimizer/baseline.py": "e90f85e850262d88c83b7a33c539c2ec08474c92c5bc47dd78d6e94b38c7f21b",
+    "optimizer/checker.py": "3e3b63f59ce5f74b1f940bba1c80bdaec7941ea9dc8a579eb346d3f0fa7c1195",
+    "optimizer/compiler.py": "2310580cbbbbcdd5604409358489efb0dddd7359d800850243ad3bc2958d3031",
+    "optimizer/cpu_shadow.py": "8eea6dbab9bc161bd20d8d497764bc005248b554234374937efed339e057e785",
+    "optimizer/formulation.py": "39081c267cb03ebaa06c58e054c64be8b8da56432f21be256d33a0b09b9fd4ac",
+    "optimizer/model.py": "e1e7a185d84f904928f9ef6560e83729d5ddc99ef35d53e3c8a4cbc1e98f72a2",
+    "optimizer/numeric.py": "635979054f49ac0c246bc1bc7132fb494b1542b0e23511d0d51f67270b9c65c8",
+    "optimizer/runner.py": "dd75d61a7044dfac2d97ae9dcce93272e6560fa31d5dfbbdc63e121761f99411",
+    "optimizer/tilelang_numeric.py": "e577fd6733602ca9263d32bc70e4f51c9716a94a7669b787bba5906f0424faac",
+    "optimizer/trace.py": "4bd5a52a5a75441b783bc079b1ded941e4cc148cd82a983a599f201ef2e8e102",
+    "templates/gemm_tilelang.py": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+    "prompts/formulate.txt": "33b70f09b0b817bba19596e5bd88e49ce7411090abe0ffde6faf1046878efbb4",
+    "tools/compiler_worker.py": "ab0ad85e5874fc3af146b8daf288dbc8eff55ee89e364f2451aa1a91011e17f1",
+    "tools/simulate_audited.py": "e3991cc13686884c9b474240f07b209a84273a30ac7a3f946f655bc4d1f0cead",
+    "setup/compiler.Dockerfile": "eac24854ad03a9b1d428f79c2ae53502d35f4a2d62384c97b0462bf8e79877c9",
+    "setup/compiler-python.lock": "d5c10e24abe046b24aad0a657308a1bbab26cc541bf9fc8f6f0d2e1e627db929",
+    "setup/mac-numeric.lock": "281dc5d571ab0c3b54079384e1ca8fe4fb2632b6cc984ba3c4f0b8f6d7ede33a",
+    "requirements-cpu.lock": "25acede54794bdddf2464163fc3bfa38a4df1dcd35fc83257e0fce1fe7d65625",
+    "run.sh": "6524de8bfd1a78dd1eae1dd4a1b56dc04834f7795d8067dbb7ce7e9bbc70ab55"
+  },
+  "case_files": [],
+  "prebuilt": "Kernel family, numerical tests, MIP feature/constraint builder, Z3 bounds checks, compiler/simulator adapters",
+  "runtime_decisions": "Agent domains/resource cap/objective weights; HiGHS configuration; feedback revisions; best candidate",
+  "verification": "Metal source-level check plus identical CUDA input TIR; no CUDA binary execution",
+  "case_policy": "GEMM semantics checked using independent CPU float64 reference; supplied baseline retained but replaced by disclosed family",
+  "graph_optimization": "Single GEMM: no graph fusion opportunity; TileLang uses its bundled TVM lowering"
+}

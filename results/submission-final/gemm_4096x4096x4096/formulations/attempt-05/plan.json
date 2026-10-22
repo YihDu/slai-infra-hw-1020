@@ -1,0 +1,39 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1.5,
+    "launches": 1,
+    "pipeline": 2,
+    "footprint": 1
+  },
+  "rationale": "Five attempts observed. Baseline (128,64,64,st=1,sw=0): 2558.09 us / 531.63 MB. Swizzle=16 variants dominate: (64,128,64,st=1,sw=16) 1616.24 us / 269.75 MB; (64,128,32,st=2,sw=16) 1597.23 us / 269.68 MB (current best); (64,128,32,st=1,sw=16) 1912.58 us / 269.68 MB. Latest attempt-04 (64,128,64,st=1,sw=8) gave 1621.54 us / 320.60 MB: swizzle=8 underperforms swizzle=16 (higher DRAM than the saturated ~269.7 MB floor and slower), so larger serpentine panels remain preferable, and stages=1 again trails stages=2 at matched tile (1597 us). Traffic is saturated near 269.7 MB once swizzle=16 is used, so the pipeline term is the discriminative signal; attempt-04 confirms stages=1 is penalized and swizzle=8 raises traffic, both consistent with current weights. Keep traffic=1.5, pipeline=2, launches=1, footprint=1; keep 32768-byte portability cap (all compiled runs used exactly 32768 B smem, indicating the cap binds the large-tile/stage combos, so lowering it would cut the best region and raising it is not permitted for portability). Keep full tile/stage/swizzle domains since all tiles divide 4096 and five exclusions have not made any subset infeasible; swizzle=[0,4,8,16] retained per feedback rules. Prior five tuples are excluded, so HiGHS must pick a new point. Next hypothesis: block_M=128 with swizzle=16 and stages in {2,3} may reduce simulated latency further via larger serpentine panels plus pipelining; if DRAM stays ~270 MB and latency does not improve, revert weights toward uniform or reduce traffic weight since it is saturated. Proxy is dimensionless ranking only, not microseconds. Metal checks execute exact source/config/TIR but CUDA binaries are not executed; GB10 values are simulator estimates, not hardware measurements; no global optimality is claimed."
+}

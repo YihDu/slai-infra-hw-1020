@@ -29,14 +29,15 @@ def build(results,output):
         add(ROOT/'docs'/name,'docs/'+name)
     for name in ['cpu.sh','mac-numeric.sh','mac-numeric.lock','compiler-build.sh','compiler.Dockerfile','compiler-python.lock','toolchain.json','wheels-macos-arm64.json','acceptance.json','submission-tests.log']:
         add(ROOT/'setup'/name,'setup/'+name)
-    for name in ['compiler_worker.py','simulate_audited.py','doctor.py','fetch_wheels.py','check_model_config.py','validate_submission.py','build_submission.py','write_submission_report.py']:
+    for name in ['compiler_worker.py','simulate_audited.py','doctor.py','fetch_wheels.py','check_model_config.py','model_api.py','test_api_contract.py','validate_submission.py','build_submission.py','write_submission_report.py']:
         add(ROOT/'tools'/name,'tools/'+name)
     for case in expected:
         for source in (results/case).rglob('*'):
             if source.is_file() and '__pycache__' not in source.parts and source.suffix!='.pyc':
                 add(source,'results/'+case+'/'+source.relative_to(results/case).as_posix())
-    if (results/'summary.json').exists():add(results/'summary.json','results/summary.json')
-    for folder in ['development-failures','submission-development','mac-feasibility','submission-v1']:
+    for name in ['summary.json','selection.json']:
+        if (results/name).exists():add(results/name,'results/'+name)
+    for folder in ['development-failures','submission-development','mac-feasibility','submission-v1','exploration-v3']:
         for source in (ROOT/'results'/folder).rglob('*'):
             if source.is_file() and '__pycache__' not in source.parts and source.suffix!='.pyc':
                 add(source,'results/history/'+folder+'/'+source.relative_to(ROOT/'results'/folder).as_posix())
@@ -70,6 +71,6 @@ def build(results,output):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--results',type=Path,default=(ROOT/'results/submission-v2' if (ROOT/'results/submission-v2').exists() else ROOT/'results'))
+    parser=argparse.ArgumentParser();parser.add_argument('--results',type=Path,default=(ROOT/'results/submission-final' if (ROOT/'results/submission-final').exists() else ROOT/'results'))
     parser.add_argument('--output',type=Path,default=ROOT/'dist/slai-infra-hw-1020.zip');a=parser.parse_args()
     print(json.dumps(build(a.results.resolve(),a.output.resolve()),indent=2))

@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[128],\"block_K\":[32,64],\"num_stages\":[2,3],\"threads\":[128],\"swizzle\":[0,4,8,16]},\"shared_memory_limit\":32768,\"weights\":{\"traffic\":0.5,\"launches\":0.75,\"pipeline\":2,\"footprint\":1},\"rationale\":\"Six evaluated points, all numerically passed, compiled, and saturating 32768 smem with 3 blocks/SM and identical 16.78 MB simulated DRAM. Latencies: 128x64x64/s1/sw0=234.82; 64x128x64/s1/sw16=235.12; 64x128x32/s2/sw16=221.79; 64x128x64/s1/sw8=214.47; 64x128x32/s2/sw8=203.69; 64x128x32/s2/sw4=203.69 (tied best). Swizzle values 4 and 8 gave identical latency and no DRAM change, confirming the analytic panel-reuse feature still is not materializing in simulator traffic; swizzle is kept open only as a probe and traffic weight stays low at 0.5. block_N=[128] and block_M=[64,128] retained (128-M row still unsampled). block_K=[32,64] and stages=[2,3] concentrate on deeper-pipeline variants; s1 points are dominated. Pipeline weight stays 2 to keep pushing toward num_stages=3 with block_K=64, which remains untested. Launches 0.75 favors larger/fewer tiles; footprint 1 is non-differentiating since all points hit the cap. Hard 32768 cap retained for portability. Metal checks execute exact source/config/TIR; CUDA binary is not executed, and GB10 latencies are simulator estimates, not hardware measurements. This is exploratory and not a claim of global optimality; the next hypothesis is that num_stages=3 (possibly with block_K=64 or the unsampled block_M=128 row) yields lower simulated latency than the current 203.69 us best.\"}",
+  "usage": {
+    "prompt_tokens": 4977,
+    "completion_tokens": 472,
+    "total_tokens": 5449,
+    "prompt_tokens_details": {
+      "cached_tokens": 4224
+    },
+    "prompt_cache_hit_tokens": 4224,
+    "prompt_cache_miss_tokens": 753
+  },
+  "response_id": "2d4a6988-6bf0-4099-a973-f46156b04adc"
+}

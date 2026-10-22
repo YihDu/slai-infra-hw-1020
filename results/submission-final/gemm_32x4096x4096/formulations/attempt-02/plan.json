@@ -1,0 +1,43 @@
+{
+  "domains": {
+    "block_M": [
+      16,
+      32
+    ],
+    "block_N": [
+      64,
+      128,
+      256
+    ],
+    "block_K": [
+      32,
+      64,
+      128
+    ],
+    "num_stages": [
+      2,
+      3,
+      4
+    ],
+    "threads": [
+      128,
+      256
+    ],
+    "swizzle": [
+      0,
+      4,
+      8,
+      16,
+      32,
+      64
+    ]
+  },
+  "shared_memory_limit": 32768,
+  "weights": {
+    "traffic": 1,
+    "launches": 1.5,
+    "pipeline": 1,
+    "footprint": 1
+  },
+  "rationale": "Attempt-00 (M=32,N=64,K=32,st=3,thr=256,sw=0) gave 195.8us; attempt-01 (M=16,N=64,K=64,st=2,thr=256,sw=8) improved to 176.4us with lower regs (44). Both pass numerical/compile; GB10 values are simulator estimates, CUDA binary not executed. Since M=32, block_M in {16,32} only; 64/128 overshoot and divide poorly. Keep block_N/{64,128,256} and block_K/{32,64,128} to test larger K tiles and wider N. Stages {2,3,4} (drop 1, no overlap benefit). Keep threads {128,256} (drop 64, which produced no winner yet and reg pressure/layout is unpriced) to test the changed thread-domain hypothesis early. Now that M/block_M=1 or 2, add full swizzle domain [0,4,8,16,32,64] to check whether panel reuse ever materializes at this shape; the analytic reuse is min(swizzle,ceil(M/block_M))<=2, so gains are expected to be marginal, and if simulator traffic stays flat we will down-weight traffic in later rounds. Slightly raise launches weight to 1.5 because N/block_N dominates block count (and small M needs enough blocks); traffic kept at 1 pending observed locality, pipeline/footprint at 1 to penalize smem-heavy stage=4/block_K=128 tuples under the 32768 cap plus hard portability cap. Next hypothesis: test whether block_K=128 with fewer stages reduces simulated latency more than w=N=256; if the wider N tile loses due to launch/occupancy tradeoffs, revert to N in {64,128}."
+}

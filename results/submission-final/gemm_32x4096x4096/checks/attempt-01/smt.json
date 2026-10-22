@@ -1,0 +1,47 @@
+{
+  "property": "Tiled indices stay in bounds; serpentine launch map covers each tile exactly once",
+  "assumptions": "Fixed shape/config; selected tiles divide tensor dimensions; physical launch indices cover the whole grid",
+  "shape": [
+    32,
+    4096,
+    4096
+  ],
+  "config": {
+    "block_M": 16,
+    "block_N": 64,
+    "block_K": 64,
+    "num_stages": 2,
+    "threads": 256,
+    "swizzle": 8
+  },
+  "code_sha256": "2677a62d074a09c15391b46faed5baf9c0d2d94b8754e13e4559965e7553d773",
+  "results": [
+    {
+      "dimension": "M",
+      "status": "unsat",
+      "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_M () Int)\n(declare-fun local_M () Int)\n(assert\n (>= block_M 0))\n(assert\n (< block_M 2))\n(assert\n (>= local_M 0))\n(assert\n (< local_M 16))\n(assert\n (or (< (+ (* block_M 16) local_M) 0) (>= (+ (* block_M 16) local_M) 32)))\n(check-sat)\n"
+    },
+    {
+      "dimension": "N",
+      "status": "unsat",
+      "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_N () Int)\n(declare-fun local_N () Int)\n(assert\n (>= block_N 0))\n(assert\n (< block_N 64))\n(assert\n (>= local_N 0))\n(assert\n (< local_N 64))\n(assert\n (or (< (+ (* block_N 64) local_N) 0) (>= (+ (* block_N 64) local_N) 4096)))\n(check-sat)\n"
+    },
+    {
+      "dimension": "K",
+      "status": "unsat",
+      "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun block_K () Int)\n(declare-fun local_K () Int)\n(assert\n (>= block_K 0))\n(assert\n (< block_K 64))\n(assert\n (>= local_K 0))\n(assert\n (< local_K 64))\n(assert\n (or (< (+ (* block_K 64) local_K) 0) (>= (+ (* block_K 64) local_K) 4096)))\n(check-sat)\n"
+    },
+    {
+      "dimension": "swizzled_tile_bounds",
+      "status": "unsat",
+      "smt2": "; benchmark generated from python API\n(set-info :status unknown)\n(declare-fun launch_index () Int)\n(assert\n (>= launch_index 0))\n(assert\n (< launch_index 128))\n(assert\n (let ((?x42 (ite (< (div launch_index 512) 0) 8 2)))\n(let ((?x16 (mod launch_index 512)))\n(let ((?x87 (div ?x16 ?x42)))\n(let (($x11 (= (mod (div launch_index 512) 2) 1)))\n(let ((?x56 (ite $x11 (- 63 ?x87) ?x87)))\n(or (< (+ (* (div launch_index 512) 8) (mod ?x16 ?x42)) 0) (>= (+ (* (div launch_index 512) 8) (mod ?x16 ?x42)) 2) (< ?x56 0) (>= ?x56 64))))))))\n(check-sat)\n"
+    }
+  ],
+  "finite_mapping_check": {
+    "bijective": true,
+    "grid_tiles": 128,
+    "method": "Complete finite enumeration of coordinates, not performance evaluation"
+  },
+  "scope": "Integer bounds only; not floating-point correctness, pipeline safety or lowering correctness",
+  "config_sha256": "fe4f38d1edcedf89fbb871671780aadd5db5fc41fa29dfba9546885dadba02a2"
+}

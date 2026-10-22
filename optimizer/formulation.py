@@ -68,6 +68,17 @@ def solve(plan, shape, directory, timeout=20, excluded=(), hardware_limit=None):
     return (rows[chosen]['config'] if chosen is not None else None),report
 
 
+def proof_result(solver, status, dimension):
+    result = dict(dimension=dimension, status=str(status), smt2=solver.to_smt2())
+    if status == z3.sat:
+        model = solver.model()
+        result['counterexample'] = {str(v): str(model[v]) for v in model.decls()}
+        result['violated_property'] = 'An index is outside the declared tensor or tile-grid bounds'
+    elif status == z3.unknown:
+        result['reason_unknown'] = solver.reason_unknown()
+    return result
+
+
 def index_proof(shape, config, code_hash):
     results=[]
     for dimension,extent,tile in zip(['M','N','K'],shape,[config['block_M'],config['block_N'],config['block_K']]):
@@ -75,7 +86,7 @@ def index_proof(shape, config, code_hash):
         index=block*tile+local;s=z3.Solver();s.set(timeout=3000)
         s.add(block>=0,block<(extent+tile-1)//tile,local>=0,local<tile)
         s.add(z3.Or(index<0,index>=extent));status=s.check()
-        results.append(dict(dimension=dimension,status=str(status),smt2=s.to_smt2()))
+        results.append(proof_result(s, status, dimension))
     m,n,k=shape;rows=(m+config['block_M']-1)//config['block_M'];cols=(n+config['block_N']-1)//config['block_N']
     panel=config.get('swizzle',0)
     if panel:
@@ -90,7 +101,7 @@ def index_proof(shape, config, code_hash):
             col=z3.If(group%2==1,cols-1-offset/stride,offset/stride)
             violations.append(z3.And(domain,z3.Or(row<0,row>=rows,col<0,col>=cols)))
         s=z3.Solver();s.set(timeout=3000);s.add(z3.Or(*violations))
-        results.append(dict(dimension='swizzled_tile_bounds',status=str(s.check()),smt2=s.to_smt2()))
+        results.append(proof_result(s, s.check(), 'swizzled_tile_bounds'))
     mapping=[launch_coordinate(i,rows,cols,panel) for i in range(rows*cols)]
     bijective=len(set(mapping))==rows*cols and all(0<=r<rows and 0<=c<cols for r,c in mapping)
     return dict(property='Tiled indices stay in bounds; serpentine launch map covers each tile exactly once',assumptions='Fixed shape/config; selected tiles divide tensor dimensions; physical launch indices cover the whole grid',
