@@ -1,6 +1,33 @@
-# Agentic AI Infrastructure Optimizer — preparation workspace
+# Agentic AI Infrastructure Optimizer — CPU development baseline
 
-当前为环境准备阶段，尚未实现优化闭环，也没有通过检查的 kernel。
+已运行五个公开案例的两轮 DeepSeek → HiGHS → TileLang 源码生成 → CPU shadow 诊断 → 反馈流程。
+所有 CPU 诊断通过，但没有实际编译/执行 TileLang 或 GB10 SASS 模拟；结果均为
+`no_valid_result`，不能作为已经通过课程检查的 kernel。
+
+开发顺序见 [开发计划](docs/development-plan.md)，实测结果和限制见 [报告](report.md)。
+
+## 运行 baseline
+
+设置 `DEEPSEEK_API_KEY` 后：
+
+```sh
+./run.sh --workload third_party/gb10/workloads/gemm_32x4096x4096.json \
+  --model-config configs/deepseek.json --output results/new-run
+```
+
+输出目录必须为空，防止覆盖证据。默认两轮，最长 1200 秒；可用 `--rounds 1`
+和 `--budget-seconds 60` 控制开发运行。`run.sh` 不下载依赖，也不访问模型服务之外的网络。
+它只加载仓库中的模型驱动、提示词与代码，不加载个人 Agent 设置。
+真实模型服务需要联网和运行时凭据；课程无 GPU 编译/验证接口接入前不能生成 checked 结果。
+
+```sh
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python tools/summarize_baseline.py
+```
+
+公开案例记录位于 `results/gemm_*/`。每次运行保留模型请求/可见响应、token 用量、
+LP/MPS、HiGHS 状态与 gap、配置和源码哈希、Z3 范围证明、CPU 误差、编译/模拟缺失原因。
+`state/source/` 保存与当次 manifest 哈希一致的代码快照。第一次空模型响应失败也保留。
 
 ## 已准备
 
@@ -42,7 +69,7 @@ TileLang 使用定制 TVM，避免盲目安装另一套 TVM。
 API 已通过一次真实连通性测试，证据见 `setup/deepseek-connectivity.json`。
 已验证 Python HTTP 客户端端到端调用并返回 OK（2026-10-22）；通用配置模板仍保留。
 `optimizer/model.py` 支持三种协议的纯文本请求，模型需能输出代码和结构化决策；
-当前尚未实现多轮 Agent 工具循环。不读取个人 Agent 配置，不将密钥写入项目。
+已实现有限域建模与诊断反馈循环，编译/模拟反馈尚待接入。不读取个人 Agent 配置，不将密钥写入项目。
 
 ```sh
 .venv/bin/python tools/check_model_config.py configs/model.example.json
@@ -53,6 +80,7 @@ API 已通过一次真实连通性测试，证据见 `setup/deepseek-connectivit
 默认检查不会发起模型调用。端点应包含服务所需的版本前缀（如 `/v1`）。
 HTTP 客户端默认不继承系统代理；DeepSeek 配置显式设置 `trust_env: true`。
 DeepSeek 使用 `max_tokens` 字段，通用 Chat Completions 配置默认使用 `max_completion_tokens`。
+开发配置显式设置 `thinking: disabled`，避免有限输出预算全部用于推理而没有结构化正文。
 密钥通过 `DEEPSEEK_API_KEY` 环境变量提供，不保存在仓库。开发时可从指定文件安全加载：
 
 ```sh
@@ -70,4 +98,4 @@ https://developers.openai.com/api/reference/resources/responses/methods/create
 下载来源：
 http://10.204.87.113:8001/agentic-optimizer/downloads/gb10-simulator-inputs-v2.zip
 
-课程编译/验证接口、run.sh 和优化闭环仍待完成；本目录不能作为最终作业提交。
+课程编译/验证接口和真实性能优化闭环仍待完成；本目录尚不满足最终作业全部要求。

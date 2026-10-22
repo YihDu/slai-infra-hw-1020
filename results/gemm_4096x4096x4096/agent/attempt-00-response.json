@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":49152,\"weights\":{\"traffic\":1,\"launches\":0.5,\"pipeline\":0.5,\"footprint\":1},\"rationale\":\"Square 4096^3 fp16 GEMM with fp32 accumulation; all listed tile choices divide M,N,K, so the full Cartesian domain is supported. Shared-memory budget capped at 49152 bytes; estimate 2*block_K*(block_M+block_N)*num_stages, largest tuple (128+128)*64*2*3=98304 exceeds budget and will be excluded by the MIP constraint, while feasible combinations remain. Objective emphasizes traffic and footprint equally to balance data movement against shared-memory residency, with lower weights on launch count and pipeline depth as secondary effects for this large square workload. Feedback is currently null; any future feedback would revise weights/domains within allowed values. Note: CPU-shadow correctness and latency do not establish CUDA correctness or GB10 performance, and no SASS timings are inferred or GPU results claimed.\"}",
+  "usage": {
+    "prompt_tokens": 586,
+    "completion_tokens": 255,
+    "total_tokens": 841,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 330
+  },
+  "response_id": "3678f818-2bd9-497b-9111-e5281209f22c"
+}

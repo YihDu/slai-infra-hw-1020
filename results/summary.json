@@ -1,0 +1,181 @@
+{
+  "scope": "CPU development baseline only; no checked TileLang result",
+  "cases": [
+    {
+      "workload": "gemm_128x4096x4096",
+      "seconds": 7.825,
+      "cpu_checks": 4,
+      "max_abs_error": 0.0009765625,
+      "initial_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 3,
+        "threads": 128
+      },
+      "final_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 1689,
+        "output_tokens": 671,
+        "cached_tokens": 768,
+        "reasoning_tokens": null,
+        "evaluations": 0,
+        "cpu_diagnostics": 2,
+        "compilations": 0,
+        "simulations": 0
+      }
+    },
+    {
+      "workload": "gemm_2048x2048x2048",
+      "seconds": 7.211,
+      "cpu_checks": 4,
+      "max_abs_error": 0.0009765625,
+      "initial_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "final_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 1693,
+        "output_tokens": 639,
+        "cached_tokens": 768,
+        "reasoning_tokens": null,
+        "evaluations": 0,
+        "cpu_diagnostics": 2,
+        "compilations": 0,
+        "simulations": 0
+      }
+    },
+    {
+      "workload": "gemm_32x4096x4096",
+      "seconds": 7.436,
+      "cpu_checks": 4,
+      "max_abs_error": 0.0009765625,
+      "initial_config": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "final_config": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 1703,
+        "output_tokens": 684,
+        "cached_tokens": 512,
+        "reasoning_tokens": null,
+        "evaluations": 0,
+        "cpu_diagnostics": 2,
+        "compilations": 0,
+        "simulations": 0
+      }
+    },
+    {
+      "workload": "gemm_4096x4096x1024",
+      "seconds": 10.265,
+      "cpu_checks": 4,
+      "max_abs_error": 0.0009765625,
+      "initial_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "final_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 1741,
+        "output_tokens": 758,
+        "cached_tokens": 768,
+        "reasoning_tokens": null,
+        "evaluations": 0,
+        "cpu_diagnostics": 2,
+        "compilations": 0,
+        "simulations": 0
+      }
+    },
+    {
+      "workload": "gemm_4096x4096x4096",
+      "seconds": 26.888,
+      "cpu_checks": 4,
+      "max_abs_error": 0.001953125,
+      "initial_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 32,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "final_config": {
+        "block_M": 128,
+        "block_N": 128,
+        "block_K": 64,
+        "num_stages": 1,
+        "threads": 128
+      },
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 1651,
+        "output_tokens": 534,
+        "cached_tokens": 768,
+        "reasoning_tokens": null,
+        "evaluations": 0,
+        "cpu_diagnostics": 2,
+        "compilations": 0,
+        "simulations": 0
+      }
+    }
+  ],
+  "successful_run_usage": {
+    "model_calls": 10,
+    "input_tokens": 8477,
+    "output_tokens": 3286
+  },
+  "retained_failed_runs": [
+    {
+      "path": "results/development-failures/empty-model-output/result.json",
+      "usage": {
+        "model_calls": 2,
+        "input_tokens": 1236,
+        "output_tokens": 8192,
+        "cached_tokens": 384,
+        "reasoning_tokens": 8192,
+        "evaluations": 0,
+        "cpu_diagnostics": 0,
+        "compilations": 0,
+        "simulations": 0
+      }
+    }
+  ]
+}

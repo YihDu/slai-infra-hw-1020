@@ -9,5 +9,4 @@ __pycache__/
 *.pem
 *.key
 setup/environment.json
-results/
 wheelhouse/

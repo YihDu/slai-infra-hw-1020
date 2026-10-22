@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":49152,\"weights\":{\"traffic\":1.0,\"launches\":0.5,\"pipeline\":0.7,\"footprint\":0.8},\"rationale\":\"GEMM 2048x2048x2048 float16 with fp32 accumulation; all candidate block dimensions (64/128 for M and N, 32/64 for K) divide M=N=K=2048, so the full domain subset is supported by the first kernel family. threads is fixed to 128 per allowed values. shared_memory_limit=49152 permits larger tiles/stages (e.g., 128x128 blocks up to a few stages) while maintaining a conservative development bound; the analytic footprint cap informs selection among feasible tuples. Weights are positive and finite within [0.001,100], favoring traffic reduction primarily, with moderate penalization of pipeline underutilization and footprint, and lighter emphasis on launch overhead since 2048x2048 offers ample work. This formulation is purely analytic MIP-based selection and does not imply measured GPU performance: CPU-shadow correctness or latency would not establish CUDA correctness or GB10 performance, timings cannot be inferred without SASS, and no checked GPU results are claimed.\"}",
+  "usage": {
+    "prompt_tokens": 586,
+    "completion_tokens": 296,
+    "total_tokens": 882,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 330
+  },
+  "response_id": "1b577a69-c6f6-4a51-99c1-6d928efd9c44"
+}

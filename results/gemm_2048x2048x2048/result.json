@@ -1,0 +1,23 @@
+{
+  "schema_version": "agentic-result-v1",
+  "workload_id": "gemm_2048x2048x2048",
+  "status": "no_valid_result",
+  "implementation": null,
+  "evidence": {
+    "correctness": "checks.json",
+    "evaluation": "evaluation.json"
+  },
+  "elapsed_ms": 7211,
+  "usage": {
+    "model_calls": 2,
+    "input_tokens": 1693,
+    "output_tokens": 639,
+    "cached_tokens": 768,
+    "reasoning_tokens": null,
+    "evaluations": 0,
+    "cpu_diagnostics": 2,
+    "compilations": 0,
+    "simulations": 0
+  },
+  "reason": "CPU development baseline completed; exact TileLang compilation/numerical execution and GB10 simulation remain unavailable"
+}

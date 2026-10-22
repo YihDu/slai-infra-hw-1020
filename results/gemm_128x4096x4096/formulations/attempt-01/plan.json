@@ -1,0 +1,32 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 49152,
+  "weights": {
+    "traffic": 1.4,
+    "launches": 0.5,
+    "pipeline": 1.0,
+    "footprint": 0.8
+  },
+  "rationale": "Workload is M=128,N=4096,K=4096 so block_M in {64,128}, block_N in {64,128}, block_K in {32,64} all divide dims; threads=128 and stages 1-3 retained. Shared-memory estimate 2*block_K*(block_M+block_N)*num_stages can reach 98304 (e.g., 128x128, K=64, stages=3), so the 49152 integer limit prunes the widest/highest-stage tuples while keeping 128x128 with block_K=32 stages<=3 and narrower blocks with block_K=64. Weights revised slightly from feedback: traffic raised to 1.4 because M is small and redundant B traffic dominates, favoring larger block_N/block_M products; launches lowered to 0.5 since ceil(M/block_M)*ceil(N/block_N) is at most 128 in coarse units for this shape and is secondary; pipeline kept at 1.0 to reward deeper num_stages within the memory budget; footprint raised to 0.8 to penalize near-limit shared-memory tuples that may be more fragile. This is an analytic MIP formulation only: CPU-shadow correctness and any CPU latency do not establish CUDA correctness, SASS validity, or GB10 performance, and no GPU timing or checked-GPU results are claimed."
+}

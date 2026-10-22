@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":49152,\"weights\":{\"traffic\":1.2,\"launches\":0.8,\"pipeline\":1.0,\"footprint\":0.6},\"rationale\":\"For M=128, N=K=4096, block_M is restricted to 64 or 128 to divide M; block_N 64/128 divide N; block_K 32/64 divide K. num_stages 1-3 and threads=128 kept as small search space. Shared-memory estimate 2*block_K*(block_M+block_N)*num_stages is maximized at 2*64*256*3=98304, exceeding the 49152 limit, so the MIP constraint prunes high-stage wide-block tuples while allowing others. Weights emphasize traffic (M is small, so larger block_N and block_M reduce redundancy) and pipeline depth, with moderate penalty on launches (launch count is sizable since N/block_N * M/block_M is 64*2 at largest blocks) and mild footprint penalty to favor lower shared-memory tuples. This formulation is analytic only; it does not establish CUDA correctness, SASS behavior, or GB10 performance, and no GPU measurements are claimed.\"}",
+  "usage": {
+    "prompt_tokens": 583,
+    "completion_tokens": 298,
+    "total_tokens": 881,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 327
+  },
+  "response_id": "ba8f1cd3-de1e-4e6e-898f-76de12d733fc"
+}

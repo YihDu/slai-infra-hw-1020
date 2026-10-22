@@ -1,0 +1,11 @@
+{
+  "source_integrity": "all supplied file hashes match",
+  "command": [
+    "simulate.py",
+    "--input",
+    "examples/simulation-input.json"
+  ],
+  "exit_code": 1,
+  "stderr": "Traceback (most recent call last):\n  File \"<workspace>/third_party/gb10/simulate.py\", line 78, in <module>\n    main()\n    ~~~~^^\n  File \"<workspace>/third_party/gb10/simulate.py\", line 69, in main\n    report = simulate(json.loads(args.input.read_text()), args.input.resolve().parent)\n  File \"<workspace>/third_party/gb10/simulate.py\", line 16, in simulate\n    if not kernel_sass(sass, kernel=symbol):\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/third_party/gb10/agentic/gb10/sim/sm.py\", line 510, in kernel_sass\n    txt = open(path).read()\n          ~~~~^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '<workspace>/third_party/gb10/examples/kernel.sass'\n",
+  "interpretation": "Course sample is metadata only; kernel.sass is not supplied. No timing evaluated."
+}

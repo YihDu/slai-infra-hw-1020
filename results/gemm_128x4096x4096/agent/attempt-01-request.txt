@@ -1,0 +1,26 @@
+You are the formulation agent for a GEMM optimizer. Return only one JSON object.
+You may choose domains, a shared-memory budget, and analytic objective weights.
+The deterministic MIP builder creates a binary choice per tuple, sum(choice)=1,
+sum(shared_memory_bytes*choice)<=shared_memory_limit, and minimizes weighted
+normalized analytic features. This is genuine MIP candidate selection, not measured enumeration.
+Allowed values: block_M [32,64,128], block_N [64,128], block_K [32,64],
+num_stages [1,2,3], threads [128]. Choose nonempty subsets of these values.
+Only tuples dividing M,N,K are supported by this first kernel family.
+Shared memory estimate = 2*block_K*(block_M+block_N)*num_stages.
+Features: traffic=2*M*N*K*(1/block_M+1/block_N)/1e8;
+launches=ceil(M/block_M)*ceil(N/block_N)/1000;
+pipeline=(K/block_K)/num_stages/100;
+footprint=shared_memory_bytes/49152.
+Weights must be positive finite numbers between 0.001 and 100.
+shared_memory_limit must be an integer in [8192,49152]. These are conservative
+development limits, not a proof of actual device resource validity.
+Required schema:
+{"domains":{"block_M":[64,128],"block_N":[64,128],"block_K":[32,64],"num_stages":[1,2,3],"threads":[128]},"shared_memory_limit":49152,"weights":{"traffic":1,"launches":1,"pipeline":1,"footprint":1},"rationale":"Explain domains, constraints, objective and feedback."}
+When feedback is supplied, revise the formulation when justified. Acknowledge that
+CPU-shadow correctness and latency do NOT establish CUDA correctness or GB10 performance.
+Do not infer timings for missing SASS. Do not claim checked GPU results.
+
+Workload:
+{"id": "gemm_128x4096x4096", "operation": "C = A @ B", "inputs": {"A": {"shape": [128, 4096], "dtype": "float16"}, "B": {"shape": [4096, 4096], "dtype": "float16"}}, "outputs": {"C": {"shape": [128, 4096], "dtype": "float16"}}, "accumulation_dtype": "float32", "tolerance": {"rtol": 0.02, "atol": 0.002}, "evaluation": {"scope": "whole_workload"}, "baseline_config": {}}
+Feedback:
+{"previous_plan": {"domains": {"block_M": [64, 128], "block_N": [64, 128], "block_K": [32, 64], "num_stages": [1, 2, 3], "threads": [128]}, "shared_memory_limit": 49152, "weights": {"traffic": 1.2, "launches": 0.8, "pipeline": 1.0, "footprint": 0.6}, "rationale": "For M=128, N=K=4096, block_M is restricted to 64 or 128 to divide M; block_N 64/128 divide N; block_K 32/64 divide K. num_stages 1-3 and threads=128 kept as small search space. Shared-memory estimate 2*block_K*(block_M+block_N)*num_stages is maximized at 2*64*256*3=98304, exceeding the 49152 limit, so the MIP constraint prunes high-stage wide-block tuples while allowing others. Weights emphasize traffic (M is small, so larger block_N and block_M reduce redundancy) and pipeline depth, with moderate penalty on launches (launch count is sizable since N/block_N * M/block_M is 64*2 at largest blocks) and mild footprint penalty to favor lower shared-memory tuples. This formulation is analytic only; it does not establish CUDA correctness, SASS behavior, or GB10 performance, and no GPU measurements are claimed."}, "selection": {"block_M": 128, "block_N": 128, "block_K": 32, "num_stages": 3, "threads": 128}, "solver_status": "Optimal", "cost": 1.8575730346666666, "cpu_shadow_passed": true, "compilation": {"status": "unavailable", "tools": {"tilelang": false, "nvcc": null, "nvdisasm": null}, "reason": "sm_121a compile/export adapter not integrated"}, "simulation": {"status": "not_run", "reason": "No compiled encoded SASS or actual resource metadata", "source": "gb10_instruction_simulator", "value": null, "unit": "us"}, "instruction": "Revise domains/weights only when justified. CPU timing is not GB10 timing; compilation is still blocked."}

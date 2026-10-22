@@ -1,0 +1,73 @@
+{
+  "attempts": [
+    {
+      "attempt": "attempt-00",
+      "kernel_sha256": "4d2296addc698d17747ee85e824646adbeac4dbbbe9d11d0fead51f5e2704ee4",
+      "config_sha256": "58a407c23238560cff5c29ccf2c06a7e81faaed2cc2e6728b2a66bece1f67744",
+      "configuration": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "compilation": {
+        "status": "unavailable",
+        "tools": {
+          "tilelang": false,
+          "nvcc": null,
+          "nvdisasm": null
+        },
+        "reason": "sm_121a compile/export adapter not integrated"
+      },
+      "correctness": {
+        "status": "not_run",
+        "reason": "CPU shadow does not execute TileLang"
+      },
+      "simulation": {
+        "status": "not_run",
+        "reason": "No compiled encoded SASS or actual resource metadata",
+        "source": "gb10_instruction_simulator",
+        "value": null,
+        "unit": "us"
+      },
+      "cpu_shadow_passed": true
+    },
+    {
+      "attempt": "attempt-01",
+      "kernel_sha256": "4d2296addc698d17747ee85e824646adbeac4dbbbe9d11d0fead51f5e2704ee4",
+      "config_sha256": "58a407c23238560cff5c29ccf2c06a7e81faaed2cc2e6728b2a66bece1f67744",
+      "configuration": {
+        "block_M": 32,
+        "block_N": 64,
+        "block_K": 64,
+        "num_stages": 2,
+        "threads": 128
+      },
+      "compilation": {
+        "status": "unavailable",
+        "tools": {
+          "tilelang": false,
+          "nvcc": null,
+          "nvdisasm": null
+        },
+        "reason": "sm_121a compile/export adapter not integrated"
+      },
+      "correctness": {
+        "status": "not_run",
+        "reason": "CPU shadow does not execute TileLang"
+      },
+      "simulation": {
+        "status": "not_run",
+        "reason": "No compiled encoded SASS or actual resource metadata",
+        "source": "gb10_instruction_simulator",
+        "value": null,
+        "unit": "us"
+      },
+      "cpu_shadow_passed": true
+    }
+  ],
+  "performance_source": "none",
+  "unit": null,
+  "value": null
+}

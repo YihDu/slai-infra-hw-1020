@@ -1,0 +1,32 @@
+{
+  "domains": {
+    "block_M": [
+      32,
+      64
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 49152,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 0.5,
+    "pipeline": 1.0,
+    "footprint": 0.5
+  },
+  "rationale": "M=32 forces block_M<=32, so block_M=32 is the only viable tile height; block_M=64 is kept as a domain fallback since the MIP only selects tuples dividing M,N,K, and the builder will exclude non-dividing tuples. N=4096 and K=4096 support block_N in {64,128} and block_K in {32,64}; num_stages 1-3 and threads=128 per the allowed single-thread value. The shared-memory cap of 49152 bytes permits the largest 2*64*(32+128)*3=61440-byte candidate to be filtered by the constraint, so the MIP has genuine tension between pipeline depth and footprint. Weights emphasize traffic (1/block_M dominates given small M) and pipeline (K/block_K/stages), while launches and footprint are down-weighted because the tiny M makes launch count secondary and footprint mainly a constraint. This is a formulation-only MIP configuration; CPU-shadow correctness and latency do not establish CUDA correctness or GB10 performance, and no timing claims are made for missing SASS."
+}

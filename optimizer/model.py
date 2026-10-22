@@ -13,6 +13,7 @@ class ModelConfig:
     api_key_env: str
     max_tokens_field: str = 'max_completion_tokens'
     trust_env: bool = False
+    thinking: str | None = None
 
     @classmethod
     def load(cls, path):
@@ -23,7 +24,11 @@ class ModelConfig:
             raise ValueError('Model config requires nonempty strings: ' + ', '.join(fields))
         config = cls(**{k: data[k] for k in fields},
                      max_tokens_field=data.get('max_tokens_field', 'max_completion_tokens'),
-                     trust_env=data.get('trust_env', False))
+                     trust_env=data.get('trust_env', False), thinking=data.get('thinking'))
+        if config.thinking not in {None, 'enabled', 'disabled'}:
+            raise ValueError('thinking must be enabled or disabled')
+        if config.thinking is not None and config.protocol != 'openai_chat_completions':
+            raise ValueError('thinking extension is supported only for Chat Completions')
         if config.max_tokens_field not in {'max_tokens', 'max_completion_tokens'}:
             raise ValueError('Unsupported max_tokens_field')
         if not isinstance(config.trust_env, bool):
@@ -50,6 +55,8 @@ class ModelConfig:
             headers['Authorization'] = 'Bearer ' + key
             body = dict(model=self.model, messages=[dict(role='user', content=prompt)])
             body[self.max_tokens_field] = max_output_tokens
+            if self.thinking is not None:
+                body['thinking'] = {'type': self.thinking}
         else:
             suffix = '/messages'
             headers.update({'x-api-key': key, 'anthropic-version': '2023-06-01'})

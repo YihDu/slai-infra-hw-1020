@@ -1,0 +1,61 @@
+{
+  "previous_plan": {
+    "domains": {
+      "block_M": [
+        64,
+        128
+      ],
+      "block_N": [
+        64,
+        128
+      ],
+      "block_K": [
+        32,
+        64
+      ],
+      "num_stages": [
+        1,
+        2,
+        3
+      ],
+      "threads": [
+        128
+      ]
+    },
+    "shared_memory_limit": 49152,
+    "weights": {
+      "traffic": 1.5,
+      "launches": 0.5,
+      "pipeline": 0.75,
+      "footprint": 1
+    },
+    "rationale": "Square 4096^3 fp16 GEMM with fp32 accumulation; all listed tile values divide M,N,K, so the full Cartesian product remains supported and the MIP constraint excludes over-budget tuples such as (128,128,64,3), whose estimate is 98304 bytes. The previous plan selected (128,128,32,1), which minimizes traffic but offers no pipeline depth; since no compile, SASS, or GB10 timing evidence is available, I keep the feasible domain and 49152-byte budget and only rebalance analytic weights: raise traffic slightly and add moderate pipeline weight to favor deeper blocking where the footprint constraint permits, while keeping footprint at 1 and launches modest for this large single-workload launch grid. This is a formulation-only revision justified by analytic structure, not by measured performance. CPU-shadow correctness and latency do not establish CUDA correctness or GB10 performance; no SASS timing is inferred and no GPU results are claimed."
+  },
+  "selection": {
+    "block_M": 128,
+    "block_N": 128,
+    "block_K": 64,
+    "num_stages": 1,
+    "threads": 128
+  },
+  "solver_status": "Optimal",
+  "cost": 33.87092138666667,
+  "cpu_shadow_passed": true,
+  "compilation": {
+    "status": "unavailable",
+    "tools": {
+      "tilelang": false,
+      "nvcc": null,
+      "nvdisasm": null
+    },
+    "reason": "sm_121a compile/export adapter not integrated"
+  },
+  "simulation": {
+    "status": "not_run",
+    "reason": "No compiled encoded SASS or actual resource metadata",
+    "source": "gb10_instruction_simulator",
+    "value": null,
+    "unit": "us"
+  },
+  "instruction": "Revise domains/weights only when justified. CPU timing is not GB10 timing; compilation is still blocked."
+}

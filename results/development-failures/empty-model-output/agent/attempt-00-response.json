@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "usage": {
+    "prompt_tokens": 609,
+    "completion_tokens": 4096,
+    "total_tokens": 4705,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 4096
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 609
+  },
+  "response_id": "27944152-3fa8-492a-8d3b-07c75d29c568"
+}

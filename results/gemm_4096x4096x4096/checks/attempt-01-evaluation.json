@@ -1,0 +1,33 @@
+{
+  "attempt": "attempt-01",
+  "kernel_sha256": "4d2296addc698d17747ee85e824646adbeac4dbbbe9d11d0fead51f5e2704ee4",
+  "config_sha256": "42b4311abfd3a06d0030bb0ff92a925cf687abf60df0d12f72592360b5e9a65b",
+  "configuration": {
+    "block_M": 128,
+    "block_N": 128,
+    "block_K": 64,
+    "num_stages": 1,
+    "threads": 128
+  },
+  "compilation": {
+    "status": "unavailable",
+    "tools": {
+      "tilelang": false,
+      "nvcc": null,
+      "nvdisasm": null
+    },
+    "reason": "sm_121a compile/export adapter not integrated"
+  },
+  "correctness": {
+    "status": "not_run",
+    "reason": "CPU shadow does not execute TileLang"
+  },
+  "simulation": {
+    "status": "not_run",
+    "reason": "No compiled encoded SASS or actual resource metadata",
+    "source": "gb10_instruction_simulator",
+    "value": null,
+    "unit": "us"
+  },
+  "cpu_shadow_passed": true
+}

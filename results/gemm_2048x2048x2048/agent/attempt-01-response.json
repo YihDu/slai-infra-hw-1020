@@ -1,0 +1,14 @@
+{
+  "text": "{\"domains\":{\"block_M\":[64,128],\"block_N\":[64,128],\"block_K\":[32,64],\"num_stages\":[1,2,3],\"threads\":[128]},\"shared_memory_limit\":49152,\"weights\":{\"traffic\":1.0,\"launches\":0.3,\"pipeline\":0.9,\"footprint\":1.1},\"rationale\":\"GEMM 2048x2048x2048 float16 with fp32 accumulation. All listed block_M (64,128), block_N (64,128), and block_K (32,64) divide M=N=K=2048, so the full allowed domain remains supported by the first kernel family. threads is fixed to 128 by the allowed set. shared_memory_limit=49152 keeps a conservative development bound while permitting large tiles with multiple stages; the analytic footprint cap constrains the MIP choice. Based on feedback, the prior optimal picked num_stages=1, indicating pipeline weight was too weak relative to footprint. I raise pipeline weight to 0.9 and footprint to 1.1 to discourage under-staged selections and better reflect shared-memory pressure, while lowering launches to 0.3 since 2048x2048 offers ample work and launch count is a minor analytic factor. Traffic remains the primary objective at 1.0. This is still purely analytic MIP-based selection: compilation is unavailable (sm_121a adapter not integrated), simulation was not run, and CPU-shadow correctness or latency does NOT establish CUDA correctness or GB10 performance. No timings are inferred without SASS, and no checked GPU results are claimed.\"}",
+  "usage": {
+    "prompt_tokens": 1107,
+    "completion_tokens": 343,
+    "total_tokens": 1450,
+    "prompt_tokens_details": {
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 595
+  },
+  "response_id": "0bd0201e-7c42-4044-91ad-5f57f6539fc7"
+}

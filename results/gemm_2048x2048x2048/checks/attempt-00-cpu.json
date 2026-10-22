@@ -1,0 +1,40 @@
+{
+  "scope": "CPU shadow only; not TileLang execution",
+  "passed": true,
+  "source_sha256": "8eea6dbab9bc161bd20d8d497764bc005248b554234374937efed339e057e785",
+  "config": {
+    "block_M": 128,
+    "block_N": 128,
+    "block_K": 32,
+    "num_stages": 1,
+    "threads": 128
+  },
+  "reference": "NumPy float64 full matmul, rounded to float16",
+  "input_dtype": "float16",
+  "accumulation_dtype": "float32",
+  "output_dtype": "float16",
+  "tolerance": {
+    "rtol": 0.02,
+    "atol": 0.002
+  },
+  "hardware": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+  "numpy_version": "2.2.6",
+  "cases": [
+    {
+      "pattern": "normal_seed_42",
+      "passed": true,
+      "max_abs_error": 0.0009765625,
+      "mismatches": 0,
+      "elapsed_ms": 225.80629214644432,
+      "timing_source": "CPU shadow wall clock; not GPU or GB10 simulator"
+    },
+    {
+      "pattern": "zero_rows_signed_columns",
+      "passed": true,
+      "max_abs_error": 0.0,
+      "mismatches": 0,
+      "elapsed_ms": 297.90691705420613,
+      "timing_source": "CPU shadow wall clock; not GPU or GB10 simulator"
+    }
+  ]
+}

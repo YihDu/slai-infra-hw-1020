@@ -1,0 +1,17 @@
+{
+  "attempts": [
+    {
+      "attempt": "attempt-00",
+      "stage": "model_or_schema",
+      "error_type": "JSONDecodeError"
+    },
+    {
+      "attempt": "attempt-01",
+      "stage": "model_or_schema",
+      "error_type": "JSONDecodeError"
+    }
+  ],
+  "performance_source": "none",
+  "unit": null,
+  "value": null
+}

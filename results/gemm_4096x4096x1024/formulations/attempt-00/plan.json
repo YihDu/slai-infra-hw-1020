@@ -1,0 +1,32 @@
+{
+  "domains": {
+    "block_M": [
+      64,
+      128
+    ],
+    "block_N": [
+      64,
+      128
+    ],
+    "block_K": [
+      32,
+      64
+    ],
+    "num_stages": [
+      1,
+      2,
+      3
+    ],
+    "threads": [
+      128
+    ]
+  },
+  "shared_memory_limit": 49152,
+  "weights": {
+    "traffic": 1.0,
+    "launches": 0.5,
+    "pipeline": 0.5,
+    "footprint": 1.0
+  },
+  "rationale": "Problem is 4096x4096x1024 float16 GEMM with float32 accumulation. All block_M/block_N in {64,128} and block_K in {32,64} divide M=4096, N=4096, K=1024, so the full domain is feasible; threads fixed at 128 per allowed values. Shared memory estimate 2*block_K*(block_M+block_N)*num_stages, max at block_K=64, block_M=block_N=128, stages=3 is 2*64*256*3=98304 bytes, exceeding the cap, so the 49152-byte limit meaningfully prunes high-stage large-tile tuples while admitting e.g. 128x128x32x3 (49152) and 128x64x64x2 (49152). Traffic weight captures operand reload reduction from larger tiles; footprint weight penalizes shared-memory pressure; launches weight mild since 4096-wide outputs already give small launch counts; pipeline weight mild to favor deeper K blocking without overfitting to unmeasured behavior. These are analytic objectives only; no GPU timings, SASS, or correctness results are asserted, and CPU-shadow correctness would not establish CUDA correctness or GB10 performance."
+}
